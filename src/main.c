@@ -2,4 +2,9 @@
 
 void app_main(void) {
     connect_to_wifi();
+    while (1)
+    {
+
+    }
+
 }
