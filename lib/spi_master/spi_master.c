@@ -3,7 +3,7 @@
 
 #include "esp_log.h"
 
-static const char TAG[] = "main";
+static const char TAG[] = "spi_master.c";
 
 esp_err_t test_spi()
 {
@@ -21,46 +21,57 @@ esp_err_t test_spi()
     ESP_ERROR_CHECK(ret);
 
     spi_transaction_t trans = {
-        .addr = 0x02 | MSB_ADDR_MASK,
+        .addr = 0x02 | MSB_READ_ADDR_MASK,
+        .length = 24,
         .rxlength = 16,
         .flags = SPI_TRANS_USE_RXDATA,
     };
+
+    if (trans.addr == 0x82)
+        ESP_LOGI(TAG, "read adress OK");
 
     esp_err_t err = spi_device_polling_transmit( meter_handle, &trans);
 
     if (err == ESP_OK)
     {
-        if (trans.rx_data[0] == 0x0C)
-            ESP_LOGI(TAG, "Read data is OK (=12):%d", trans.rx_data[0]);
+        if (trans.rx_data[1] == 0x0C)
+            ESP_LOGI(TAG, "Read data is OK (=12): %d", trans.rx_data[1]);
         else
         {
             ESP_LOGI(TAG, "Status read 0: %d", trans.rx_data[0]);
             ESP_LOGI(TAG, "Status read 1: %d", trans.rx_data[1]);
+            ESP_LOGI(TAG, "Status read 2: %d", trans.rx_data[2]);
+            ESP_LOGI(TAG, "Status read 3: %d", trans.rx_data[3]);
         }
     }
     else
     {
-        ESP_LOGI(TAG, "error: %s", esp_err_to_name(err));
+        ESP_LOGI(TAG, "error in read polling_transmit: %s", esp_err_to_name(err));
         return err;
     }
 
-    //write value
-    trans.rxlength = 0;
-    trans.length = 16;
-    trans.tx_data[0] = 0x20;
-    trans.flags = SPI_TRANS_USE_TXDATA;
 
-    err = spi_device_polling_transmit( meter_handle, &trans);
+    //write value
+    spi_transaction_t trans2 = {
+        .addr = 0x02,
+        .length = 16,
+        .tx_data[0] = 0x00,
+        .tx_data[1] = 0x20,
+        .flags = SPI_TRANS_USE_TXDATA,
+    };
+
+    err = spi_device_polling_transmit( meter_handle, &trans2);
 
     if (err == ESP_OK)
-        ESP_LOGI(TAG, "Write is OK (=32): %d", trans.rx_data[0]);
+        ESP_LOGI(TAG, "Write is OK (=32): %d", trans2.tx_data[1]);
     else
     {
-        ESP_LOGI(TAG, "error: %s", esp_err_to_name(err));
+        ESP_LOGI(TAG, "error in write polling_transmit: %s", esp_err_to_name(err));
         return err;
     }
 
     //Read value 32
+    trans.addr = 0x02 | MSB_READ_ADDR_MASK,
     trans.rxlength = 16;
     trans.flags = SPI_TRANS_USE_RXDATA;
 
@@ -68,8 +79,8 @@ esp_err_t test_spi()
 
     if (err == ESP_OK)
     {
-        if (trans.rx_data[0] == 0x20)
-            ESP_LOGI(TAG, "Read data is OK (=32):%d", trans.rx_data[0]);
+        if (trans.rx_data[1] == 0x20)
+            ESP_LOGI(TAG, "Read data is OK (=32): %d", trans.rx_data[1]);
         else
         {
             ESP_LOGI(TAG, "Status read 0: %d", trans.rx_data[0]);
@@ -78,7 +89,7 @@ esp_err_t test_spi()
     }
     else
     {
-        ESP_LOGI(TAG, "error: %s", esp_err_to_name(err));
+        ESP_LOGI(TAG, "error in read polling_transmit: %s", esp_err_to_name(err));
         return err;
     }
 

@@ -13,18 +13,10 @@
 #define GPIO_HEATER    18
 #define GPIO_RESET_ADC 40
 #define GPIO_PIN_SEL   ((1ULL<<GPIO_HEATER) | (1ULL<<GPIO_RESET_ADC))
-/*
- * Let's say, GPIO_OUTPUT_IO_0=18, GPIO_OUTPUT_IO_1=19
- * In binary representation,
- * 1ULL<<GPIO_OUTPUT_IO_0 is equal to 0000000000000000000001000000000000000000 and
- * 1ULL<<GPIO_OUTPUT_IO_1 is equal to 0000000000000000000010000000000000000000
- * GPIO_OUTPUT_PIN_SEL                0000000000000000000011000000000000000000
- * */
-
 
 void app_main(void)
 {
-//    connect_to_wifi();
+    connect_to_wifi();
 
     //zero-initialize the config structure.
     gpio_config_t io_conf = {};
@@ -41,14 +33,15 @@ void app_main(void)
     //configure GPIO with the given settings
     gpio_config(&io_conf);
 
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+
+    gpio_set_level(GPIO_RESET_ADC, 0);
+    vTaskDelay(10 / portTICK_PERIOD_MS);
     gpio_set_level(GPIO_RESET_ADC, 1);
-    vTaskDelay(10000 / portTICK_PERIOD_MS);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
     test_spi();
 
-    int cnt = 0;
     while (1) {
-        printf("cnt: %d\n", cnt++);
-        vTaskDelay(10000 / portTICK_PERIOD_MS);
-        gpio_set_level(GPIO_HEATER, cnt % 2);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
