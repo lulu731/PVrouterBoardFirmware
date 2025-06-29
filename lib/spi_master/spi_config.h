@@ -28,7 +28,7 @@ spi_bus_config_t buscfg = {
         .mode = 3,                              //SPI mode 3
         .spics_io_num = PIN_NUM_CS,             //CS pin
         .queue_size = 1,                        //number transactions to be queued at a time
-        .clock_speed_hz = 8000 / 4 * 1000
+        .clock_speed_hz = 160 * 1000
     };
 
 #endif // SPI_CONFIG_H
