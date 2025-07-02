@@ -1,6 +1,7 @@
 #include <unity.h>
 
 #include "spi_functions.h"
+#include "spi_param.h"
 
 void setUp(void)
 {
@@ -14,13 +15,13 @@ void tearDown(void)
 
 void test_tx_data()
 {
-    uint16_t data = 0x5678;
+    spi_param data = CAL_NEEDED;
     uint8_t tx_data[4];
-    uint8_t d[2] = {0x56, 0x78};
+    uint8_t expected_data[2] = {0x56, 0x78};
 
     set_txdata_with(tx_data, data);
 
-    TEST_ASSERT_EQUAL_UINT8_ARRAY(d, tx_data, 2);
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(expected_data, tx_data, 2);
 }
 
 int main(int argc, char** argv)
