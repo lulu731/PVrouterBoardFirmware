@@ -39,6 +39,67 @@ esp_err_t write_data(const adc_address adress, const uint16_t data)
 }
 
 
+void write_PL_constant()
+{}
+
+
+void write_MMODE()
+{}
+
+
+void exec_calibrationL(){}
+void exec_gain_calibrationL(){}
+void exec_angle_calibrationL(){}
+void write_PStartTh(){}
+void write_PNolTh(){}
+void write_QStartTh(){}
+void write_QNolTh(){}
+void write_Ugain(){}
+void write_IgainL(){}
+void write_IoffsetL(){}
+void write_Uoffset(){}
+
+//N line
+void exec_calibrationN(){}
+void exec_gain_calibrationN(){}
+void exec_angle_calibrationN(){}
+void write_IgainN(){}
+void write_IoffsetN(){}
+
+void exec_calibration(void)
+{
+    write_data(CAL_START, CAL_NEEDED); //start calibration
+
+    ///update CS1 register
+    adc_param cs_data;
+    read_data(CS1, &cs_data);
+    write_data(CS1, cs_data);
+
+    write_PL_constant();
+    write_MMODE();
+
+    exec_calibrationL();
+    exec_gain_calibrationL();
+    exec_angle_calibrationL();
+    write_PStartTh();
+    write_PNolTh();
+    write_QStartTh();
+    write_QNolTh();
+    write_Ugain();
+    write_IgainL();
+    write_IoffsetL();
+    write_Uoffset();
+
+    //N line
+    exec_calibrationN();
+    exec_gain_calibrationN();
+    exec_angle_calibrationN();
+    write_IgainN();
+    write_IoffsetN();
+
+    write_data(CAL_START, CAL_END); //end calibration
+}
+
 esp_err_t test_spi()
 {
     esp_err_t ret;
@@ -53,54 +114,8 @@ esp_err_t test_spi()
     ret = spi_bus_add_device( EMETER_HOST, &devcfg, &meter_handle);
     ESP_ERROR_CHECK(ret);
 
-    uint16_t data;
-    esp_err_t err = read_data(0x02, &data);
 
-    if (err == ESP_OK)
-    {
-        if (data == 0x000C)
-            ESP_LOGI(TAG, "Read data is OK (=12): %d", data);
-        else
-        {
-            ESP_LOGI(TAG, "Status read data (should be 12): %d", data);
-        }
-    }
-    else
-    {
-        ESP_LOGI(TAG, "error in read polling_transmit: %s", esp_err_to_name(err));
-        return err;
-    }
+    exec_calibration();
 
-
-    //write value
-    err = write_data(0x02, 0x0020);
-
-    if (err == ESP_OK)
-        ESP_LOGI(TAG, "Write is OK (=32)");
-    else
-    {
-        ESP_LOGI(TAG, "error in write polling_transmit: %s", esp_err_to_name(err));
-        return err;
-    }
-
-    //Read value 32
-    uint16_t new_data;
-    err = read_data(0x02, &new_data);
-
-    if (err == ESP_OK)
-    {
-        if (new_data == 0x20)
-            ESP_LOGI(TAG, "Read data is OK (=32): %d", new_data);
-        else
-        {
-            ESP_LOGI(TAG, "Status new_data should be 32: %d", new_data);
-        }
-    }
-    else
-    {
-        ESP_LOGI(TAG, "error in read polling_transmit: %s", esp_err_to_name(err));
-        return err;
-    }
-
-    return err;
+    return ESP_FAIL;//todo: to be corrected
 }
