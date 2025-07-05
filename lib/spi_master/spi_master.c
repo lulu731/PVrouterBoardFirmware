@@ -1,7 +1,7 @@
 #include "spi_master.h"
 #include "spi_config.h"
 #include "spi_functions.h"
-#include "spi_adress.h"
+#include "adc_adress.h"
 
 #include "esp_log.h"
 
@@ -9,7 +9,7 @@ static const char TAG[] = "spi_master.c";
 
 spi_device_handle_t meter_handle;
 
-esp_err_t read_data(const addr adress, uint16_t* data)
+esp_err_t read_data(const adc_address adress, uint16_t* data)
 {
     spi_transaction_t trans = {
         .addr = adress | MSB_READ_ADDR_MASK,
@@ -26,7 +26,7 @@ esp_err_t read_data(const addr adress, uint16_t* data)
 }
 
 
-esp_err_t write_data(const addr adress, const uint16_t data)
+esp_err_t write_data(const adc_address adress, const uint16_t data)
 {
     spi_transaction_t trans = {
         .addr = adress,

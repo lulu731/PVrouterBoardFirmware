@@ -1,7 +1,7 @@
 #include <unity.h>
 
 #include "spi_functions.h"
-#include "spi_param.h"
+#include "adc_param.h"
 
 void setUp(void)
 {
@@ -15,7 +15,7 @@ void tearDown(void)
 
 void test_tx_data()
 {
-    spi_param data = CAL_NEEDED;
+    const adc_param data = CAL_NEEDED;
     uint8_t tx_data[4];
     uint8_t expected_data[2] = {0x56, 0x78};
 
