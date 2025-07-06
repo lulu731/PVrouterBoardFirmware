@@ -5,11 +5,8 @@
 
 void set_txdata_with(uint8_t tx_data[4], const adc_param data)
 {
-    uint8_t* pdata = (uint8_t*)(&data);
-
-    tx_data[1] = *pdata;
-    pdata++;
-    tx_data[0] = *pdata;
+    tx_data[1] = (uint8_t)data;
+    tx_data[0] = (uint8_t)(data>>8);
 }
 
 
