@@ -35,12 +35,28 @@ void test_conv_uint32_to_uint8_array()
     TEST_ASSERT_EQUAL_UINT16_ARRAY(expected_array, split_array, 2);
 }
 
+void test_get_mmode_value()
+{
+    uint8_t Lgain = 0b100;
+    uint8_t Ngain = 0;
+    uint8_t LNsel = 0;
+    uint8_t DisHPF = 0;
+    uint8_t Amod = 0;
+    uint8_t Rmod = 0;
+    uint8_t Zxcon = 0b10;
+    uint8_t Pthresh = 0b10;
+    uint16_t result = get_mmode_value(Lgain, Ngain, LNsel, DisHPF, Amod, Rmod, Zxcon, Pthresh);
+
+    TEST_ASSERT(result == 0b1000000000100010);
+}
+
 int main(int argc, char** argv)
 {
     UNITY_BEGIN();
 
     RUN_TEST(test_tx_data);
     RUN_TEST(test_conv_uint32_to_uint8_array);
+    RUN_TEST(test_get_mmode_value);
 
     UNITY_END();
 }
