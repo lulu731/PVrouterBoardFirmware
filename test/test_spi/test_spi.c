@@ -50,6 +50,16 @@ void test_get_mmode_value()
     TEST_ASSERT(result == 0b1000000000100010);
 }
 
+void test_average_value()
+{
+    const uint8_t count = 5;
+    const uint16_t data_array[] = {0xFFC4, 0xFFCA, 0xFFCA, 0xFFDC, 0xFFC5};
+
+    uint16_t average_data = get_average_value(data_array, 5);
+
+    TEST_ASSERT_EQUAL(0xFFCB, average_data);
+}
+
 int main(int argc, char** argv)
 {
     UNITY_BEGIN();
@@ -57,6 +67,7 @@ int main(int argc, char** argv)
     RUN_TEST(test_tx_data);
     RUN_TEST(test_conv_uint32_to_uint8_array);
     RUN_TEST(test_get_mmode_value);
+    RUN_TEST(test_average_value);
 
     UNITY_END();
 }
