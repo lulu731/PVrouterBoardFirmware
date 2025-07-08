@@ -25,3 +25,14 @@ uint16_t get_mmode_value(uint8_t Lgain, uint8_t Ngain, uint8_t LNsel,
                       | DisHPF<<8 | Amod<<7 | Rmod<<6
                       | Zxcon<<4 | Pthresh);
 }
+
+uint16_t get_average_value( const uint16_t data_array[], const uint8_t array_size)
+{
+    uint32_t data = 0;
+
+    for (uint8_t i = 0; i < array_size; i++)
+    {
+        data += data_array[i];
+    }
+    return data / array_size;
+}

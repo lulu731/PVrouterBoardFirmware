@@ -10,5 +10,6 @@ void     split_uint32_to_uint8_array(const uint32_t data, uint16_t receiver[2]);
 uint16_t get_mmode_value(uint8_t Lgain, uint8_t Ngain, uint8_t LNsel,
                          uint8_t DisHPF, uint8_t Amod, uint8_t Rmod,
                          uint8_t Zxcon, uint8_t Pthresh);
+uint16_t get_average_value( const uint16_t data_array[], const uint8_t array_size);
 
 #endif // SPI_FUNCTIONS_H
