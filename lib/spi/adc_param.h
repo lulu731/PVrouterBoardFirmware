@@ -1,5 +1,5 @@
-#ifndef SPI_PARAM_H
-#define SPI_PARAM_H
+#ifndef ADC_PARAM_H
+#define ADC_PARAM_H
 
 #include <stdint.h>
 
@@ -10,4 +10,4 @@ extern const adc_param CAL_END;
 extern const adc_param SMALL_P_MOD_ENTER;
 extern const adc_param SMALL_P_MOD_EXIT;
 
-#endif // SPI_PARAM_H
+#endif // ADC_PARAM_H
