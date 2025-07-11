@@ -60,6 +60,17 @@ void test_average_value()
     TEST_ASSERT_EQUAL(0xFFCB, average_data);
 }
 
+void test_threshold()
+{
+    Gl = 24;
+    Vl = 1;
+    Vu = 250;
+    const uint8_t Ks = 4; // 0/00 = 0.4%
+    const uint16_t Thr = get_threshold(Ks) ;
+
+    TEST_ASSERT_EQUAL_UINT16 (0x08BD, Thr);
+}
+
 int main(int argc, char** argv)
 {
     UNITY_BEGIN();
@@ -68,6 +79,7 @@ int main(int argc, char** argv)
     RUN_TEST(test_conv_uint32_to_uint8_array);
     RUN_TEST(test_get_mmode_value);
     RUN_TEST(test_average_value);
+    RUN_TEST(test_threshold);
 
     UNITY_END();
 }
