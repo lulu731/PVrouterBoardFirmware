@@ -1,7 +1,13 @@
 #include "spi_functions.h"
 #include "adc_param.h"
+#include "adc_adress.h"
 
 #include <stdint.h>
+#include <math.h>
+
+uint8_t Gl;
+uint8_t Vl;
+uint8_t Vu;
 
 void set_txdata_with(uint8_t tx_data[4], const adc_param data)
 {
@@ -35,4 +41,9 @@ uint16_t get_average_value( const uint16_t data_array[], const uint8_t array_siz
         data += data_array[i];
     }
     return data / array_size;
+}
+
+uint16_t get_threshold(const uint8_t K)
+{
+    return roundf(93.2067556 * (float)(Gl * Vl *Vu * K/1000));
 }
