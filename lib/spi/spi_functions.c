@@ -5,9 +5,9 @@
 #include <stdint.h>
 #include <math.h>
 
-uint8_t Gl;
-uint8_t Vl;
-uint8_t Vu;
+uint16_t Gl;
+uint16_t Vl;
+uint16_t Vu;
 
 void set_txdata_with(uint8_t tx_data[4], const adc_param data)
 {

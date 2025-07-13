@@ -1,11 +1,11 @@
 key,type,encoding,value
 namespace_name,meter_config,,
-Mc,data,u8,1000
-Un,data,u8,230
-Ib,data,u8,10
-Gl,data,u8,1
-Vl,data,u8,167
-Vu,data,u8,529
+Mc,data,u16,1000
+Un,data,u16,230
+Ib,data,u16,10
+Gl,data,u16,1
+Vl,data,u16,167
+Vu,data,u16,529
 Lgain,data,u8,0b100
 Ngain,data,u8,0
 LNsel,data,u8,0

@@ -6,9 +6,9 @@
 
 #include <stdint.h>
 
-extern uint8_t Gl;
-extern uint8_t Vl;
-extern uint8_t Vu;
+extern uint16_t Gl;
+extern uint16_t Vl;
+extern uint16_t Vu;
 
 void     set_txdata_with(uint8_t tx_data[4], const adc_param data);
 void     split_uint32_to_uint8_array(const uint32_t data, uint16_t receiver[2]);
