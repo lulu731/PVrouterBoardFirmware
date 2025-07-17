@@ -53,6 +53,16 @@ void test_PL_constant()
     TEST_ASSERT_EQUAL_UINT32(0x01eba5e4,(uint32_t)(pl_float));
 }
 
+void test_offset()
+{
+    float current = (uint16_t)0x2710 / 1000;
+    uint16_t gain = 0x5AA7;
+    uint16_t expected_offset = 906;
+    uint16_t actual_offset =  current * ((float)gain / (1 << 16) * (1<<8));
+
+    TEST_ASSERT_EQUAL_UINT16(expected_offset, actual_offset);
+}
+
 int main(int argc, char** argv)
 {
     UNITY_BEGIN();
@@ -61,6 +71,7 @@ int main(int argc, char** argv)
     RUN_TEST(test_complement_value);
     RUN_TEST(test_U_conversion);
     RUN_TEST(test_PL_constant);
+    RUN_TEST(test_offset);
 
     UNITY_END();
 }
