@@ -47,3 +47,9 @@ uint16_t get_threshold(const uint8_t K)
 {
     return roundf(93.2067556 * (float)(Gl * Vl *Vu * K/1000));
 }
+
+uint16_t get_offset_from_measured(const uint16_t measured_value, const uint16_t gain)
+{
+    float value = measured_value / 1000;
+    return value * ((float)gain / (1 << 16) * (1<<8));
+}

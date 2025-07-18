@@ -71,6 +71,16 @@ void test_threshold()
     TEST_ASSERT_EQUAL_UINT16 (0x08BD, Thr);
 }
 
+void test_offset()
+{
+    uint16_t measured_value = 0x2710;
+    uint16_t gain = 0x5AA7;
+    uint16_t expected_offset = 906;
+    uint16_t actual_offset =  get_offset_from_measured(measured_value, gain);
+
+    TEST_ASSERT_EQUAL_UINT16(expected_offset, actual_offset);
+}
+
 int main(int argc, char** argv)
 {
     UNITY_BEGIN();
@@ -80,6 +90,7 @@ int main(int argc, char** argv)
     RUN_TEST(test_get_mmode_value);
     RUN_TEST(test_average_value);
     RUN_TEST(test_threshold);
+    RUN_TEST(test_offset);
 
     UNITY_END();
 }
