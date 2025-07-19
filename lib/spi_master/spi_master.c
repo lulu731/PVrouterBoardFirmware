@@ -133,7 +133,7 @@ void write_phi_N() // 26H
 
 uint8_t K = 1;
 
-void load_param()
+void load_param() //todo: get from config file
 {
     Gl =  1;
     Vl =  167;
@@ -214,14 +214,27 @@ void exec_metering_calibration()
 /* Measure calibration */
 /***********************/
 
-void write_gain( const float expected_value, const adc_address meas_value_address,
+/**
+ * @brief write calculated gain based on measured and expected values to gain address
+ *
+ * @param expected_value expected value of measured value
+ * @param measured_value_address address of measured value
+ * @param gain_address address of gain value
+ */
+void write_gain( const float expected_value, const adc_address measured_value_address,
                  const adc_address gain_address)
 {
     uint16_t measured_value;
-    read_data(meas_value_address, &measured_value);
+    read_data(measured_value_address, &measured_value);
     uint16_t old_gain;
     read_data(gain_address, &old_gain);
-    const float float_measured_value = measured_value / 100;
+
+    float divider = 1000;
+    if (measured_value_address == U_RMS)
+        divider = 100;
+
+    const float float_measured_value = measured_value / divider;
+
     write_data(gain_address, old_gain * expected_value / float_measured_value);
 }
 
@@ -243,19 +256,32 @@ void write_IgainN() // 33H
     write_gain( Ib, I_RMS_2, I_GAIN_N);
 }
 
+uint16_t get_offset(const adc_address address, const uint16_t gain)
+{
+    uint16_t data;
+    read_data(address, &data);
+    return get_offset_from_measured(data, gain);
+}
+
 void write_Uoffset() // 34H
 {
-    write_average_to_address(U_RMS, U_OFFSET);
+    uint16_t Ugain = 1; //todo: from nvs or former calculated Igain
+    uint16_t offset = get_offset( U_RMS, Ugain);
+    write_data(U_OFFSET, ~offset+1);
 }
 
 void write_IoffsetL() // 35H
 {
-    write_average_to_address(I_RMS, I_OFFSET_L);
+    uint16_t Igain = 1; //todo: from nvs or former calculated Igain
+    uint16_t offset = get_offset( I_RMS, Igain);
+    write_data(I_OFFSET_L, ~offset+1);
 }
 
 void write_IoffsetN() // 36H
 {
-    write_average_to_address(I_RMS_2, I_OFFSET_N);
+    uint16_t Igain = 1; //todo: from nvs or former calculated Igain
+    uint16_t offset = get_offset( I_RMS_2, Igain);
+    write_data(I_OFFSET_N, ~offset+1);
 }
 
 void write_PQoffsetL() // 37H 38H
@@ -271,27 +297,31 @@ void write_PQoffsetN()
 }
 
 
+void exec_gain_calibration()
+{
+    write_Ugain(); //todo: needs measure at 230V
+    write_IgainL(); //todo: needs measure at Ib
+    write_IgainN(); //todo: needs measure at Ib
+}
+
+void exec_offset_calibration()
+{
+    write_Uoffset(); //todo: needs measure no current
+    write_IoffsetL(); //todo: needs measure no current
+    write_IoffsetN(); //todo: needs measure no current
+
+    write_data(SMALL_P_MOD, 0xA987);
+    write_PQoffsetL(); //todo: needs measure no current
+    write_PQoffsetN(); //todo: needs measure no current
+    write_data(SMALL_P_MOD, 0xA980);}
+
 void exec_measurement_calibration()
 {
     write_data(ADJ_START, CAL_NEEDED); //start calibration
 
-    //V line
-    write_Ugain();
-    write_Uoffset();
+    exec_gain_calibration();
 
-    //L line
-    write_IgainL();
-    write_IoffsetL();
-
-    //if PoffsetL does not exist in NVS
-    write_data(SMALL_P_MOD, 0xA987);
-    write_PQoffsetL();
-    write_PQoffsetN();
-    write_data(SMALL_P_MOD, 0xA980);
-
-    //N line
-    write_IgainN();
-    write_IoffsetN();
+    exec_offset_calibration();
 
     ///update CS1 register
     adc_param cs_data;
@@ -313,7 +343,7 @@ void exec_calibration(void)
     exec_measurement_calibration();
 }
 
-esp_err_t test_spi()
+esp_err_t calibrate_adc()
 {
     esp_err_t ret;
 

@@ -39,7 +39,7 @@ void app_main(void)
     vTaskDelay(10 / portTICK_PERIOD_MS);
     gpio_set_level(GPIO_RESET_ADC, 1);
     vTaskDelay(1000 / portTICK_PERIOD_MS);
-    test_spi();
+    calibrate_adc();
 
     while (1) {
         vTaskDelay(1000 / portTICK_PERIOD_MS);
