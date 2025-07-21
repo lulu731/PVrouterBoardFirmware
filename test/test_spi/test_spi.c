@@ -37,14 +37,14 @@ void test_conv_uint32_to_uint8_array()
 
 void test_get_mmode_value()
 {
-    uint8_t Lgain = 0b100;
-    uint8_t Ngain = 0;
-    uint8_t LNsel = 0;
-    uint8_t DisHPF = 0;
-    uint8_t Amod = 0;
-    uint8_t Rmod = 0;
-    uint8_t Zxcon = 0b10;
-    uint8_t Pthresh = 0b10;
+    uint16_t Lgain = 0b100;
+    uint16_t Ngain = 0;
+    uint16_t LNsel = 0;
+    uint16_t DisHPF = 0;
+    uint16_t Amod = 0;
+    uint16_t Rmod = 0;
+    uint16_t Zxcon = 0b10;
+    uint16_t Pthresh = 0b10;
     uint16_t result = get_mmode_value(Lgain, Ngain, LNsel, DisHPF, Amod, Rmod, Zxcon, Pthresh);
 
     TEST_ASSERT(result == 0b1000000000100010);

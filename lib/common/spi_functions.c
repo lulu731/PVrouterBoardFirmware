@@ -23,9 +23,9 @@ void split_uint32_to_uint8_array(const uint32_t data, uint16_t receiver[2])
 }
 
 
-uint16_t get_mmode_value(uint8_t Lgain, uint8_t Ngain, uint8_t LNsel,
-                         uint8_t DisHPF, uint8_t Amod, uint8_t Rmod,
-                         uint8_t Zxcon, uint8_t Pthresh)
+uint16_t get_mmode_value(uint16_t Lgain, uint16_t Ngain, uint16_t LNsel,
+                         uint16_t DisHPF, uint16_t Amod, uint16_t Rmod,
+                         uint16_t Zxcon, uint16_t Pthresh)
 {
     return (uint16_t)(Lgain<<13 | Ngain<<11 | LNsel<<10
                       | DisHPF<<8 | Amod<<7 | Rmod<<6
