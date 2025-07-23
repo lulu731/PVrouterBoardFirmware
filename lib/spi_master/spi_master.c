@@ -3,8 +3,6 @@
 #include "spi_functions.h"
 #include "adc_adress.h"
 
-#include "calibration_params.h"
-
 #include "esp_log.h"
 
 static const char TAG[] = "spi_master.c";
@@ -132,15 +130,7 @@ void write_phi_N() // 26H
     write_data(N_PHI, Nphi);
 }
 
-
 uint8_t K = 1;
-
-void load_param() //todo: get from config file
-{
-    Gl =  1;
-    Vl =  167;
-    Vu =  529;
-}
 
 void write_PStartTh() // 27H
 {

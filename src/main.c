@@ -2,7 +2,6 @@
 #include "spi_master.h"
 #include "spi_functions.h"
 #include "nvs_params.h"
-#include "calibration_params.h"
 
 #include <stdio.h>
 #include <string.h>

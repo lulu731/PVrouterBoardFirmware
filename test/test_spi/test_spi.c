@@ -1,6 +1,5 @@
 #include <unity.h>
 
-#include "calibration_params.h"
 #include "spi_functions.h"
 #include "adc_param.h"
 
@@ -60,6 +59,8 @@ void test_average_value()
 
     TEST_ASSERT_EQUAL(0xFFCB, average_data);
 }
+
+extern uint16_t Gl, Vl, Vu;
 
 void test_threshold()
 {

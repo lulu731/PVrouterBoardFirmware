@@ -1,7 +1,6 @@
 #include "spi_functions.h"
 #include "adc_param.h"
 #include "adc_adress.h"
-#include "calibration_params.h"
 
 #include <stdint.h>
 #include <math.h>
@@ -39,6 +38,8 @@ uint16_t get_average_value( const uint16_t data_array[], const uint8_t array_siz
     }
     return data / array_size;
 }
+
+extern uint16_t Gl, Vl, Vu;
 
 uint16_t get_threshold(const uint8_t K)
 {

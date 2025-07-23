@@ -1,12 +1,6 @@
 #include "nvs_params.h"
 #include "nvs_functions.h"
-#include "calibration_params.h"
 
-//#include <stdio.h>
-//#include <inttypes.h>
-//#include "freertos/FreeRTOS.h"
-//#include "freertos/task.h"
-//#include "esp_system.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
 #include "nvs.h"
@@ -14,6 +8,9 @@
 static const char *TAG = "nvs_params";
 
 static const char* namespace = "meter_config";
+
+extern const char* string_keys_array[];
+extern uint16_t* keys_array[];
 
 void load_nvs_params(void)
 {

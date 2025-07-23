@@ -1,5 +1,3 @@
-#include "calibration_params.h"
-
 #include <stdint.h>
 
 uint16_t Mc, Un, Ib, Gl, Vl, Vu,
