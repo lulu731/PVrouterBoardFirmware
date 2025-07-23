@@ -1,6 +1,7 @@
 #include <unity.h>
 
 #include "nvs_functions.h"
+#include "calibration_params.h"
 
 #include <string.h>
 
@@ -58,6 +59,9 @@ void test_load_param_key_not_found(void) {
     TEST_ASSERT_EQUAL_UINT16(0, test3);
 }
 
+void test_keys_count_in_array(void) {
+    TEST_ASSERT_EQUAL_INT(14, keys_count);
+}
 
 int main(int argc, char** argv)
 {
@@ -65,6 +69,7 @@ int main(int argc, char** argv)
 
     RUN_TEST(test_load);
     RUN_TEST(test_load_param_key_not_found);
+    RUN_TEST(test_keys_count_in_array);
 
     UNITY_END();
 }

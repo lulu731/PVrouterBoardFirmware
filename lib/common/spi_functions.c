@@ -1,13 +1,10 @@
 #include "spi_functions.h"
 #include "adc_param.h"
 #include "adc_adress.h"
+#include "calibration_params.h"
 
 #include <stdint.h>
 #include <math.h>
-
-uint16_t Gl;
-uint16_t Vl;
-uint16_t Vu;
 
 void set_txdata_with(uint8_t tx_data[4], const adc_param data)
 {

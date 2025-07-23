@@ -3,6 +3,8 @@
 #include "spi_functions.h"
 #include "adc_adress.h"
 
+#include "calibration_params.h"
+
 #include "esp_log.h"
 
 static const char TAG[] = "spi_master.c";

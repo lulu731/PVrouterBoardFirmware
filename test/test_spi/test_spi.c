@@ -1,5 +1,6 @@
 #include <unity.h>
 
+#include "calibration_params.h"
 #include "spi_functions.h"
 #include "adc_param.h"
 
@@ -65,6 +66,7 @@ void test_threshold()
     Gl = 24;
     Vl = 1;
     Vu = 250;
+
     const uint8_t Ks = 4; // 0/00 = 0.4%
     const uint16_t Thr = get_threshold(Ks) ;
 

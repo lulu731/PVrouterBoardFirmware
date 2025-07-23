@@ -6,12 +6,13 @@
 
 #include <stdint.h>
 
-extern uint16_t Gl;
+/*extern uint16_t Gl;
 extern uint16_t Vl;
-extern uint16_t Vu;
+extern uint16_t Vu;*/
 
 void     set_txdata_with(uint8_t tx_data[4], const adc_param data);
 void     split_uint32_to_uint8_array(const uint32_t data, uint16_t receiver[2]);
+
 uint16_t get_mmode_value(uint16_t Lgain, uint16_t Ngain, uint16_t LNsel,
                          uint16_t DisHPF, uint16_t Amod, uint16_t Rmod,
                          uint16_t Zxcon, uint16_t Pthresh);

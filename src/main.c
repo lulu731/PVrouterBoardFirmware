@@ -1,5 +1,8 @@
 #include "wifi_connect.h"
 #include "spi_master.h"
+#include "spi_functions.h"
+#include "nvs_params.h"
+#include "calibration_params.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -16,6 +19,8 @@
 
 void app_main(void)
 {
+    load_nvs_params();
+
     connect_to_wifi();
 
     //zero-initialize the config structure.
