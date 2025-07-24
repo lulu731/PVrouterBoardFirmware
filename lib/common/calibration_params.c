@@ -1,18 +1,21 @@
 #include <stdint.h>
 
 uint16_t Mc, Un, Ib, Gl, Vl, Vu,
-                //mmode register params
-                Lgain, Ngain, LNsel, DisHPF, Amod,
-                Rmod, Zxcon, Pthresh;
+         Ugain, IgainL, IgainN,
+         //mmode register params
+         Lgain, Ngain, LNsel, DisHPF, Amod,
+         Rmod, Zxcon, Pthresh;
 
 const char* string_keys_array[] = {
     "Mc", "Un", "Ib", "Gl", "Vl", "Vu",
+    "Ugain", "IgainL", "IgainN",
     "Lgain", "Ngain", "LNsel", "DisHPF", "Amod",
     "Rmod", "Zxcon", "Pthresh"
 };
 
 uint16_t* keys_array[] = {
     &Mc, &Un, &Ib, &Gl, &Vl, &Vu,
+    &Ugain, &IgainL, &IgainN,
     &Lgain, &Ngain, &LNsel, &DisHPF, &Amod,
     &Rmod, &Zxcon, &Pthresh
 };

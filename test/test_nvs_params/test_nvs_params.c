@@ -61,7 +61,7 @@ void test_load_param_key_not_found(void) {
 extern const int keys_count;
 
 void test_keys_count_in_array(void) {
-    TEST_ASSERT_EQUAL_INT(14, keys_count);
+    TEST_ASSERT_EQUAL_INT(17, keys_count);
 }
 
 int main(int argc, char** argv)

@@ -213,21 +213,19 @@ void write_gain( const float expected_value, const adc_address measured_value_ad
     write_data(gain_address, old_gain * expected_value / float_measured_value);
 }
 
+extern uint16_t Un, Ib;
 void write_Ugain() // 31H
 {
-    const float Un = 230.00;
     write_gain( Un, U_RMS, U_GAIN);
 }
 
 void write_IgainL() // 32H
 {
-    const float Ib = 10.00;
     write_gain( Ib, I_RMS, I_GAIN_L);
 }
 
 void write_IgainN() // 33H
 {
-    const float Ib = 10.00;
     write_gain( Ib, I_RMS_2, I_GAIN_N);
 }
 
@@ -238,24 +236,22 @@ uint16_t get_offset(const adc_address address, const uint16_t gain)
     return get_offset_from_measured(data, gain);
 }
 
+extern uint16_t Ugain, IgainL, IgainN; //todo: from nvs/calculated during calibration
 void write_Uoffset() // 34H
 {
-    uint16_t Ugain = 1; //todo: from nvs or former calculated Igain
     uint16_t offset = get_offset( U_RMS, Ugain);
     write_data(U_OFFSET, ~offset+1);
 }
 
 void write_IoffsetL() // 35H
 {
-    uint16_t Igain = 1; //todo: from nvs or former calculated Igain
-    uint16_t offset = get_offset( I_RMS, Igain);
+    uint16_t offset = get_offset( I_RMS, IgainL);
     write_data(I_OFFSET_L, ~offset+1);
 }
 
 void write_IoffsetN() // 36H
 {
-    uint16_t Igain = 1; //todo: from nvs or former calculated Igain
-    uint16_t offset = get_offset( I_RMS_2, Igain);
+    uint16_t offset = get_offset( I_RMS_2, IgainN);
     write_data(I_OFFSET_N, ~offset+1);
 }
 
@@ -332,8 +328,7 @@ esp_err_t calibrate_adc()
     ret = spi_bus_add_device( EMETER_HOST, &devcfg, &meter_handle);
     ESP_ERROR_CHECK(ret);
 
-
     exec_calibration();
 
-    return ret;//todo: to be corrected
+    return ret;//todo: return error?
 }
