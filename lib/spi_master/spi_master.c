@@ -76,20 +76,14 @@ void write_average_to_address(const adc_address source_address,
 }
 
 
-
 /************************/
 /* Metering calibration */
 /************************/
 
+extern uint16_t Mc, Un, Ib, Gl, Vl, Vu;
+
 void write_PL_constant() //21 - 22H
 {
-    const uint16_t Mc = 1000; //todo: get from nvs
-    const uint16_t Un = 230;
-    const uint16_t Ib = 10;
-    const uint16_t Gl = 1;
-    const uint16_t Vl = 167;
-    const uint16_t Vu = 529;
-
     const float pl_float = 838860800 * (float)(Gl * Vl *Vu) / (float)(Mc * Un * Ib);
     uint32_t pl_const = pl_float;
 
@@ -106,28 +100,25 @@ void write_PL_constant() //21 - 22H
     write_data(PL_CONST_L, data[1]);
 }
 
+/// set calibration gains and angles to 0
 void write_gain_L() // 23H
 {
-    const uint16_t Lgain = 0; //todo: get fm nvs
-    write_data(L_GAIN, Lgain);
+    write_data(L_GAIN, 0);
 }
 
 void write_phi_L() // 24H
 {
-    const uint16_t Lphi = 0;
-    write_data(L_PHI, Lphi);
+    write_data(L_PHI, 0);
 }
 
 void write_gain_N() // 25H
 {
-    const uint16_t Ngain = 0; //todo: get fm nvs
-    write_data(N_GAIN, Ngain);
+    write_data(N_GAIN, 0);
 }
 
 void write_phi_N() // 26H
 {
-    const uint16_t Nphi = 0;
-    write_data(N_PHI, Nphi);
+    write_data(N_PHI, 0);
 }
 
 uint8_t K = 1;
@@ -156,17 +147,9 @@ void write_QNolTh() // 2AH
     write_data(P_START_TH, QNolTh);
 }
 
+extern uint16_t Lgain, Ngain, LNsel, DisHPF, Amod, Rmod, Zxcon, Pthresh;
 void write_MMODE() // 2BH
 {
-    //todo: get values frmo nvs
-    uint8_t Lgain = 0b100;
-    uint8_t Ngain = 0;
-    uint8_t LNsel = 0;
-    uint8_t DisHPF = 0;
-    uint8_t Amod = 0;
-    uint8_t Rmod = 0;
-    uint8_t Zxcon = 0b10;
-    uint8_t Pthresh = 0b10;
     write_data(MMODE, get_mmode_value(Lgain, Ngain, LNsel, DisHPF, Amod, Rmod, Zxcon, Pthresh));
 }
 
@@ -352,5 +335,5 @@ esp_err_t calibrate_adc()
 
     exec_calibration();
 
-    return ESP_FAIL;//todo: to be corrected
+    return ret;//todo: to be corrected
 }

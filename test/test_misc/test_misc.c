@@ -40,7 +40,7 @@ void test_U_conversion()
 
 void test_PL_constant()
 {
-    const uint16_t Mc = 1000; //todo: get from nvs
+    const uint16_t Mc = 1000;
     const uint16_t Un = 230;
     const uint16_t Ib = 10;
     const uint16_t Gl = 1;
