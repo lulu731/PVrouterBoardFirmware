@@ -9,6 +9,13 @@ Vu,data,u16,529
 Ugain,data,u16,0x6720
 IgainL,data,u16,0x7A13
 IgainN,data,u16,0x7530
+PoffsetL,data,u16,0
+QoffsetL,data,u16,0
+PoffsetN,data,u16,0
+QoffsetN,data,u16,0
+Uoffset,data,u16,0
+IoffsetL,data,u16,0
+IoffsetN,data,u16,0
 Lgain,data,u16,0b100
 Ngain,data,u16,0
 LNsel,data,u16,0
