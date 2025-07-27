@@ -18,10 +18,11 @@ static uint16_t key2_value = 0x2702;
 static char key3[5] = "key3";
 static uint16_t key3_value = 0x2703;
 
+static int expected_keys_count = 24;
 
 void setUp(void)
 {
-// set stuff up here
+
 }
 
 void tearDown(void)
@@ -61,7 +62,7 @@ void test_load_param_key_not_found(void) {
 extern const int keys_count;
 
 void test_keys_count_in_array(void) {
-    TEST_ASSERT_EQUAL_INT(17, keys_count);
+    TEST_ASSERT_EQUAL_INT(expected_keys_count, keys_count);
 }
 
 int main(int argc, char** argv)
