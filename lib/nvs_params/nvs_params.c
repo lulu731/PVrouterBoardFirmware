@@ -51,15 +51,42 @@ void load_nvs_params(void)
     }
     nvs_release_iterator(it);
 
+    // Close
+    nvs_close(nvs_handle);
+    ESP_LOGI(TAG, "NVS handle closed.");
+
+    ESP_LOGI(TAG, "Returned to app_main");
+}
+
+
+void save_nvs_param(const char* key, const uint16_t value)
+{
+    // Open NVS handle
+    ESP_LOGI(TAG, "\nOpening Non-Volatile Storage (NVS) handle...");
+    nvs_handle_t nvs_handle;
+    esp_err_t err = nvs_open(namespace, NVS_READWRITE, &nvs_handle);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Error (%s) opening NVS handle!", esp_err_to_name(err));
+        return;
+    }
+
+    // Set value
+    ESP_LOGI(TAG, "\nSetting value for key '%s'...", key);
+    err = nvs_set_u16(nvs_handle, key, value);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Error (%s) setting value for key '%s'!", esp_err_to_name(err), key);
+        return;
+    }
+
     // Commit changes
     // After setting any values, nvs_commit() must be called to ensure changes are written
     // to flash storage. Implementations may write to storage at other times,
     // but this is not guaranteed.
-    /*ESP_LOGI(TAG, "\nCommitting updates in NVS...");
+    ESP_LOGI(TAG, "\nCommitting updates in NVS...");
     err = nvs_commit(nvs_handle);
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "Failed to commit NVS changes!");
-    }*/
+    }
 
     // Close
     nvs_close(nvs_handle);
