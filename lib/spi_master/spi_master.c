@@ -1,8 +1,8 @@
 #include "spi_master.h"
 #include "spi_config.h"
 #include "spi_functions.h"
-#include "adc_adress.h"
 #include "nvs_params.h"
+#include "adc_registers.h"
 
 #include "esp_log.h"
 
@@ -13,10 +13,11 @@ spi_device_handle_t meter_handle;
 /***********************/
 /* READ and WRITE data */
 /***********************/
-esp_err_t read_data(const adc_address adress, uint16_t* data)
+
+esp_err_t read_adc_register(struct adc_register reg)
 {
     spi_transaction_t trans = {
-        .addr = adress | MSB_READ_ADDR_MASK,
+        .addr = reg.address | MSB_READ_ADDR_MASK,
         .length = 24,
         .rxlength = 16,
         .flags = SPI_TRANS_USE_RXDATA,
@@ -24,22 +25,24 @@ esp_err_t read_data(const adc_address adress, uint16_t* data)
 
     esp_err_t ret = spi_device_polling_transmit( meter_handle, &trans);
     if (ret ==ESP_OK)
-        *data = (uint16_t)trans.rx_data[0] << 8 | (uint16_t)trans.rx_data[1];
+        reg.data = (adc_data)trans.rx_data[0] << 8 | (adc_data)trans.rx_data[1];
 
     return ret;
 }
 
-esp_err_t write_data(const adc_address adress, const uint16_t data)
+esp_err_t write_adc_register(struct adc_register reg)
 {
     spi_transaction_t trans = {
-        .addr = adress,
+        .addr = reg.address,
         .length = 16,
         .flags = SPI_TRANS_USE_TXDATA,
     };
-    set_txdata_with(trans.tx_data, data);
+    set_txdata_with(trans.tx_data, reg.data);
 
     return spi_device_polling_transmit( meter_handle, &trans);
 }
+
+
 
 //todo: manage errors in writing
 /***********************/
@@ -48,36 +51,37 @@ esp_err_t write_data(const adc_address adress, const uint16_t data)
 /***********************/
 
 
-uint16_t get_average_value_fm_adress(adc_address adress)
+adc_data get_count_average_data(struct adc_register reg, const int count)
 {
-    uint8_t count = 5;
-    uint16_t data_array[count];
+    adc_data data_array[count];
 
     for (uint8_t i = 0; i < count; i++)
     {
-        read_data(adress, &data_array[i]);
+        read_adc_register(reg);
+        data_array[i] = reg.data;
     }
 
     return get_average_value(data_array, count);
 }
 
 
-uint16_t write_complement_average_to_address(const adc_address source_address,
-                                         const adc_address average_address)
+adc_data write_complement_average_to_register(const struct adc_register source_reg,
+                                              struct adc_register average_reg)
 {
-    uint16_t average_value = get_average_value_fm_adress(source_address);
-    write_data(average_address, ~average_value + 1);
-    return ~average_value + 1;
+    adc_data average_value = get_count_average_data(source_reg, 5);
+    average_reg.data = ~average_value + 1;
+    write_adc_register(average_reg);
+    return average_reg.data;
 }
 
-uint16_t write_average_to_address(const adc_address source_address,
-                              const adc_address average_address)
+/*uint16_t write_average_to_register(const struct adc_register source_reg,
+                                   struct adc_register average_reg)
 {
-    uint16_t average_value = get_average_value_fm_adress(source_address);
-    write_data(average_address, average_value);
-    return ~average_value + 1;
-}
-
+    uint16_t average_value = get_count_average_data(source_reg, 5);
+    average_reg.data = average_value;
+    write_adc_register(average_reg);
+    return average_reg.data;
+}*/
 
 /************************/
 /* Metering calibration */
@@ -99,66 +103,84 @@ void write_PL_constant() //21 - 22H
     uint16_t data[2];
     split_uint32_to_uint8_array(pl_const, data);
 
-    write_data(PL_CONST_H, data[0]);
-    write_data(PL_CONST_L, data[1]);
+    extern struct adc_register PL_CONST_H, PL_CONST_L;
+    PL_CONST_H.data = data[0];
+    PL_CONST_L.data = data[1];
+    write_adc_register(PL_CONST_H);
+    write_adc_register(PL_CONST_L);
 }
 
 /// set calibration gains and angles to 0
+extern struct adc_register L_GAIN, L_PHI, N_GAIN, N_PHI;
+
 void write_gain_L() // 23H
 {
-    write_data(L_GAIN, 0);
+    L_GAIN.data = 0;
+    write_adc_register(L_GAIN);
 }
 
 void write_phi_L() // 24H
 {
-    write_data(L_PHI, 0);
+    L_PHI.data = 0;
+    write_adc_register(L_PHI);
 }
 
 void write_gain_N() // 25H
 {
-    write_data(N_GAIN, 0);
+    N_GAIN.data = 0;
+    write_adc_register(N_GAIN);
 }
 
 void write_phi_N() // 26H
 {
-    write_data(N_PHI, 0);
+    N_PHI.data = 0;
+    write_adc_register(N_PHI);
 }
 
 uint8_t K = 1;
 
+extern struct adc_register P_START_TH, P_NO_L_TH, Q_START_TH, Q_NO_L_TH;
 void write_PStartTh() // 27H
 {
     uint16_t PStartTh = get_threshold(K);
-    write_data(P_START_TH, PStartTh);
+    P_START_TH.data = PStartTh;
+    write_adc_register(P_START_TH);
 }
 
 void write_PNolTh() // 28H
 {
     uint16_t PNolTh = get_threshold(K);
-    write_data(P_START_TH, PNolTh);
+    P_NO_L_TH.data = PNolTh;
+    write_adc_register(P_NO_L_TH);
 }
 
 void write_QStartTh() // 29H
 {
     uint16_t QStartTh = get_threshold(K);
-    write_data(Q_START_TH, QStartTh);
+    Q_START_TH.data = QStartTh;
+    write_adc_register(Q_START_TH);
 }
 
 void write_QNolTh() // 2AH
 {
     uint16_t QNolTh = get_threshold(K);
-    write_data(P_START_TH, QNolTh);
+    Q_NO_L_TH.data = QNolTh;
+    write_adc_register(Q_NO_L_TH);
 }
 
 extern uint16_t Lgain, Ngain, LNsel, DisHPF, Amod, Rmod, Zxcon, Pthresh;
 void write_MMODE() // 2BH
 {
-    write_data(MMODE, get_mmode_value(Lgain, Ngain, LNsel, DisHPF, Amod, Rmod, Zxcon, Pthresh));
+    extern struct adc_register MMODE;
+    MMODE.data = get_mmode_value(Lgain, Ngain, LNsel, DisHPF, Amod, Rmod, Zxcon, Pthresh);
+    write_adc_register(MMODE);
 }
 
 void exec_metering_calibration()
 {
-    write_data(CAL_START, CAL_NEEDED); //start calibration
+    extern struct adc_register CAL_START;
+    CAL_START.data = CAL_NEEDED;
+    write_adc_register(CAL_START); //start calibration
 
     write_PL_constant();
 
@@ -175,11 +197,12 @@ void exec_metering_calibration()
     write_MMODE();
 
     ///update CS1 register
-    adc_param cs_data;
-    read_data(CS1, &cs_data);
-    write_data(CS1, cs_data);
+    extern struct adc_register CS1;
+    read_adc_register(CS1);
+    write_adc_register(CS1);
 
-    write_data(CAL_START, CAL_END); //end calibration
+    CAL_START.data = CAL_END;
+    write_adc_register(CAL_START); //end calibration
 }
 
 /************************/
@@ -199,27 +222,31 @@ void exec_metering_calibration()
  * @param measured_value_address address of measured value
  * @param gain_address address of gain value
  */
-uint16_t write_gain( const float expected_value, const adc_address measured_value_address,
-                 const adc_address gain_address)
-{
-    uint16_t measured_value;
-    read_data(measured_value_address, &measured_value);
-    uint16_t old_gain;
-    read_data(gain_address, &old_gain);
 
+ adc_data write_gain( const float expected_value, struct adc_register measured_value_register,
+                     struct adc_register gain_register)
+{
+    read_adc_register(measured_value_register);
+
+    read_adc_register(gain_register);
+    adc_data old_gain = gain_register.data;
+
+    extern struct adc_register U_RMS;
     float divider = 1000;
-    if (measured_value_address == U_RMS)
+    if (measured_value_register.address == U_RMS.address)
         divider = 100;
 
-    const float float_measured_value = measured_value / divider;
+    const float float_measured_value = measured_value_register.data / divider;
 
-    write_data(gain_address, old_gain * expected_value / float_measured_value);
-    return old_gain * expected_value / float_measured_value;
+    gain_register.data = old_gain * expected_value / float_measured_value;
+    write_adc_register(gain_register);
+    return gain_register.data;
 }
 
 extern uint16_t Un, Ib;
 extern uint16_t Ugain, IgainL, IgainN, Uoffset, IoffsetL, IoffsetN;
-
+extern struct adc_register U_GAIN, I_GAIN_L, I_GAIN_N, U_OFFSET, I_OFFSET_L, I_OFFSET_N;
+extern struct adc_register U_RMS, I_RMS, I_RMS_2;
 void write_Ugain() // 31H
 {
     Ugain = write_gain(Un, U_RMS, U_GAIN);
@@ -235,45 +262,46 @@ void write_IgainN() // 33H
     IgainN = write_gain(Ib, I_RMS_2, I_GAIN_N);
 }
 
-uint16_t get_offset(const adc_address address, const uint16_t gain)
+uint16_t get_offset(struct adc_register reg, const uint16_t gain)
 {
-    uint16_t data;
-    read_data(address, &data);
-    return get_offset_from_measured(data, gain);
+    read_adc_register(reg);
+    return get_offset_from_measured(reg.data, gain);
 }
 
 void write_Uoffset() // 34H
 {
-    uint16_t offset = get_offset( U_RMS, Ugain);
-    Uoffset = ~offset + 1;
-    write_data(U_OFFSET, Uoffset);
-}
+    adc_data offset = get_offset(U_RMS, Ugain);
+    U_OFFSET.data = ~offset + 1;
+    write_adc_register(U_OFFSET); }
 
 void write_IoffsetL() // 35H
 {
-    uint16_t offset = get_offset( I_RMS, IgainL);
-    IoffsetL = ~offset + 1;
-    write_data(I_OFFSET_L, IoffsetL);
+    uint16_t offset = get_offset(I_RMS, IgainL);
+    I_OFFSET_L.data = ~offset + 1;
+    write_adc_register(I_OFFSET_L);
 }
 
 void write_IoffsetN() // 36H
 {
-    uint16_t offset = get_offset( I_RMS_2, IgainN);
-    IoffsetN = ~offset + 1;
-    write_data(I_OFFSET_N, IoffsetN);
+    uint16_t offset = get_offset(I_RMS_2, IgainN);
+    I_OFFSET_N.data = ~offset + 1;
+    write_adc_register(I_OFFSET_N);
 }
 
 extern uint16_t PoffsetL, QoffsetL, PoffsetN, QoffsetN;
+
 void write_PQoffsetL() // 37H 38H
 {
-    PoffsetL = write_complement_average_to_address(P_MEAN, P_OFFSET_L);
-    PoffsetN = write_complement_average_to_address(Q_MEAN, Q_OFFSET_L);
+    extern struct adc_register P_MEAN, Q_MEAN, P_OFFSET_L, Q_OFFSET_L;
+    PoffsetL = write_complement_average_to_register(P_MEAN, P_OFFSET_L);
+    PoffsetN = write_complement_average_to_register(Q_MEAN, Q_OFFSET_L);
 }
 
 void write_PQoffsetN()
 {
-    PoffsetN = write_complement_average_to_address(P_MEAN_2, P_OFFSET_N);
-    QoffsetN = write_complement_average_to_address(Q_MEAN_2, Q_OFFSET_N);
+    extern struct adc_register P_MEAN_2, Q_MEAN_2, P_OFFSET_N, Q_OFFSET_N;
+    PoffsetN = write_complement_average_to_register(P_MEAN_2, P_OFFSET_N);
+    QoffsetN = write_complement_average_to_register(Q_MEAN_2, Q_OFFSET_N);
 }
 
 
@@ -290,14 +318,20 @@ void exec_offset_calibration() // needs measure no current
     write_IoffsetL();
     write_IoffsetN();
 
-    write_data(SMALL_P_MOD, 0xA987); // small power mode
+    extern struct adc_register SMALL_P_MOD;
+    SMALL_P_MOD.data = 0xA987;
+    write_adc_register(SMALL_P_MOD); // small power mode
     write_PQoffsetL();
     write_PQoffsetN();
-    write_data(SMALL_P_MOD, 0xA980);}
+    SMALL_P_MOD.data = 0xA980;
+    write_adc_register(SMALL_P_MOD);
+}
 
 void exec_measurement_calibration()
 {
-    write_data(ADJ_START, CAL_NEEDED); //start calibration
+    extern struct adc_register ADJ_START;
+    ADJ_START.data = CAL_NEEDED;
+    write_adc_register(ADJ_START); //start calibration
 
     #ifdef CALIBRATION_AT_IB
         exec_gain_calibration();
@@ -321,12 +355,13 @@ void exec_measurement_calibration()
 
     #endif
 
-    ///update CS1 register
-    adc_param cs_data;
-    read_data(CS2, &cs_data);
-    write_data(CS2, cs_data);
+    ///update CS2 register
+    extern struct adc_register CS2;
+    read_adc_register(CS2);
+    write_adc_register(CS2);
 
-    write_data(ADJ_START, CAL_END); //end calibration
+    ADJ_START.data = CAL_END;
+    write_adc_register(ADJ_START); //end calibration
 }
 
 /***********************/

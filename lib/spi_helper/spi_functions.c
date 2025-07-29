@@ -1,6 +1,5 @@
 #include "spi_functions.h"
 #include "adc_param.h"
-#include "adc_adress.h"
 
 #include <stdint.h>
 #include <math.h>
