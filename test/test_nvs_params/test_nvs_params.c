@@ -36,13 +36,13 @@ void test_load()
     test2 = 0;
     test3 = 0;
 
-    load_param(key1, key_array, key1_value, test_array);
+    load_param(key1, key_array, key1_value, test_array, 3);
     TEST_ASSERT_EQUAL_UINT16_MESSAGE(key1_value, test1, "failed test1");
 
-    load_param(key2, key_array, key2_value, test_array);
+    load_param(key2, key_array, key2_value, test_array, 3);
     TEST_ASSERT_EQUAL_UINT16_MESSAGE(key2_value, test2, "failed test2");
 
-    load_param(key3, key_array, key3_value, test_array);
+    load_param(key3, key_array, key3_value, test_array, 3);
     TEST_ASSERT_EQUAL_UINT16_MESSAGE(key3_value, test3, "failed test3");
 }
 
@@ -52,7 +52,7 @@ void test_load_param_key_not_found(void) {
     test3 = 0;
     const char *key = "key4";
 
-    load_param(key, key_array, 0xFF, test_array);
+    load_param(key, key_array, 0xFF, test_array, 3);
 
     TEST_ASSERT_EQUAL_UINT16(0, test1);
     TEST_ASSERT_EQUAL_UINT16(0, test2);
