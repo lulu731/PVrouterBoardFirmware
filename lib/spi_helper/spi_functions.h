@@ -1,11 +1,11 @@
 #ifndef SPI_FUNCTIONS_H
 #define SPI_FUNCTIONS_H
 
-#include "adc_param.h"
+#include "adc_registers.h"
 
 #include <stdint.h>
 
-void     set_txdata_with(uint8_t tx_data[4], const adc_param data);
+void     set_txdata_with(uint8_t tx_data[4], const adc_data data);
 void     split_uint32_to_uint8_array(const uint32_t data, uint16_t receiver[2]);
 
 uint16_t get_mmode_value(uint16_t Lgain, uint16_t Ngain, uint16_t LNsel,

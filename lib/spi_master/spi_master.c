@@ -42,8 +42,6 @@ esp_err_t write_adc_register(struct adc_register reg)
     return spi_device_polling_transmit( meter_handle, &trans);
 }
 
-
-
 //todo: manage errors in writing
 /***********************/
 /*        END          */
@@ -73,15 +71,6 @@ adc_data write_complement_average_to_register(const struct adc_register source_r
     write_adc_register(average_reg);
     return average_reg.data;
 }
-
-/*uint16_t write_average_to_register(const struct adc_register source_reg,
-                                   struct adc_register average_reg)
-{
-    uint16_t average_value = get_count_average_data(source_reg, 5);
-    average_reg.data = average_value;
-    write_adc_register(average_reg);
-    return average_reg.data;
-}*/
 
 /************************/
 /* Metering calibration */
@@ -179,6 +168,8 @@ void write_MMODE() // 2BH
 void exec_metering_calibration()
 {
     extern struct adc_register CAL_START;
+    extern adc_data CAL_NEEDED, CAL_END;
+
     CAL_START.data = CAL_NEEDED;
     write_adc_register(CAL_START); //start calibration
 
@@ -330,6 +321,8 @@ void exec_offset_calibration() // needs measure no current
 void exec_measurement_calibration()
 {
     extern struct adc_register ADJ_START;
+    extern adc_data CAL_NEEDED, CAL_END;
+
     ADJ_START.data = CAL_NEEDED;
     write_adc_register(ADJ_START); //start calibration
 

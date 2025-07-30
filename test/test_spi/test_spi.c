@@ -1,7 +1,7 @@
 #include <unity.h>
 
 #include "spi_functions.h"
-#include "adc_param.h"
+#include "adc_registers.h"
 
 void setUp(void)
 {
@@ -15,7 +15,8 @@ void tearDown(void)
 
 void test_tx_data()
 {
-    const adc_param data = CAL_NEEDED;
+    extern adc_data CAL_NEEDED;
+    const adc_data data = CAL_NEEDED;
     uint8_t tx_data[4];
     uint8_t expected_data[2] = {0x56, 0x78};
 
@@ -68,7 +69,7 @@ void test_threshold()
     Vl = 1;
     Vu = 250;
 
-    const uint8_t Ks = 4; // 0/00 = 0.4%
+    const uint8_t Ks = 4; // 4 per mille = 0.4%
     const uint16_t Thr = get_threshold(Ks) ;
 
     TEST_ASSERT_EQUAL_UINT16 (0x08BD, Thr);

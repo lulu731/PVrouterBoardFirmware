@@ -1,10 +1,9 @@
 #include "spi_functions.h"
-#include "adc_param.h"
 
 #include <stdint.h>
 #include <math.h>
 
-void set_txdata_with(uint8_t tx_data[4], const adc_param data)
+void set_txdata_with(uint8_t tx_data[4], const adc_data data)
 {
     tx_data[1] = (uint8_t)data;
     tx_data[0] = (uint8_t)(data>>8);

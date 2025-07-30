@@ -79,3 +79,9 @@ const struct adc_register P_MEAN_2 =
     {.address = 0x6A, .data = 0};
 const struct adc_register Q_MEAN_2 =
     {.address = 0x6B, .data = 0};
+
+const adc_data CAL_NEEDED        = 0x5678;
+const adc_data CAL_END           = 0x8765;
+
+const adc_data SMALL_P_MOD_ENTER = 0xA987;
+const adc_data SMALL_P_MOD_EXIT  = 0xA900;
