@@ -11,6 +11,7 @@ static const char* namespace = "meter_config";
 
 extern const char* string_keys_array[];
 extern uint16_t* keys_array[];
+extern int keys_count;
 
 void load_nvs_params(void)
 {
@@ -44,9 +45,8 @@ void load_nvs_params(void)
 
         uint16_t value = nvs_get_u16(nvs_handle, info.key, &value);
 
-        load_param(info.key, string_keys_array, value, keys_array);
-        //const char *type_str =  type_to_str(info.type);
-        //ESP_LOGI(TAG, "Key: '%s', Type: %s", info.key, type_str);
+        load_param(info.key, string_keys_array, value, keys_array, keys_count);
+
         res = nvs_entry_next(&it);
     }
     nvs_release_iterator(it);
