@@ -62,15 +62,12 @@ adc_data get_average_data_fm_register(struct adc_register reg, const int nbr_dat
     return get_average_data_in_array(data_array, nbr_datas);
 }
 
-
-adc_data write_complement_average_to_register(const struct adc_register source_reg,
-                                              struct adc_register average_reg)
+adc_data get_complement_average_fm_register(struct adc_register source_reg, const int nbr_datas)
 {
-    adc_data average_value = get_average_data_fm_register(source_reg, 5);
-    average_reg.data = ~average_value + 1;
-    write_adc_register(average_reg);
-    return average_reg.data;
+    adc_data average_value = get_average_data_fm_register(source_reg, nbr_datas);
+    return ~average_value + 1;
 }
+
 
 /************************/
 /* Metering calibration */
@@ -230,34 +227,49 @@ void exec_metering_calibration()
     const float float_measured_value = measured_value_register.data / divider;
 
     return old_gain * expected_value / float_measured_value;
-    //write_adc_register(gain_register);
-    //return gain_register.data;
 }
 
 extern uint16_t Un, Ib;
 extern uint16_t Ugain, IgainL, IgainN, Uoffset, IoffsetL, IoffsetN;
 extern struct adc_register U_GAIN, I_GAIN_L, I_GAIN_N, U_OFFSET, I_OFFSET_L, I_OFFSET_N;
 extern struct adc_register U_RMS, I_RMS, I_RMS_2;
-void write_Ugain() // 31H
+
+/*---------------gain------------------*/
+
+void get_Ugain()
 {
     Ugain = get_gain(Un, U_RMS, U_GAIN);
+}
+
+void write_Ugain() // 31H
+{
     U_GAIN.data = Ugain;
     write_adc_register(U_GAIN);
 }
 
-void write_IgainL() // 32H
+void get_IgainL()
 {
     IgainL = get_gain(Ib, I_RMS, I_GAIN_L);
+}
+
+void write_IgainL() // 32H
+{
     I_GAIN_L.data = IgainL;
     write_adc_register(I_GAIN_L);
 }
 
-void write_IgainN() // 33H
+void get_IgainN()
 {
     IgainN = get_gain(Ib, I_RMS_2, I_GAIN_N);
+}
+
+void write_IgainN() // 33H
+{
     I_GAIN_N.data = IgainN;
     write_adc_register(I_GAIN_N);
 }
+
+/*---------------ofsset------------------*/
 
 uint16_t get_offset(struct adc_register reg, const uint16_t gain)
 {
@@ -265,62 +277,90 @@ uint16_t get_offset(struct adc_register reg, const uint16_t gain)
     return ~get_offset_from_measured(reg.data, gain) + 1;
 }
 
-void write_Uoffset() // 34H
+void get_Uoffset()
 {
     Uoffset = get_offset(U_RMS, Ugain);
+}
+
+void write_Uoffset() // 34H
+{
     U_OFFSET.data = Uoffset;
     write_adc_register(U_OFFSET);
 }
 
-void write_IoffsetL() // 35H
+void get_IoffsetL()
 {
     IoffsetL = get_offset(I_RMS, IgainL);
+}
+
+void write_IoffsetL() // 35H
+{
     I_OFFSET_L.data = IoffsetL;
     write_adc_register(I_OFFSET_L);
 }
 
-void write_IoffsetN() // 36H
+void get_IoffsetN()
 {
     IoffsetN = get_offset(I_RMS_2, IgainN);
+}
+void write_IoffsetN() // 36H
+{
     I_OFFSET_N.data = IoffsetN;
     write_adc_register(I_OFFSET_N);
 }
 
 extern uint16_t PoffsetL, QoffsetL, PoffsetN, QoffsetN;
 
+void get_PQoffsetL() // 37H 38H
+{
+    extern struct adc_register P_MEAN, Q_MEAN;
+    PoffsetL = get_average_data_fm_register(P_MEAN, 5);
+    PoffsetN = get_average_data_fm_register(Q_MEAN, 5);
+}
+
 void write_PQoffsetL() // 37H 38H
 {
-    extern struct adc_register P_MEAN, Q_MEAN, P_OFFSET_L, Q_OFFSET_L;
-    PoffsetL = write_complement_average_to_register(P_MEAN, P_OFFSET_L);
-    PoffsetN = write_complement_average_to_register(Q_MEAN, Q_OFFSET_L);
+    extern struct adc_register P_OFFSET_L, Q_OFFSET_L;
+    P_OFFSET_L.data = PoffsetL;
+    Q_OFFSET_L.data = QoffsetL;
+    write_adc_register(P_OFFSET_L);
+    write_adc_register(Q_OFFSET_L);
 }
 
-void write_PQoffsetN()
+void get_PQoffsetN()
 {
-    extern struct adc_register P_MEAN_2, Q_MEAN_2, P_OFFSET_N, Q_OFFSET_N;
-    PoffsetN = write_complement_average_to_register(P_MEAN_2, P_OFFSET_N);
-    QoffsetN = write_complement_average_to_register(Q_MEAN_2, Q_OFFSET_N);
+    extern struct adc_register P_MEAN_2, Q_MEAN_2;
+    PoffsetN = get_average_data_fm_register(P_MEAN_2, 5);
+    QoffsetN = get_average_data_fm_register(Q_MEAN_2, 5);
 }
 
+void write_PQoffsetN() // 37H 38H
+{
+    extern struct adc_register P_OFFSET_N, Q_OFFSET_N;
+    P_OFFSET_N.data = PoffsetN;
+    Q_OFFSET_N.data = QoffsetN;
+    write_adc_register(P_OFFSET_N);
+    write_adc_register(Q_OFFSET_N);
+}
 
 void exec_gain_calibration()
 {
-    write_Ugain(); // needs measure at 230V
-    write_IgainL(); // needs measure at Ib
-    write_IgainN(); // needs measure at Ib
+    get_Ugain(); // needs measure at 230V
+    get_IgainL(); // needs measure at Ib
+    get_IgainN(); // needs measure at Ib*/
 }
 
 void exec_offset_calibration() // needs measure no current
 {
-    write_Uoffset();
-    write_IoffsetL();
-    write_IoffsetN();
+    get_Uoffset();
+    get_IoffsetL();
+    get_IoffsetN();
 
     extern struct adc_register SMALL_P_MOD;
     SMALL_P_MOD.data = 0xA987;
     write_adc_register(SMALL_P_MOD); // small power mode
-    write_PQoffsetL();
-    write_PQoffsetN();
+    get_PQoffsetL();
+    get_PQoffsetN();
     SMALL_P_MOD.data = 0xA980;
     write_adc_register(SMALL_P_MOD);
 }
@@ -338,9 +378,12 @@ void exec_measurement_calibration()
         save_nvs_param("Ugain", Ugain);
         save_nvs_param("IgainL", IgainL);
         save_nvs_param("IgainN", IgainN);
-    #else
-
     #endif
+
+    write_Ugain();
+    write_IgainL();
+    write_IgainN();
+
 
     #ifdef CALIBRATION_NO_CURRENT
         exec_offset_calibration(); //
@@ -351,9 +394,13 @@ void exec_measurement_calibration()
         save_nvs_param("QoffsetL", QoffsetL);
         save_nvs_param("PoffsetN", PoffsetN);
         save_nvs_param("QoffsetN", QoffsetN);
-    #else
-
     #endif
+
+    write_Uoffset();
+    write_IoffsetL();
+    write_IoffsetN();
+    write_PQoffsetL();
+    write_PQoffsetN();
 
     ///update CS2 register
     extern struct adc_register CS2;
