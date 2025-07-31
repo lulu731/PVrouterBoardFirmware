@@ -30,7 +30,7 @@ esp_err_t read_adc_register(struct adc_register reg)
     return ret;
 }
 
-esp_err_t write_adc_register(struct adc_register reg)
+esp_err_t write_adc_register(const struct adc_register reg)
 {
     spi_transaction_t trans = {
         .addr = reg.address,
@@ -49,24 +49,24 @@ esp_err_t write_adc_register(struct adc_register reg)
 /***********************/
 
 
-adc_data get_count_average_data(struct adc_register reg, const int count)
+adc_data get_average_data_fm_register(struct adc_register reg, const int nbr_datas)
 {
-    adc_data data_array[count];
+    adc_data data_array[nbr_datas];
 
-    for (uint8_t i = 0; i < count; i++)
+    for (uint8_t i = 0; i < nbr_datas; i++)
     {
         read_adc_register(reg);
         data_array[i] = reg.data;
     }
 
-    return get_average_value(data_array, count);
+    return get_average_data_in_array(data_array, nbr_datas);
 }
 
 
 adc_data write_complement_average_to_register(const struct adc_register source_reg,
                                               struct adc_register average_reg)
 {
-    adc_data average_value = get_count_average_data(source_reg, 5);
+    adc_data average_value = get_average_data_fm_register(source_reg, 5);
     average_reg.data = ~average_value + 1;
     write_adc_register(average_reg);
     return average_reg.data;
@@ -214,7 +214,7 @@ void exec_metering_calibration()
  * @param gain_address address of gain value
  */
 
- adc_data write_gain( const float expected_value, struct adc_register measured_value_register,
+ adc_data get_gain(const float expected_value, struct adc_register measured_value_register,
                      struct adc_register gain_register)
 {
     read_adc_register(measured_value_register);
@@ -229,9 +229,9 @@ void exec_metering_calibration()
 
     const float float_measured_value = measured_value_register.data / divider;
 
-    gain_register.data = old_gain * expected_value / float_measured_value;
-    write_adc_register(gain_register);
-    return gain_register.data;
+    return old_gain * expected_value / float_measured_value;
+    //write_adc_register(gain_register);
+    //return gain_register.data;
 }
 
 extern uint16_t Un, Ib;
@@ -240,42 +240,49 @@ extern struct adc_register U_GAIN, I_GAIN_L, I_GAIN_N, U_OFFSET, I_OFFSET_L, I_O
 extern struct adc_register U_RMS, I_RMS, I_RMS_2;
 void write_Ugain() // 31H
 {
-    Ugain = write_gain(Un, U_RMS, U_GAIN);
+    Ugain = get_gain(Un, U_RMS, U_GAIN);
+    U_GAIN.data = Ugain;
+    write_adc_register(U_GAIN);
 }
 
 void write_IgainL() // 32H
 {
-    IgainL = write_gain(Ib, I_RMS, I_GAIN_L);
+    IgainL = get_gain(Ib, I_RMS, I_GAIN_L);
+    I_GAIN_L.data = IgainL;
+    write_adc_register(I_GAIN_L);
 }
 
 void write_IgainN() // 33H
 {
-    IgainN = write_gain(Ib, I_RMS_2, I_GAIN_N);
+    IgainN = get_gain(Ib, I_RMS_2, I_GAIN_N);
+    I_GAIN_N.data = IgainN;
+    write_adc_register(I_GAIN_N);
 }
 
 uint16_t get_offset(struct adc_register reg, const uint16_t gain)
 {
     read_adc_register(reg);
-    return get_offset_from_measured(reg.data, gain);
+    return ~get_offset_from_measured(reg.data, gain) + 1;
 }
 
 void write_Uoffset() // 34H
 {
-    adc_data offset = get_offset(U_RMS, Ugain);
-    U_OFFSET.data = ~offset + 1;
-    write_adc_register(U_OFFSET); }
+    Uoffset = get_offset(U_RMS, Ugain);
+    U_OFFSET.data = Uoffset;
+    write_adc_register(U_OFFSET);
+}
 
 void write_IoffsetL() // 35H
 {
-    uint16_t offset = get_offset(I_RMS, IgainL);
-    I_OFFSET_L.data = ~offset + 1;
+    IoffsetL = get_offset(I_RMS, IgainL);
+    I_OFFSET_L.data = IoffsetL;
     write_adc_register(I_OFFSET_L);
 }
 
 void write_IoffsetN() // 36H
 {
-    uint16_t offset = get_offset(I_RMS_2, IgainN);
-    I_OFFSET_N.data = ~offset + 1;
+    IoffsetN = get_offset(I_RMS_2, IgainN);
+    I_OFFSET_N.data = IoffsetN;
     write_adc_register(I_OFFSET_N);
 }
 

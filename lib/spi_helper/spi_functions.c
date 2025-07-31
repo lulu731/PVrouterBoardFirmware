@@ -26,7 +26,7 @@ uint16_t get_mmode_value(uint16_t Lgain, uint16_t Ngain, uint16_t LNsel,
                       | Zxcon<<4 | Pthresh);
 }
 
-uint16_t get_average_value( const uint16_t data_array[], const uint8_t array_size)
+uint16_t get_average_data_in_array( const uint16_t data_array[], const uint8_t array_size)
 {
     uint32_t data = 0;
 
