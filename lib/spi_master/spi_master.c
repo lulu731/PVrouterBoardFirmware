@@ -36,7 +36,7 @@ void exec_metering_calibration()
 
     ///update CS1 register
     extern struct adc_register CS1;
-    read_adc_register(CS1);
+    read_adc_register(&CS1);
     write_adc_register(CS1);
 
     CAL_START.data = CAL_END;
@@ -114,7 +114,7 @@ void exec_measurement_calibration()
 
     ///update CS2 register
     extern struct adc_register CS2;
-    read_adc_register(CS2);
+    read_adc_register(&CS2);
     write_adc_register(CS2);
 
     ADJ_START.data = CAL_END;

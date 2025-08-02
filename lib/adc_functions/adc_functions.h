@@ -15,10 +15,10 @@ extern spi_device_handle_t meter_handle;
 /* READ and WRITE data */
 /***********************/
 
-esp_err_t read_adc_register(struct adc_register reg)
+esp_err_t read_adc_register(struct adc_register* reg)
 {
     spi_transaction_t trans = {
-        .addr = reg.address | MSB_READ_ADDR_MASK,
+        .addr = (*reg).address | MSB_READ_ADDR_MASK,
         .length = 24,
         .rxlength = 16,
         .flags = SPI_TRANS_USE_RXDATA,
@@ -26,7 +26,7 @@ esp_err_t read_adc_register(struct adc_register reg)
 
     esp_err_t ret = spi_device_polling_transmit( meter_handle, &trans);
     if (ret ==ESP_OK)
-        reg.data = (adc_data)trans.rx_data[0] << 8 | (adc_data)trans.rx_data[1];
+        (*reg).data = (adc_data)trans.rx_data[0] << 8 | (adc_data)trans.rx_data[1];
 
     return ret;
 }
@@ -55,7 +55,7 @@ adc_data get_average_data_fm_register(struct adc_register reg, const int nbr_dat
 
     for (uint8_t i = 0; i < nbr_datas; i++)
     {
-        read_adc_register(reg);
+        read_adc_register(&reg);
         data_array[i] = reg.data;
     }
 
@@ -168,9 +168,9 @@ void write_MMODE() // 2BH
  adc_data get_gain(const float expected_value, struct adc_register measured_value_register,
                      struct adc_register gain_register)
 {
-    read_adc_register(measured_value_register);
+    read_adc_register(&measured_value_register);
 
-    read_adc_register(gain_register);
+    read_adc_register(&gain_register);
     adc_data old_gain = gain_register.data;
 
     extern struct adc_register U_RMS;
@@ -227,7 +227,7 @@ void write_IgainN() // 33H
 
 uint16_t get_offset(struct adc_register reg, const uint16_t gain)
 {
-    read_adc_register(reg);
+    read_adc_register(&reg);
     return ~get_offset_from_measured(reg.data, gain) + 1;
 }
 
