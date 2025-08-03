@@ -97,15 +97,20 @@
 # see documentation for the many options for specifying this.
 :paths:
   :test:
-    - +:test/**
+    - +:test/test_adc_functions
     - -:test/support
   :source:
     - src/**
     - lib/**
+    - /home/lulu/.platformio/packages/framework-espidf/components/**
   :include:
     - src/** # In simple projects, this entry often duplicates :source
     - include/**
     - lib/**
+#    - /home/lulu/.platformio/packages/framework-espidf/components/esp_driver_spi/include/**
+#    - /home/lulu/.platformio/packages/framework-espidf/components/esp_common/include/**
+#    - /home/lulu/.platformio/packages/framework-espidf/components/esp_system/**
+#    - /home/lulu/.platformio/packages/framework-espidf/components/**
   :support:
     - test/support
   :libraries:

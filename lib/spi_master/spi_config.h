@@ -9,8 +9,6 @@
 #define PIN_NUM_CLK       12
 #define PIN_NUM_CS        10
 
-#define MSB_READ_ADDR_MASK 0x80 //adress should start with 1 for read phase
-
 spi_bus_config_t buscfg = {
         .miso_io_num = PIN_NUM_MISO,
         .mosi_io_num = PIN_NUM_MOSI,
