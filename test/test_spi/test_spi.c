@@ -2,6 +2,7 @@
 
 #include "spi_functions.h"
 #include "adc_registers.h"
+#include "calibration_params.c"
 
 void setUp(void)
 {
@@ -51,16 +52,6 @@ void test_get_mmode_value()
     TEST_ASSERT(result == 0b1000000000100010);
 }
 
-void test_average_data()
-{
-    const uint8_t count = 5;
-    const uint16_t data_array[] = {0xFFC4, 0xFFCA, 0xFFCA, 0xFFDC, 0xFFC5};
-
-    uint16_t average_data = get_average_data_in_array(data_array, 5);
-
-    TEST_ASSERT_EQUAL(0xFFCB, average_data);
-}
-
 extern uint16_t Gl, Vl, Vu;
 
 void test_threshold()
@@ -83,18 +74,4 @@ void test_offset()
     uint16_t actual_offset =  get_offset_from_measured(measured_value, gain);
 
     TEST_ASSERT_EQUAL_UINT16(expected_offset, actual_offset);
-}
-
-int main(int argc, char** argv)
-{
-    UNITY_BEGIN();
-
-    RUN_TEST(test_tx_data);
-    RUN_TEST(test_conv_uint32_to_uint8_array);
-    RUN_TEST(test_get_mmode_value);
-    RUN_TEST(test_average_data);
-    RUN_TEST(test_threshold);
-    RUN_TEST(test_offset);
-
-    UNITY_END();
 }

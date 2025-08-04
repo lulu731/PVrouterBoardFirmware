@@ -3,20 +3,6 @@
 
 #include "adc_registers.h"
 
-/***********************/
-/* READ and WRITE data */
-/***********************/
-
-int read_adc_register(struct adc_register* reg);
-
-int write_adc_register(const struct adc_register reg);
-
-//todo: manage errors in writing
-/***********************/
-/*        END          */
-/* READ and WRITE data */
-/***********************/
-
 adc_data get_average_data_fm_register(struct adc_register reg, const int nbr_datas);
 
 adc_data get_complement_average_fm_register(struct adc_register source_reg, const int nbr_datas);

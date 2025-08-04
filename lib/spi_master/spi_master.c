@@ -1,6 +1,7 @@
 #include "spi_master.h"
 #include "spi_config.h"
 #include "adc_functions.h"
+#include "adc_rw.h"
 
 #include "esp_log.h"
 

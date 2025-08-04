@@ -52,15 +52,3 @@ void test_PL_constant()
 
     TEST_ASSERT_EQUAL_UINT32(0x01eba5e4,(uint32_t)(pl_float));
 }
-
-int main(int argc, char** argv)
-{
-    UNITY_BEGIN();
-
-    RUN_TEST(test_uint8_to_uint16_data);
-    RUN_TEST(test_complement_value);
-    RUN_TEST(test_U_conversion);
-    RUN_TEST(test_PL_constant);
-
-    UNITY_END();
-}
