@@ -28,11 +28,6 @@ int callback(struct adc_register* reg, int numcalls)
 
 void test_average_data_fm_register()
 {
-    struct adc_register U_RMS =
-    {
-        .address = 0x47,
-        .data = 0
-    };
     read_adc_register_Stub(callback);
 
     adc_data average = get_average_data_fm_register(U_RMS, 5);
