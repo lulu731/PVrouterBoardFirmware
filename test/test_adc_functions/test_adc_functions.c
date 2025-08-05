@@ -4,6 +4,7 @@
 #include "adc_registers.h"
 #include "spi_functions.h"
 #include "calibration_params.c"
+#include "adc_registers.c"
 
 #include "mock_adc_rw.h"
 
@@ -36,4 +37,23 @@ void test_average_data_fm_register()
 
     adc_data average = get_average_data_fm_register(U_RMS, 5);
     TEST_ASSERT(average == 0xFFCB);
+}
+
+extern uint16_t Mc, Un, Ib, Gl, Vl, Vu;
+
+void test_write_PL_constant()
+{
+    Mc = 1000;
+    Un = 230;
+    Ib = 10;
+    Gl = 1;
+    Vl = 167;
+    Vu = 529;
+
+    PL_CONST_H.data = 0x01eb;
+    write_adc_register_ExpectAndReturn(PL_CONST_H, 0);
+    PL_CONST_L.data = 0xa5e4;
+    write_adc_register_ExpectAndReturn(PL_CONST_L, 0);
+
+    write_PL_constant();
 }

@@ -37,18 +37,3 @@ void test_U_conversion()
 
     TEST_ASSERT_EQUAL_UINT16(23611, (uint16_t)(Ugain * Un / Urms));
 }
-
-void test_PL_constant()
-{
-    const uint16_t Mc = 1000;
-    const uint16_t Un = 230;
-    const uint16_t Ib = 10;
-    const uint16_t Gl = 1;
-    const uint16_t Vl = 167;
-    const uint16_t Vu = 529;
-
-    const float pl_float = 838860800 * (float)(Gl * Vl *Vu) / (float)(Mc * Un * Ib) ;
-    uint32_t pl_const = pl_float;
-
-    TEST_ASSERT_EQUAL_UINT32(0x01eba5e4,(uint32_t)(pl_float));
-}
