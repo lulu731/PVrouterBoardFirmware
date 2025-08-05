@@ -46,31 +46,14 @@ void write_PL_constant() //21 - 22H
     write_adc_register(PL_CONST_L);
 }
 
-/// set calibration gains and angles to 0
-extern struct adc_register L_GAIN, L_PHI, N_GAIN, N_PHI;
-
-void write_gain_L() // 23H
+void write_gain_register(const struct adc_register gain_register)
 {
-    L_GAIN.data = 0;
-    write_adc_register(L_GAIN);
+    write_adc_register(gain_register);
 }
 
-void write_phi_L() // 24H
+void write_phi_register(const struct adc_register gain_register)
 {
-    L_PHI.data = 0;
-    write_adc_register(L_PHI);
-}
-
-void write_gain_N() // 25H
-{
-    N_GAIN.data = 0;
-    write_adc_register(N_GAIN);
-}
-
-void write_phi_N() // 26H
-{
-    N_PHI.data = 0;
-    write_adc_register(N_PHI);
+    write_adc_register(gain_register);
 }
 
 uint8_t K = 1;

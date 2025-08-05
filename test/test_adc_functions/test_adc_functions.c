@@ -52,3 +52,16 @@ void test_write_PL_constant()
 
     write_PL_constant();
 }
+
+extern struct adc_register L_GAIN, N_GAIN, L_PHI, N_PHI;
+void test_write_null_gains()
+{
+    L_GAIN.data = 0;
+    N_GAIN.data = 0;
+
+    write_adc_register_ExpectAndReturn(L_GAIN, 0);
+    write_adc_register_ExpectAndReturn(N_GAIN, 0);
+
+    write_gain_register(L_GAIN);
+    write_gain_register(N_GAIN);
+}

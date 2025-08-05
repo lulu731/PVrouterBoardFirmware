@@ -10,14 +10,9 @@ adc_data get_complement_average_fm_register(struct adc_register source_reg, cons
 void write_PL_constant(); //21 - 22H
 
 /// set calibration gains and angles to 0
+void write_gain_register(const struct adc_register gain_register); // 23H or 25H
+void write_phi_register(const struct adc_register gain_register); // 24H or 26H
 
-void write_gain_L(); // 23H
-
-void write_phi_L(); // 24H
-
-void write_gain_N(); // 25H
-
-void write_phi_N(); // 26H
 
 void write_PStartTh(); // 27H
 

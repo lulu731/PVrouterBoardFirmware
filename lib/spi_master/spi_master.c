@@ -13,6 +13,7 @@ spi_device_handle_t meter_handle;
 /* Metering calibration */
 /************************/
 
+extern struct adc_register L_GAIN, L_PHI, N_GAIN, N_PHI;
 void exec_metering_calibration()
 {
     extern struct adc_register CAL_START;
@@ -23,10 +24,14 @@ void exec_metering_calibration()
 
     write_PL_constant();
 
-    write_gain_L();
-    write_phi_L();
-    write_gain_N();
-    write_phi_N();
+    L_GAIN.data = 0; // all gains are null
+    N_GAIN.data = 0;
+    L_PHI.data = 0;
+    N_PHI.data = 0;
+    write_gain_register(L_GAIN);
+    write_gain_register(N_GAIN);
+    write_phi_register(L_PHI);
+    write_phi_register(N_PHI);
 
     write_PStartTh();
     write_PNolTh();
