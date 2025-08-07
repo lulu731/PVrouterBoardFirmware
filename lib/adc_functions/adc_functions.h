@@ -22,8 +22,8 @@ void write_threshold_register(struct adc_register threshold_register);
  * @param measured_value_address address of measured value
  * @param gain_address address of gain value
  */
- adc_data get_gain(const float expected_value, struct adc_register measured_value_register,
-                     struct adc_register gain_register);
+ adc_data get_line_gain(const float expected_value, struct adc_register measured_value_register,
+                        struct adc_register gain_register);
 
 /*---------------gain------------------*/
 

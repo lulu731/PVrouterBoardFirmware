@@ -65,3 +65,57 @@ void test_write_null_gains()
     write_gain_register(L_GAIN);
     write_gain_register(N_GAIN);
 }
+
+extern struct adc_register U_RMS, U_GAIN;
+
+void test_get_line_gain_for_Un(void)
+{
+    float Un = 220.024;
+
+    U_RMS.data = 0x6019;
+    struct adc_register measured_value_register = U_RMS;
+    read_adc_register_ExpectAndReturn(&measured_value_register, 0);
+
+    U_GAIN.data = 26400;
+    struct adc_register gain_register = U_GAIN;
+    read_adc_register_ExpectAndReturn(&gain_register, 0);
+
+    adc_data expected_gain = 0x5C3B;
+
+    adc_data actual_gain = get_line_gain(Un, measured_value_register, gain_register);
+
+    TEST_ASSERT_EQUAL_UINT16(expected_gain, actual_gain);
+}
+
+/*void test_get_gain_not_equal_to_U_RMS(void) {
+    struct adc_register measured_value_register = {.address = 0x01, .data = 100};
+    struct adc_register gain_register = {.address = 0x23, .data = 50};
+    float expected_value = 2.0;
+    adc_data expected_gain = 1.0;
+
+    adc_data actual_gain = get_gain(expected_value, measured_value_register, gain_register);
+
+    TEST_ASSERT_EQUAL(expected_gain, actual_gain);
+}
+
+void test_get_gain_division_by_zero(void) {
+    struct adc_register measured_value_register = {.address = 0x01, .data = 0};
+    struct adc_register gain_register = {.address = 0x23, .data = 50};
+    float expected_value = 2.0;
+
+    // This test should not crash or produce a NaN result
+    adc_data actual_gain = get_gain(expected_value, measured_value_register, gain_register);
+
+    TEST_ASSERT_NOT_EQUAL(0, actual_gain);
+}
+
+void test_get_gain_negative_input(void) {
+    struct adc_register measured_value_register = {.address = 0x01, .data = -100};
+    struct adc_register gain_register = {.address = 0x23, .data = -50};
+    float expected_value = -2.0;
+    adc_data expected_gain = 1.0;
+
+    adc_data actual_gain = get_gain(expected_value, measured_value_register, gain_register);
+
+    TEST_ASSERT_EQUAL(expected_gain, actual_gain);
+}*/
