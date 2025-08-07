@@ -4,6 +4,8 @@
 #include "adc_rw.h"
 #include "adc_registers.h"
 
+#include <assert.h>
+
 adc_data get_average_data_fm_register(struct adc_register reg, const int nbr_datas)
 {
     adc_data data_array[nbr_datas];
@@ -48,11 +50,13 @@ void write_PL_constant() //21 - 22H
 
 void write_gain_register(const struct adc_register gain_register)
 {
+    assert(gain_register.address == 23 || gain_register.address == 25);
     write_adc_register(gain_register);
 }
 
 void write_phi_register(const struct adc_register gain_register)
 {
+    assert(gain_register.address == 24 || gain_register.address == 26);
     write_adc_register(gain_register);
 }
 
