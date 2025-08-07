@@ -41,6 +41,7 @@ struct adc_register L_PHI =
     {.address = 0x24, .data = 0};
 struct adc_register N_PHI =
     {.address = 0x26, .data = 0};
+
 struct adc_register P_START_TH =
     {.address = 0x27, .data = 0};
 struct adc_register P_NO_L_TH =

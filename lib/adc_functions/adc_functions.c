@@ -50,7 +50,7 @@ void write_PL_constant() //21 - 22H
 
 void write_gain_register(const struct adc_register gain_register)
 {
-    assert(gain_register.address == 23 || gain_register.address == 25);
+    assert(gain_register.address == 0x23 || gain_register.address == 0x25);
     write_adc_register(gain_register);
 }
 
@@ -62,33 +62,14 @@ void write_phi_register(const struct adc_register gain_register)
 
 uint8_t K = 1;
 
-extern struct adc_register P_START_TH, P_NO_L_TH, Q_START_TH, Q_NO_L_TH;
-void write_PStartTh() // 27H
+void write_threshold_register(struct adc_register threshold_register)
 {
-    uint16_t PStartTh = get_threshold(K);
-    P_START_TH.data = PStartTh;
-    write_adc_register(P_START_TH);
-}
 
-void write_PNolTh() // 28H
-{
-    uint16_t PNolTh = get_threshold(K);
-    P_NO_L_TH.data = PNolTh;
-    write_adc_register(P_NO_L_TH);
-}
+    assert(threshold_register.address == 0x27 || threshold_register.address == 0x28 ||
+           threshold_register.address == 0x29 || threshold_register.address == 0x2A);
 
-void write_QStartTh() // 29H
-{
-    uint16_t QStartTh = get_threshold(K);
-    Q_START_TH.data = QStartTh;
-    write_adc_register(Q_START_TH);
-}
-
-void write_QNolTh() // 2AH
-{
-    uint16_t QNolTh = get_threshold(K);
-    Q_NO_L_TH.data = QNolTh;
-    write_adc_register(Q_NO_L_TH);
+    threshold_register.data = get_threshold(K);
+    write_adc_register(threshold_register);
 }
 
 extern uint16_t Lgain, Ngain, LNsel, DisHPF, Amod, Rmod, Zxcon, Pthresh;

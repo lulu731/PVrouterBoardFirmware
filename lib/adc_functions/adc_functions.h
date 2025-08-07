@@ -13,16 +13,7 @@ void write_PL_constant(); //21 - 22H
 void write_gain_register(const struct adc_register gain_register); // 23H or 25H
 void write_phi_register(const struct adc_register gain_register); // 24H or 26H
 
-
-void write_PStartTh(); // 27H
-
-void write_PNolTh(); // 28H
-
-void write_QStartTh(); // 29H
-
-void write_QNolTh(); // 2AH
-
-void write_MMODE(); // 2BH
+void write_threshold_register(struct adc_register threshold_register);
 
 /**
  * @brief write calculated gain based on measured and expected values to gain address

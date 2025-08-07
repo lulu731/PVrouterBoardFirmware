@@ -33,10 +33,11 @@ void exec_metering_calibration()
     write_phi_register(L_PHI);
     write_phi_register(N_PHI);
 
-    write_PStartTh();
-    write_PNolTh();
-    write_QStartTh();
-    write_QNolTh();
+    extern struct adc_register P_START_TH, P_NO_L_TH, Q_START_TH, Q_NO_L_TH;
+    write_threshold_register(P_START_TH);
+    write_threshold_register(P_NO_L_TH);
+    write_threshold_register(Q_START_TH);
+    write_threshold_register(Q_NO_L_TH);
 
     write_MMODE();
 
