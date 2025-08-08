@@ -15,6 +15,8 @@ void write_phi_register(const struct adc_register gain_register); // 24H or 26H
 
 void write_threshold_register(struct adc_register threshold_register);
 
+void write_MMODE();
+
 /**
  * @brief write calculated gain based on measured and expected values to gain address
  *
@@ -27,15 +29,9 @@ void write_threshold_register(struct adc_register threshold_register);
 
 /*---------------gain------------------*/
 
-void get_Ugain();
-
 void write_Ugain(); // 31H
 
-void get_IgainL();
-
 void write_IgainL(); // 32H
-
-void get_IgainN();
 
 void write_IgainN(); // 33H
 

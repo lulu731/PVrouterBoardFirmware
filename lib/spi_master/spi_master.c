@@ -60,11 +60,15 @@ void exec_metering_calibration()
 /* Measure calibration */
 /***********************/
 
+extern struct adc_register U_GAIN, I_GAIN_L, I_GAIN_N;
+extern struct adc_register U_RMS, I_RMS, I_RMS_2;
+extern adc_data Ugain, IgainL, IgainN;
+extern adc_data Un, Ib;
 void exec_gain_calibration()
 {
-    get_Ugain(); // needs measure at 230V
-    get_IgainL(); // needs measure at Ib
-    get_IgainN(); // needs measure at Ib*/
+    Ugain = get_line_gain(Un, U_RMS, U_GAIN); // needs measure at 230V
+    IgainL = get_line_gain(Ib, I_RMS, I_GAIN_L); // needs measure at Ib
+    IgainN = get_line_gain(Ib, I_RMS_2, I_GAIN_N); // needs measure at Ib
 }
 
 void exec_offset_calibration() // needs measure no current

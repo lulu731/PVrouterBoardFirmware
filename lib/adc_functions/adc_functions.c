@@ -88,24 +88,6 @@ void write_MMODE() // 2BH
  * @param gain_address address of gain value
  */
 
-adc_data get_gain(const float expected_value, struct adc_register measured_value_register,
-                     struct adc_register gain_register)
-{
-    read_adc_register(&measured_value_register);
-
-    read_adc_register(&gain_register);
-    adc_data old_gain = gain_register.data;
-
-    extern struct adc_register U_RMS;
-    float divider = 1000;
-    if (measured_value_register.address == U_RMS.address)
-        divider = 100;
-
-    const float float_measured_value = measured_value_register.data / divider;
-
-    return old_gain * expected_value / float_measured_value;
-}
-
 adc_data get_line_gain(const float expected_value, struct adc_register measured_value_register,
                        struct adc_register gain_register)
 {
@@ -131,31 +113,16 @@ extern struct adc_register U_RMS, I_RMS, I_RMS_2;
 
 /*---------------gain------------------*/
 
-void get_Ugain()
-{
-    Ugain = get_gain(Un, U_RMS, U_GAIN);
-}
-
 void write_Ugain() // 31H
 {
     U_GAIN.data = Ugain;
     write_adc_register(U_GAIN);
 }
 
-void get_IgainL()
-{
-    IgainL = get_gain(Ib, I_RMS, I_GAIN_L);
-}
-
 void write_IgainL() // 32H
 {
     I_GAIN_L.data = IgainL;
     write_adc_register(I_GAIN_L);
-}
-
-void get_IgainN()
-{
-    IgainN = get_gain(Ib, I_RMS_2, I_GAIN_N);
 }
 
 void write_IgainN() // 33H
