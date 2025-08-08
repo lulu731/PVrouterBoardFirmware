@@ -6,27 +6,27 @@
 
 #include <assert.h>
 
-adc_data get_average_data_fm_register(struct adc_register reg, const int nbr_datas)
+adc_data get_average_data_fm_register(struct adc_register* reg, const int nbr_datas)
 {
     adc_data data_array[nbr_datas];
 
     for (uint8_t i = 0; i < nbr_datas; i++)
     {
-        read_adc_register(&reg);
-        data_array[i] = reg.data;
+        read_adc_register(reg);
+        data_array[i] = (*reg).data;
     }
 
     return get_average_data_in_array(data_array, nbr_datas);
 }
 
-adc_data get_complement_average_fm_register(struct adc_register source_reg, const int nbr_datas)
+adc_data get_complement_average_fm_register(struct adc_register* source_reg, const int nbr_datas)
 {
     adc_data average_value = get_average_data_fm_register(source_reg, nbr_datas);
     return ~average_value + 1;
 }
 
 extern uint16_t Mc, Un, Ib, Gl, Vl, Vu;
-
+extern struct adc_register PL_CONST_H, PL_CONST_L;
 void write_PL_constant() //21 - 22H
 {
     const float pl_float = 838860800 * (float)(Gl * Vl *Vu) / (float)(Mc * Un * Ib);
@@ -41,7 +41,6 @@ void write_PL_constant() //21 - 22H
     uint16_t data[2];
     split_uint32_to_uint8_array(pl_const, data);
 
-    extern struct adc_register PL_CONST_H, PL_CONST_L;
     PL_CONST_H.data = data[0];
     PL_CONST_L.data = data[1];
     write_adc_register(PL_CONST_H);
@@ -73,9 +72,9 @@ void write_threshold_register(struct adc_register threshold_register)
 }
 
 extern uint16_t Lgain, Ngain, LNsel, DisHPF, Amod, Rmod, Zxcon, Pthresh;
+extern struct adc_register MMODE;
 void write_MMODE() // 2BH
 {
-    extern struct adc_register MMODE;
     MMODE.data = get_mmode_value(Lgain, Ngain, LNsel, DisHPF, Amod, Rmod, Zxcon, Pthresh);
     write_adc_register(MMODE);
 }
@@ -89,99 +88,34 @@ void write_MMODE() // 2BH
  */
 
  /*---------------gain------------------*/
-adc_data get_line_gain(const float expected_value, struct adc_register measured_value_register,
-                       struct adc_register gain_register)
+extern struct adc_register U_RMS;
+ adc_data get_line_gain(const float expected_value, struct adc_register* measured_value_register,
+                       struct adc_register* gain_register)
 {
-    read_adc_register(&measured_value_register);
+    read_adc_register(measured_value_register);
 
-    read_adc_register(&gain_register);
-    adc_data old_gain = gain_register.data;
+    read_adc_register(gain_register);
+    adc_data old_gain = (*gain_register).data;
 
-    extern struct adc_register U_RMS;
     float divider = 1000;
-    if (measured_value_register.address == U_RMS.address)
+    if ((*measured_value_register).address == U_RMS.address)
         divider = 100;
 
-    const float float_measured_value = measured_value_register.data / divider;
+    const float float_measured_value = (*measured_value_register).data / divider;
 
     return old_gain * expected_value / float_measured_value;
 }
 
-extern uint16_t Un, Ib;
-extern uint16_t Ugain, IgainL, IgainN, Uoffset, IoffsetL, IoffsetN;
-extern struct adc_register U_GAIN, I_GAIN_L, I_GAIN_N, U_OFFSET, I_OFFSET_L, I_OFFSET_N;
-extern struct adc_register U_RMS, I_RMS, I_RMS_2;
 
 /*---------------ofsset------------------*/
 
-uint16_t get_offset(struct adc_register reg, const uint16_t gain)
+adc_data get_offset(struct adc_register reg, const adc_data gain)
 {
     read_adc_register(&reg);
     return ~get_offset_from_measured(reg.data, gain) + 1;
 }
 
-void get_Uoffset()
+adc_data get_power_offset(struct adc_register* power_register)
 {
-    Uoffset = get_offset(U_RMS, Ugain);
-}
-
-void write_Uoffset() // 34H
-{
-    U_OFFSET.data = Uoffset;
-    write_adc_register(U_OFFSET);
-}
-
-void get_IoffsetL()
-{
-    IoffsetL = get_offset(I_RMS, IgainL);
-}
-
-void write_IoffsetL() // 35H
-{
-    I_OFFSET_L.data = IoffsetL;
-    write_adc_register(I_OFFSET_L);
-}
-
-void get_IoffsetN()
-{
-    IoffsetN = get_offset(I_RMS_2, IgainN);
-}
-void write_IoffsetN() // 36H
-{
-    I_OFFSET_N.data = IoffsetN;
-    write_adc_register(I_OFFSET_N);
-}
-
-extern uint16_t PoffsetL, QoffsetL, PoffsetN, QoffsetN;
-
-void get_PQoffsetL() // 37H 38H
-{
-    extern struct adc_register P_MEAN, Q_MEAN;
-    PoffsetL = get_average_data_fm_register(P_MEAN, 5);
-    PoffsetN = get_average_data_fm_register(Q_MEAN, 5);
-}
-
-void write_PQoffsetL() // 37H 38H
-{
-    extern struct adc_register P_OFFSET_L, Q_OFFSET_L;
-    P_OFFSET_L.data = PoffsetL;
-    Q_OFFSET_L.data = QoffsetL;
-    write_adc_register(P_OFFSET_L);
-    write_adc_register(Q_OFFSET_L);
-}
-
-void get_PQoffsetN()
-{
-    extern struct adc_register P_MEAN_2, Q_MEAN_2;
-    PoffsetN = get_average_data_fm_register(P_MEAN_2, 5);
-    QoffsetN = get_average_data_fm_register(Q_MEAN_2, 5);
-}
-
-void write_PQoffsetN() // 37H 38H
-{
-    extern struct adc_register P_OFFSET_N, Q_OFFSET_N;
-    P_OFFSET_N.data = PoffsetN;
-    Q_OFFSET_N.data = QoffsetN;
-    write_adc_register(P_OFFSET_N);
-    write_adc_register(Q_OFFSET_N);
+    return get_average_data_fm_register(power_register, 5);
 }

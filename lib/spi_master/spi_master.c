@@ -66,25 +66,48 @@ extern adc_data Ugain, IgainL, IgainN;
 extern adc_data Un, Ib;
 void exec_gain_calibration()
 {
-    Ugain = get_line_gain(Un, U_RMS, U_GAIN); // needs measure at 230V
-    IgainL = get_line_gain(Ib, I_RMS, I_GAIN_L); // needs measure at Ib
-    IgainN = get_line_gain(Ib, I_RMS_2, I_GAIN_N); // needs measure at Ib
+    Ugain = get_line_gain(Un, &U_RMS, &U_GAIN); // needs measure at 230V
+    IgainL = get_line_gain(Ib, &I_RMS, &I_GAIN_L); // needs measure at Ib
+    IgainN = get_line_gain(Ib, &I_RMS_2, &I_GAIN_N); // needs measure at Ib
 }
+
+extern adc_data Uoffset, IoffsetL, IoffsetN;
+extern adc_data PoffsetL, QoffsetL, PoffsetN, QoffsetN;
+
+extern struct adc_register P_MEAN, Q_MEAN, P_MEAN_2, Q_MEAN_2;
 
 void exec_offset_calibration() // needs measure no current
 {
-    get_Uoffset();
-    get_IoffsetL();
-    get_IoffsetN();
+    Uoffset = get_offset(U_RMS, Ugain);
+    IoffsetL = get_offset(I_RMS, IgainL);
+    IoffsetN = get_offset(I_RMS_2, IgainN);
 
     extern struct adc_register SMALL_P_MOD;
     SMALL_P_MOD.data = 0xA987;
     write_adc_register(SMALL_P_MOD); // small power mode
-    get_PQoffsetL();
-    get_PQoffsetN();
+
+    PoffsetL = get_power_offset(&P_MEAN);
+    PoffsetN = get_power_offset(&P_MEAN_2);
+    QoffsetL = get_power_offset(&P_MEAN);
+    QoffsetN = get_power_offset(&Q_MEAN_2);
+
     SMALL_P_MOD.data = 0xA980;
     write_adc_register(SMALL_P_MOD);
 }
+
+extern struct adc_register U_OFFSET, I_OFFSET_L, I_OFFSET_N;
+void exec_offset_calibration_write() // needs measure no current
+{
+    U_OFFSET.data = Uoffset;
+    I_OFFSET_L.data = IoffsetL;
+    I_OFFSET_N.data = IoffsetN;
+    write_adc_register(U_OFFSET);
+    write_adc_register(I_OFFSET_L);
+    write_adc_register(I_OFFSET_N);
+}
+
+extern struct adc_register P_OFFSET_L, Q_OFFSET_L;
+extern struct adc_register P_OFFSET_N, Q_OFFSET_N;
 
 void exec_measurement_calibration()
 {
@@ -120,11 +143,22 @@ void exec_measurement_calibration()
         save_nvs_param("QoffsetN", QoffsetN);
     #endif
 
-    write_Uoffset();
-    write_IoffsetL();
-    write_IoffsetN();
-    write_PQoffsetL();
-    write_PQoffsetN();
+    U_OFFSET.data = Uoffset;
+    write_adc_register(U_OFFSET);
+    I_OFFSET_L.data = IoffsetL;
+    write_adc_register(I_OFFSET_L);
+    I_OFFSET_N.data = IoffsetN;
+    write_adc_register(I_OFFSET_N);
+
+    P_OFFSET_L.data = PoffsetL;
+    Q_OFFSET_L.data = QoffsetL;
+    write_adc_register(P_OFFSET_L);
+    write_adc_register(Q_OFFSET_L);
+
+    P_OFFSET_N.data = PoffsetN;
+    Q_OFFSET_N.data = QoffsetN;
+    write_adc_register(P_OFFSET_N);
+    write_adc_register(Q_OFFSET_N);
 
     ///update CS2 register
     extern struct adc_register CS2;
