@@ -30,7 +30,7 @@ void test_average_data_fm_register()
 {
     read_adc_register_Stub(callback);
 
-    adc_data average = get_average_data_fm_register(U_RMS, 5);
+    adc_data average = get_average_data_fm_register(&U_RMS, 5);
     TEST_ASSERT(average == 0xFFCB);
 }
 
@@ -82,7 +82,7 @@ void test_get_line_gain_for_Un(void)
 
     adc_data expected_gain = 0x5C3B;
 
-    adc_data actual_gain = get_line_gain(Un, measured_value_register, gain_register);
+    adc_data actual_gain = get_line_gain(Un, &measured_value_register, &gain_register);
 
     TEST_ASSERT_EQUAL_UINT16(expected_gain, actual_gain);
 }
@@ -101,7 +101,7 @@ void test_get_line_gain_for_Ib(void)
 
     adc_data expected_gain = 0x5AA6;
 
-    adc_data actual_gain = get_line_gain(Ib, measured_value_register, gain_register);
+    adc_data actual_gain = get_line_gain(Ib, &measured_value_register, &gain_register);
 
     TEST_ASSERT_EQUAL_UINT16(expected_gain, actual_gain);
 }
