@@ -17,6 +17,8 @@ void write_threshold_register(struct adc_register threshold_register);
 
 void write_MMODE();
 
+/*---------------gain------------------*/
+
 /**
  * @brief write calculated gain based on measured and expected values to gain address
  *
@@ -26,14 +28,6 @@ void write_MMODE();
  */
  adc_data get_line_gain(const float expected_value, struct adc_register measured_value_register,
                         struct adc_register gain_register);
-
-/*---------------gain------------------*/
-
-void write_Ugain(); // 31H
-
-void write_IgainL(); // 32H
-
-void write_IgainN(); // 33H
 
 /*---------------ofsset------------------*/
 

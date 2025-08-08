@@ -101,10 +101,13 @@ void exec_measurement_calibration()
         save_nvs_param("IgainN", IgainN);
     #endif
 
-    write_Ugain();
-    write_IgainL();
-    write_IgainN();
-
+    // write gains to registers
+    U_GAIN.data = Ugain;
+    write_adc_register(U_GAIN);
+    I_GAIN_L.data = IgainL;
+    write_adc_register(I_GAIN_L);
+    I_GAIN_N.data = IgainN;
+    write_adc_register(I_GAIN_N);
 
     #ifdef CALIBRATION_NO_CURRENT
         exec_offset_calibration(); //

@@ -88,6 +88,7 @@ void write_MMODE() // 2BH
  * @param gain_address address of gain value
  */
 
+ /*---------------gain------------------*/
 adc_data get_line_gain(const float expected_value, struct adc_register measured_value_register,
                        struct adc_register gain_register)
 {
@@ -110,26 +111,6 @@ extern uint16_t Un, Ib;
 extern uint16_t Ugain, IgainL, IgainN, Uoffset, IoffsetL, IoffsetN;
 extern struct adc_register U_GAIN, I_GAIN_L, I_GAIN_N, U_OFFSET, I_OFFSET_L, I_OFFSET_N;
 extern struct adc_register U_RMS, I_RMS, I_RMS_2;
-
-/*---------------gain------------------*/
-
-void write_Ugain() // 31H
-{
-    U_GAIN.data = Ugain;
-    write_adc_register(U_GAIN);
-}
-
-void write_IgainL() // 32H
-{
-    I_GAIN_L.data = IgainL;
-    write_adc_register(I_GAIN_L);
-}
-
-void write_IgainN() // 33H
-{
-    I_GAIN_N.data = IgainN;
-    write_adc_register(I_GAIN_N);
-}
 
 /*---------------ofsset------------------*/
 
