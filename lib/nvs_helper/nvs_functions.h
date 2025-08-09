@@ -1,6 +1,9 @@
 #ifndef NVS_FUNCTIONS_H
 #define NVS_FUNCTIONS_H
 
+#include "esp_err.h"
+#include "nvs.h"
+
 #include <stdint.h>
 
 /**
@@ -18,5 +21,8 @@ void load_param(const char*    key,   const char* key_array[],
                 const uint16_t value, uint16_t*   to_param_array[],
                 const int array_keys_count);
 
+esp_err_t nvs_init(void);
+esp_err_t nvs_open_file(const char* namespace, nvs_handle_t* handle);
+void nvs_close_file(nvs_handle_t handle);
 
 #endif // NVS_FUNCTIONS_H

@@ -1,6 +1,7 @@
 #include "wifi_connect.h"
 #include "spi_master.h"
 #include "spi_functions.h"
+#include "nvs_functions.h"
 #include "nvs_params.h"
 
 #include <stdio.h>
@@ -18,7 +19,12 @@
 
 void app_main(void)
 {
-    load_nvs_params();
+    esp_err_t nvs_error = nvs_init();
+    assert(nvs_error == ESP_OK);
+    nvs_handle_t nvs_handle;// = 0;
+    nvs_open_file("meter_config", &nvs_handle);
+    load_nvs_params(nvs_handle);
+    nvs_close(nvs_handle);
 
     connect_to_wifi();
 
