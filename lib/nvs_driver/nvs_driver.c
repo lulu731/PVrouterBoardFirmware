@@ -7,7 +7,7 @@
 static const char* namespace = "meter_config";
 
 nvs_handle_t handle = 0;
-static nvs_iterator_t iterator = 0; // TODO: should be released nvs_release_iterator(iterator);
+static nvs_iterator_t iterator = NULL; // TODO: should be released nvs_release_iterator(iterator);
 
 nvs_data_t get_first_nvs_data(void)
 {
@@ -18,17 +18,26 @@ nvs_data_t get_first_nvs_data(void)
     };
 
     esp_err_t nvs_error = nvs_entry_find("nvs", namespace, NVS_TYPE_U16, &iterator);
-    if (nvs_error == ESP_OK)
+    switch (nvs_error)
     {
-        nvs_entry_info_t entry_info;
-        nvs_entry_info(iterator, &entry_info);
+        case ESP_OK:
+            nvs_entry_info_t entry_info;
+            nvs_entry_info(iterator, &entry_info);
 
-        uint16_t param_value;
-        nvs_get_u16(handle, entry_info.key, &param_value);
+            uint16_t param_value;
+            nvs_get_u16(handle, entry_info.key, &param_value);
 
-        nvs_data.key = entry_info.key;
-        nvs_data.value = param_value;
+            nvs_data.key = entry_info.key;
+            nvs_data.value = param_value;
+
+            break;
+
+        case ESP_ERR_INVALID_ARG:
+            break;
+
+        default:
+            nvs_release_iterator(iterator);
+            break;
     }
-
     return nvs_data;
 }
