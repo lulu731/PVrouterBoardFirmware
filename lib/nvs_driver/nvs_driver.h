@@ -10,5 +10,6 @@ typedef struct
 } nvs_data_t;
 
 nvs_data_t get_first_nvs_data(void);
+nvs_data_t get_next_nvs_data(void);
 
 #endif // NVS_DRIVER_H

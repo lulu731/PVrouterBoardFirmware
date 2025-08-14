@@ -41,3 +41,29 @@ nvs_data_t get_first_nvs_data(void)
     }
     return nvs_data;
 }
+
+nvs_data_t get_next_nvs_data(void)
+{
+    nvs_data_t nvs_data =
+    {
+        .key = NULL,
+        .value = 0
+    };
+
+    esp_err_t nvs_error = nvs_entry_next(&iterator);
+    if (nvs_error == ESP_OK)
+    {
+        nvs_entry_info_t entry_info;
+        nvs_entry_info(iterator, &entry_info);
+
+        uint16_t param_value;
+        nvs_get_u16(handle, entry_info.key, &param_value);
+
+        nvs_data.key = entry_info.key;
+        nvs_data.value = param_value;
+    }
+    else
+        nvs_release_iterator(iterator);
+
+    return nvs_data;
+}
