@@ -27,16 +27,14 @@ void tearDown(void)
 {
 }
 
-void assert_nvs_data_returned(const nvs_data_t expected_nvs_data)
+void assert_nvs_data_returned(const nvs_data_t expected_nvs_data, const nvs_data_t actual_nvs_data)
 {
-    nvs_data_t actual_nvs_data = get_first_nvs_data();
     TEST_ASSERT_EQUAL_STRING(expected_nvs_data.key, actual_nvs_data.key);
     TEST_ASSERT_EQUAL_UINT16(expected_nvs_data.value, actual_nvs_data.value);
 }
 
 static uint32_t int_iterator = 0;
 static nvs_iterator_t iterator = &int_iterator;
-
 
 void test_get_first_nvs_data(void)
 {
@@ -58,20 +56,28 @@ void test_get_first_nvs_data(void)
     nvs_get_u16_IgnoreArg_out_value();
     nvs_get_u16_ReturnThruPtr_out_value(&param_value);
 
-    assert_nvs_data_returned(nvs_datas[*iterator]);
+    nvs_data_t actual_nvs_data = get_first_nvs_data();
+
+    assert_nvs_data_returned(nvs_datas[*iterator], actual_nvs_data);
 }
 
 void test_get_first_nvs_data_no_entry_found(void)
 {
     nvs_entry_find_ExpectAnyArgsAndReturn(ESP_ERR_NVS_NOT_FOUND);
     nvs_release_iterator_ExpectAnyArgs();
-    assert_nvs_data_returned((nvs_data_t){NULL, 0});
+
+    nvs_data_t actual_nvs_data = get_first_nvs_data();
+
+    assert_nvs_data_returned((nvs_data_t){NULL, 0}, actual_nvs_data);
 }
 
 void test_get_first_nvs_data_invalid_arg_should_not_release_iterator(void)
 {
     nvs_entry_find_ExpectAnyArgsAndReturn(ESP_ERR_INVALID_ARG);
-    assert_nvs_data_returned((nvs_data_t){NULL, 0});
+
+    nvs_data_t actual_nvs_data = get_first_nvs_data();
+
+    assert_nvs_data_returned((nvs_data_t){NULL, 0}, actual_nvs_data);
 }
 
 void test_get_next_nvs_data(void)
@@ -97,10 +103,9 @@ void test_get_next_nvs_data(void)
     nvs_get_u16_IgnoreArg_out_value();
     nvs_get_u16_ReturnThruPtr_out_value(&param_value);
 
-    nvs_data_t nvs_data = get_next_nvs_data();
+    nvs_data_t actual_nvs_data = get_next_nvs_data();
 
-    TEST_ASSERT_EQUAL_STRING(nvs_datas[1].key, nvs_data.key);
-    TEST_ASSERT_EQUAL_UINT16(nvs_datas[1].value, nvs_data.value);
+    assert_nvs_data_returned(nvs_datas[1], actual_nvs_data);
 }
 
 #endif // TEST
