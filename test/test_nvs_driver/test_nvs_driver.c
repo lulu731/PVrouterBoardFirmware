@@ -77,8 +77,7 @@ void test_get_first_nvs_data_invalid_arg_should_not_release_iterator(void)
 void test_get_next_nvs_data(void)
 {
     test_get_first_nvs_data();
-
-    iterator++;
+    int_iterator++;
     nvs_entry_next_ExpectAnyArgsAndReturn(ESP_OK);
     nvs_entry_next_ReturnThruPtr_iterator(&iterator);
 
@@ -100,8 +99,8 @@ void test_get_next_nvs_data(void)
 
     nvs_data_t nvs_data = get_next_nvs_data();
 
-    TEST_ASSERT_EQUAL_STRING(nvs_datas[*iterator].key, nvs_data.key);
-    TEST_ASSERT_EQUAL_UINT16(nvs_datas[*iterator].value, nvs_data.value);
+    TEST_ASSERT_EQUAL_STRING(nvs_datas[1].key, nvs_data.key);
+    TEST_ASSERT_EQUAL_UINT16(nvs_datas[1].value, nvs_data.value);
 }
 
 #endif // TEST
