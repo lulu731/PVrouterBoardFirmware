@@ -31,6 +31,9 @@ esp_err_t nvs_entry_find(const char *part_name,
         nvs_type_t type,
         nvs_iterator_t *output_iterator);
 
+
+esp_err_t nvs_entry_next(nvs_iterator_t *iterator);
+
 esp_err_t nvs_entry_info(const nvs_iterator_t iterator, nvs_entry_info_t *out_info);
 
 esp_err_t nvs_get_u16 (nvs_handle_t handle, const char* key, uint16_t* out_value);
