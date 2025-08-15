@@ -9,7 +9,7 @@ typedef struct
     uint16_t value;
 } nvs_data_t;
 
-nvs_data_t get_first_nvs_data(void);
-nvs_data_t get_next_nvs_data(void);
+const nvs_data_t get_first_nvs_data(void);
+const nvs_data_t get_next_nvs_data(void);
 
 #endif // NVS_DRIVER_H

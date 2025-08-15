@@ -9,7 +9,7 @@ static const char* namespace = "meter_config";
 nvs_handle_t handle = 0;
 static nvs_iterator_t iterator = NULL; // TODO: should be released nvs_release_iterator(iterator);
 
-nvs_data_t get_first_nvs_data(void)
+const nvs_data_t get_first_nvs_data(void)
 {
     nvs_data_t nvs_data =
     {
@@ -42,7 +42,7 @@ nvs_data_t get_first_nvs_data(void)
     return nvs_data;
 }
 
-nvs_data_t get_next_nvs_data(void)
+const nvs_data_t get_next_nvs_data(void)
 {
     nvs_data_t nvs_data =
     {
