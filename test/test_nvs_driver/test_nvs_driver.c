@@ -104,4 +104,30 @@ void test_get_next_nvs_data(void)
     assert_nvs_data_returned(nvs_datas[1], actual_nvs_data);
 }
 
+
+void mock_get_next_nvs_data_with_error(const esp_err_t nvs_error)
+{
+    test_get_first_nvs_data();
+    nvs_entry_next_ExpectAnyArgsAndReturn(nvs_error);
+    nvs_release_iterator_ExpectAnyArgs();
+}
+
+void test_get_next_nvs_data_not_found(void)
+{
+    mock_get_next_nvs_data_with_error(ESP_ERR_NVS_NOT_FOUND);
+
+    nvs_data_t actual_nvs_data = get_next_nvs_data();
+
+    assert_nvs_data_returned((nvs_data_t){NULL, 0}, actual_nvs_data);
+}
+
+void test_get_next_nvs_data_invalid_arg(void)
+{
+    mock_get_next_nvs_data_with_error(ESP_ERR_INVALID_ARG);
+
+    nvs_data_t actual_nvs_data = get_next_nvs_data();
+
+    assert_nvs_data_returned((nvs_data_t){NULL, 0}, actual_nvs_data);
+}
+
 #endif // TEST
