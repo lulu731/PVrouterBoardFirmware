@@ -8,18 +8,6 @@
 
 static const char *TAG = "nvs_params";
 
-void load_param(const char*    key,   const char* key_array[],
-                const uint16_t value, uint16_t*   to_param_array[],
-                const int array_keys_count)
-{
-    for (int i = 0; i < array_keys_count; i++)
-        if (strcmp(key, key_array[i]) == 0)
-        {
-            *to_param_array[i] = value;
-            return;
-        }
-}
-
 esp_err_t nvs_init(void)
 {
     esp_err_t nvs_error = nvs_flash_init();
