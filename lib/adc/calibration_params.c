@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include "calibration_params.h"
 
 uint16_t Mc, Un, Ib, Gl, Vl, Vu,
          Ugain, IgainL, IgainN,
