@@ -1,0 +1,37 @@
+{
+    "title": "Kanban",
+    "cols": [
+        {
+            "title": "Bugs",
+            "tasks": [],
+            "id": "mo8m0dzct55z3u03ej88q2hc",
+            "color": "#eb144c"
+        },
+        {
+            "title": "To-Do",
+            "tasks": [
+                {
+                    "text": "implement calibration variables loading from nvs",
+                    "id": "rokw582g6hxxzdd4aswjmg75"
+                }
+            ],
+            "id": "wasv5vybmbxplwkui3f9oin3",
+            "color": "#fcb900"
+        },
+        {
+            "title": "Doing",
+            "tasks": [],
+            "id": "rx7fs3lupnwey2dz9hwefauo",
+            "color": "#0693e3"
+        },
+        {
+            "title": "Done",
+            "tasks": [],
+            "id": "zu3wx0hxdx2qyfdwppghdgud",
+            "color": "#00d084"
+        }
+    ],
+    "autosave": false,
+    "saveToFile": true,
+    "timestamp": 1755355540716
+}
