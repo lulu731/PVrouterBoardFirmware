@@ -6,18 +6,9 @@
 #include "esp_err.h"
 
 #include "nvs_driver.h"
+#include "common_datas.h"
 
 #include <string.h>
-
-static nvs_data_t nvs_datas[] =
-{
-    {"Mc", 1000},
-    {"Un", 230},
-    {"Ib", 10},
-    {"Gl", 1},
-    {"Vl", 167},
-    {"Vu", 529}
-};
 
 void assert_nvs_data_returned(const nvs_data_t expected_nvs_data, const nvs_data_t actual_nvs_data)
 {
