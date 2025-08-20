@@ -10,7 +10,7 @@
 
 #define ESP_ERR_NVS_BASE                    0x1100                     /*!< Starting number of error codes */
 #define ESP_ERR_NVS_NOT_FOUND               (ESP_ERR_NVS_BASE + 0x02)  /*!< A requested entry couldn't be found or namespace doesn’t exist yet and mode is NVS_READONLY */
-
+#define ESP_ERR_NVS_NO_FREE_PAGES           (ESP_ERR_NVS_BASE + 0x0d)  /*!< No free space available in the NVS partition */
 
 typedef uint32_t nvs_handle_t;
 

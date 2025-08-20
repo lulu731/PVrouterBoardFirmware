@@ -8,17 +8,6 @@
 
 static const char *TAG = "nvs_params";
 
-esp_err_t nvs_init(void)
-{
-    esp_err_t nvs_error = nvs_flash_init();
-    if (nvs_error == ESP_ERR_NVS_NO_FREE_PAGES || nvs_error == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-        ESP_ERROR_CHECK(nvs_flash_erase());
-        nvs_error = nvs_flash_init();
-    }
-
-    return nvs_error;
-}
-
 esp_err_t nvs_open_file(const char* namespace, nvs_handle_t* handle)
 {
     esp_err_t nvs_error = nvs_open(namespace, NVS_READWRITE, handle);

@@ -2,6 +2,7 @@
 
 #include "unity.h"
 #include "mock_nvs.h"
+#include "mock_nvs_flash.h"
 
 #include "esp_err.h"
 
@@ -43,6 +44,22 @@ void setUp(void)
 
 void tearDown(void)
 {
+}
+
+void test_nvs_init(void)
+{
+    nvs_flash_init_ExpectAndReturn(ESP_OK);
+    TEST_ASSERT_EQUAL_UINT8(NVS_OK, nvs_init());
+}
+
+void test_nvs_init_errors(void)
+{
+    int nvs_errors[] = {ESP_ERR_NVS_NO_FREE_PAGES, ESP_ERR_NO_MEM, ESP_ERR_NOT_FOUND};
+    for (size_t i = 0; i < 3; i++)
+    {
+        nvs_flash_init_ExpectAndReturn(nvs_errors[i]);
+        TEST_ASSERT_EQUAL_UINT8(NVS_INIT_ERROR, nvs_init());
+    }
 }
 
 void test_get_first_nvs_data(void)

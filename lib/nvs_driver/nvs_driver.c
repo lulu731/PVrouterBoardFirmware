@@ -1,13 +1,23 @@
 #include "nvs_driver.h"
 
 #include "nvs.h"
+#include "nvs_flash.h"
 
 #include <stddef.h>
 
 static const char* namespace = "meter_config";
 
 nvs_handle_t handle = 0;
-static nvs_iterator_t iterator = NULL; // TODO: should be released nvs_release_iterator(iterator);
+static nvs_iterator_t iterator = NULL;
+
+nvs_err_t nvs_init(void)
+{
+    if (nvs_flash_init() != ESP_OK)
+    {
+        return NVS_INIT_ERROR;
+    }
+    return NVS_OK;
+};
 
 const nvs_data_t get_first_nvs_data(void)
 {
