@@ -1,6 +1,6 @@
 #include "adc_functions.h"
 
-#include "spi_functions.h"
+#include "calibration_helpers.h"
 #include "adc_rw.h"
 #include "adc_registers.h"
 

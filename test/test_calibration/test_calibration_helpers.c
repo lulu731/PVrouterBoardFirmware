@@ -1,6 +1,6 @@
 #include <unity.h>
 
-#include "spi_functions.h"
+#include "calibration_helpers.h"
 #include "adc_registers.h"
 #include "calibration_params.c"
 
