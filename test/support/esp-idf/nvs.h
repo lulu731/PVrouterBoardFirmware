@@ -40,4 +40,12 @@ esp_err_t nvs_get_u16 (nvs_handle_t handle, const char* key, uint16_t* out_value
 
 void nvs_release_iterator(nvs_iterator_t iterator);
 
+typedef enum {
+	NVS_READONLY,  /*!< Read only */
+	NVS_READWRITE  /*!< Read and write */
+} nvs_open_mode_t;
+
+esp_err_t nvs_open(const char* namespace_name, nvs_open_mode_t open_mode, nvs_handle_t *out_handle);
+void nvs_close(nvs_handle_t handle);
+
 #endif // NVS_H
