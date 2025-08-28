@@ -275,7 +275,10 @@
     # :html_absolute_paths: TRUE
     # :html_encoding: UTF-8
 
-# :module_generator:
+:module_generator:
+  :path_src: lib/
+  :path_inc: lib/
+  :path_tst: test/
 #   :naming: :snake #options: :bumpy, :camel, :caps, or :snake
 #   :includes:
 #     :tst: []
