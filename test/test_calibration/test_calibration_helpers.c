@@ -57,13 +57,13 @@ extern uint16_t Gl, Vl, Vu;
 void test_threshold()
 {
     Gl = 24;
-    Vl = 1;
+    Vl = 2;
     Vu = 250;
 
     const uint8_t Ks = 4; // 4 per mille = 0.4%
     const uint16_t Thr = get_threshold(Ks) ;
 
-    TEST_ASSERT_EQUAL_UINT16 (0x08BD, Thr);
+    TEST_ASSERT_EQUAL_UINT16 (0x117A, Thr);
 }
 
 void test_offset()
