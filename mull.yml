@@ -1,3 +1,5 @@
 excludePaths:
   - .*runners.*
   - .*unity.*
+  - .*mocks.*
+  - .*vendor.*
