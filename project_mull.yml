@@ -21,6 +21,7 @@
     :arguments:
       - ${1}
       - -o ${2}
+      - ${4}
 #     :name:
 #     :optional: FALSE
 #   :test_assembler:
