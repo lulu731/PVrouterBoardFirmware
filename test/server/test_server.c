@@ -24,7 +24,19 @@ void test_server_start_defining_uri(void)
 {
     httpd_start_ExpectAnyArgsAndReturn(ESP_OK);
     httpd_register_uri_handler_ExpectAnyArgsAndReturn(ESP_OK);
+
     server_err_t err = server_start();
+
+    TEST_ASSERT_EQUAL_UINT8(SERVER_OK, err);
+}
+
+void test_server_start_error(void)
+{
+    httpd_start_ExpectAnyArgsAndReturn(ESP_ERR_INVALID_ARG);
+
+    server_err_t err = server_start();
+
+    TEST_ASSERT_EQUAL_UINT8(SERVER_ERROR, err);
 }
 
 #endif // TEST
