@@ -98,5 +98,6 @@ typedef struct httpd_uri_t{
 esp_err_t httpd_start(httpd_handle_t *handle, const httpd_config_t *config);
 esp_err_t httpd_register_uri_handler(httpd_handle_t handle,
                                      const httpd_uri_t *uri_handler);
+esp_err_t httpd_stop(httpd_handle_t handle);
 
 #endif // ESP_HTTP_SERVER_H
