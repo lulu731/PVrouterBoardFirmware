@@ -10,5 +10,7 @@ typedef uint8_t server_err_t;
 
 void server_create(void);
 server_err_t server_start(void);
+server_err_t server_stop(void);
+void server_destroy(void);
 
 #endif // SERVER_H

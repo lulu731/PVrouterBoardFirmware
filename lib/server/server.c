@@ -37,12 +37,15 @@ server_err_t server_start(void)
     return SERVER_OK;
 }
 
-/*static void server_stop(void)
+server_err_t server_stop(void)
 {
-    httpd_stop(web_server);
+    if (httpd_stop(web_server) == ESP_OK)
+        return SERVER_OK;
+
+    return SERVER_ERROR;
 }
 
-static void server_destroy(void)
+void server_destroy(void)
 {
-    //httpd_stop(web_server);
-}*/
+    web_server = NULL;
+}
