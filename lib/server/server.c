@@ -26,7 +26,7 @@ void server_create(void)
 
 server_err_t server_start(void)
 {
-    esp_err_t err = httpd_start(web_server, &config);
+    esp_err_t err = httpd_start(&web_server, &config);
 
     if (err == ESP_OK)
         err = httpd_register_uri_handler(web_server, &index_uri);
@@ -39,10 +39,13 @@ server_err_t server_start(void)
 
 server_err_t server_stop(void)
 {
-    if (httpd_stop(web_server) == ESP_OK)
-        return SERVER_OK;
-
-    return SERVER_ERROR;
+    if (web_server != NULL)
+    {
+        esp_err_t err = httpd_stop(web_server);
+        if (err != ESP_OK)
+            return SERVER_ERROR;
+    }
+    return SERVER_OK;
 }
 
 void server_destroy(void)
