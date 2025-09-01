@@ -1,4 +1,3 @@
-
 #ifdef TEST
 
 #include "unity.h"
@@ -9,10 +8,21 @@
 #include "esp_err.h"
 
 static httpd_handle_t web_server = NULL;
-//static httpd_config_t config;
+static int server_handle = 100;
+
+static void mock_server(httpd_handle_t *server_handle, const esp_err_t start_error)
+{
+    httpd_start_ExpectAndReturn(NULL, NULL, start_error);
+    httpd_start_IgnoreArg_handle();
+    httpd_start_ReturnThruPtr_handle(server_handle);
+    httpd_start_IgnoreArg_config();
+    if (start_error == ESP_OK)
+        httpd_register_uri_handler_ExpectAnyArgsAndReturn(ESP_OK);
+}
 
 void setUp(void)
 {
+    web_server = &server_handle;
     server_create();
 }
 
@@ -23,8 +33,7 @@ void tearDown(void)
 
 void test_server_start_defining_uri(void)
 {
-    httpd_start_ExpectAnyArgsAndReturn(ESP_OK);
-    httpd_register_uri_handler_ExpectAnyArgsAndReturn(ESP_OK);
+    mock_server(&web_server, ESP_OK);
 
     server_err_t err = server_start();
 
@@ -33,8 +42,7 @@ void test_server_start_defining_uri(void)
 
 void test_server_start_error(void)
 {
-    httpd_start_ExpectAnyArgsAndReturn(ESP_ERR_INVALID_ARG);
-
+    mock_server(&web_server, ESP_ERR_INVALID_ARG);
     server_err_t err = server_start();
 
     TEST_ASSERT_EQUAL_UINT8(SERVER_ERROR, err);
@@ -42,27 +50,32 @@ void test_server_start_error(void)
 
 void test_server_stop(void)
 {
+    mock_server(&web_server, ESP_OK);
+    server_err_t err = server_start();
+
     httpd_stop_ExpectAnyArgsAndReturn(ESP_OK);
-    server_err_t err = server_stop();
+    err = server_stop();
 
     TEST_ASSERT_EQUAL_UINT8(SERVER_OK, err);
 }
 
 void test_server_stop_error(void)
 {
+    mock_server(&web_server, ESP_OK);
+    server_err_t err = server_start();
+
     httpd_stop_ExpectAnyArgsAndReturn(ESP_ERR_INVALID_ARG);
-    server_err_t err = server_stop();
+    err = server_stop();
 
     TEST_ASSERT_EQUAL_UINT8(SERVER_ERROR, err);
 }
 
-void test_server_stop_should_return_OK_if_server_null(void)
+void test_server_stop_should_return_OK_if_server_handle_null(void)
 {
-    httpd_start_ExpectAnyArgsAndReturn(ESP_OK);
-    httpd_register_uri_handler_ExpectAnyArgsAndReturn(ESP_OK);
+    web_server = NULL;
+    mock_server(&web_server, ESP_OK);
     server_err_t err = server_start();
 
-    httpd_stop_ExpectAndReturn(NULL, ESP_ERR_INVALID_ARG);
     err = server_stop();
 
     TEST_ASSERT_EQUAL_UINT8(SERVER_OK, err);
