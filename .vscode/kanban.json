@@ -11,6 +11,10 @@
             "title": "To-Do",
             "tasks": [
                 {
+                    "text": "server: config flags to use WS",
+                    "id": "t9isc6padkqfxnulkjqg7vfp"
+                },
+                {
                     "text": "make the tests work on hardware:\n- one test to drive all tests\n- use esp compiler\n",
                     "id": "dx5k2w0belpeiodun56dy30g"
                 },
@@ -54,5 +58,5 @@
     ],
     "autosave": false,
     "saveToFile": true,
-    "timestamp": 1755853801706
+    "timestamp": 1757191509819
 }
