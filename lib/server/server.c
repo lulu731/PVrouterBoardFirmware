@@ -4,6 +4,12 @@
 
 #include <stddef.h>
 
+#ifndef TEST
+#define STATIC static
+#else
+#define STATIC
+#endif
+
 static httpd_handle_t web_server = NULL;
 static httpd_config_t config;
 
@@ -12,11 +18,12 @@ static esp_err_t index_handler(httpd_req_t *req)
     return ESP_OK;
 }
 
-static httpd_uri_t index_uri = {
+STATIC httpd_uri_t index_uri = {
     .uri       = "/",
     .method    = HTTP_GET,
     .handler   = index_handler,
-    .user_ctx  = NULL
+    .user_ctx  = NULL,
+    .is_websocket = true
 };
 
 void server_create(void)
