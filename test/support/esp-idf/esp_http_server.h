@@ -3,6 +3,8 @@
 
 #include "esp_err.h"
 
+#include <stdbool.h>
+
 typedef void* httpd_handle_t;
 
 /*typedef struct httpd_config {
@@ -93,6 +95,7 @@ typedef struct httpd_uri_t{
     httpd_method_t    method;
     esp_err_t (*handler)(httpd_req_t *r);
     void *user_ctx;
+    bool is_websocket;
 } httpd_uri_t;
 
 esp_err_t httpd_start(httpd_handle_t *handle, const httpd_config_t *config);

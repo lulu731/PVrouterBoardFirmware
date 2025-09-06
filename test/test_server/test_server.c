@@ -10,6 +10,8 @@
 static httpd_handle_t web_server = NULL;
 static int server_handle = 100;
 
+extern httpd_uri_t index_uri;
+
 static void mock_server(httpd_handle_t *server_handle, const esp_err_t start_error)
 {
     httpd_start_ExpectAndReturn(NULL, NULL, start_error);
@@ -31,12 +33,13 @@ void tearDown(void)
     server_destroy();
 }
 
-void test_server_start_defining_uri(void)
+void test_server_start_defining_uri_as_websocket(void)
 {
     mock_server(&web_server, ESP_OK);
 
     server_err_t err = server_start();
 
+    TEST_ASSERT(index_uri.is_websocket);
     TEST_ASSERT_EQUAL_UINT8(SERVER_OK, err);
 }
 
