@@ -11,6 +11,10 @@
             "title": "To-Do",
             "tasks": [
                 {
+                    "text": "connect to wifi: check use of nvs which should be excluded from module",
+                    "id": "qt513i7x65jjdwpor7wp37o0"
+                },
+                {
                     "text": "server: config flags to use WS",
                     "id": "t9isc6padkqfxnulkjqg7vfp"
                 },
@@ -58,5 +62,5 @@
     ],
     "autosave": false,
     "saveToFile": true,
-    "timestamp": 1757191509819
+    "timestamp": 1757360197879
 }
