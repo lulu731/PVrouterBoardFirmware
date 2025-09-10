@@ -98,9 +98,27 @@ typedef struct httpd_uri_t{
     bool is_websocket;
 } httpd_uri_t;
 
+#define HTTPD_WS_TYPE_TEXT 0x1
+typedef struct httpd_ws_frame_t
+{
+    bool fragmented;
+    uint8_t type;
+    uint8_t* payload;
+    uint16_t len;
+} httpd_ws_frame_t;
+
+
 esp_err_t httpd_start(httpd_handle_t *handle, const httpd_config_t *config);
 esp_err_t httpd_register_uri_handler(httpd_handle_t handle,
                                      const httpd_uri_t *uri_handler);
 esp_err_t httpd_stop(httpd_handle_t handle);
+
+typedef int httpd_err_code_t;
+
+esp_err_t httpd_resp_send_err(httpd_req_t *req, httpd_err_code_t error, const char *msg);
+esp_err_t httpd_resp_sendstr_chunk(httpd_req_t *r, const char *str);
+esp_err_t httpd_ws_send_frame(httpd_req_t *req, httpd_ws_frame_t *pkt);
+
+#define vTaskDelay(x)
 
 #endif // ESP_HTTP_SERVER_H

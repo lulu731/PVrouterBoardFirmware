@@ -82,18 +82,23 @@ STATIC httpd_uri_t index_uri = {
 
 void server_create(void)
 {
+    ESP_LOGI(TAG, "creating server");
     web_server = NULL;
 }
 
 server_err_t server_start(void)
 {
+    ESP_LOGI(TAG, "starting server");
     esp_err_t err = httpd_start(&web_server, &config);
 
     if (err == ESP_OK)
         err = httpd_register_uri_handler(web_server, &index_uri);
 
     if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "httpd_start fail");
         return SERVER_ERROR;
+    }
 
     return SERVER_OK;
 }
