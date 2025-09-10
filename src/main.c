@@ -8,6 +8,7 @@
 #include "freertos/task.h"
 #include "freertos/queue.h"
 #include "driver/gpio.h"
+#include "mount_partition_Driver.h"
 #include "server.h"
 
 
@@ -23,6 +24,9 @@ void app_main(void)
     nvs_open_file("meter_config", &nvs_handle);
     load_nvs_params(nvs_handle);
     nvs_close(nvs_handle);*/
+
+    mount_part_create("littlefs", "/littlefs");
+    mount_part();
 
     connect_to_wifi();
 

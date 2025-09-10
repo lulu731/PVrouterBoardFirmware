@@ -21,7 +21,7 @@ static httpd_config_t config = HTTPD_DEFAULT_CONFIG();
 static esp_err_t index_handler(httpd_req_t *req)
 {
     ESP_LOGI(TAG, "Reading %s", "/index.html");
-    FILE* pfile = fopen("/index.html", "r");
+    FILE* pfile = fopen("/littlefs/index.html", "r");
 
     if (pfile == NULL)
     {
