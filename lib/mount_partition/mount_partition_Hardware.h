@@ -1,6 +1,21 @@
-
 #ifndef MOUNT_PARTITION_HARDWARE_H
 #define MOUNT_PARTITION_HARDWARE_H
 
+#include <stdint.h>
+//#include <esp_littlefs.h>
 
-#endif // MOUNT_PARTITION_HARDWARE_H
+typedef uint8_t hardware_mount_error_t;
+
+#define HARD_MOUNT_OK    0
+#define HARD_MOUNT_ERROR 1
+
+typedef struct
+{
+    const char *base_path;            /**< Mounting point. */
+    const char *partition_label;      /**< Label of partition to use.*/
+} fs_config_t;
+
+void init_fs(const char* partition_name, const char* mount_point);
+hardware_mount_error_t mount_fs();
+
+#endif // MOUNT_PARTITION_HARDWARE_H>
