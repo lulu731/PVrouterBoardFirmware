@@ -21,6 +21,12 @@ static httpd_config_t config = HTTPD_DEFAULT_CONFIG();
 
 static esp_err_t index_handler(httpd_req_t *req)
 {
+    if (req->method == HTTP_GET)
+    {
+        ESP_LOGI(TAG, "handshake done");
+        return ESP_OK;
+    }
+
     ESP_LOGI(TAG, "Reading %s", "/index.html");
     FILE* pfile = fopen("/littlefs/index.html", "r");
 
@@ -34,19 +40,6 @@ static esp_err_t index_handler(httpd_req_t *req)
     {
 		char line[128];
 		while (fgets(line, sizeof(line), pfile) != NULL) {
-			/*size_t linelen = strlen(line);
-			//remove EOL (CR or LF)
-			for (int i=linelen;i>0;i--) {
-				if (line[i-1] == 0x0a) {
-					line[i-1] = 0;
-				} else if (line[i-1] == 0x0d) {
-					line[i-1] = 0;
-				} else {
-					break;
-				}
-			}*/
-			//ESP_LOGD(TAG, "line=[%s]", line);
-			//if (strlen(line) == 0) continue;
 			esp_err_t ret = httpd_resp_sendstr_chunk(req, line);//, HTTPD_RESP_USE_STRLEN);
 			if (ret != ESP_OK) {
 				ESP_LOGE(TAG, "httpd_resp_sendstr_chunk fail %d", ret);
@@ -54,7 +47,7 @@ static esp_err_t index_handler(httpd_req_t *req)
 		}
 		fclose(pfile);
 
-        int i = 0;
+        /*int i = 0;
         while (1) {
             char data[11];
             sprintf(data, "%d", i++);
@@ -68,7 +61,7 @@ static esp_err_t index_handler(httpd_req_t *req)
             };
             httpd_ws_send_frame(req, &frame);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
-        }
+        }*/
 	}
     return ESP_OK;
 }
