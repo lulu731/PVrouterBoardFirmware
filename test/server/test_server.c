@@ -2,6 +2,7 @@
 
 #include "unity.h"
 #include "mock_esp_http_server.h"
+#include "mock_server_Hardware.h"
 
 #include "server.h"
 
@@ -82,6 +83,17 @@ void test_server_stop_should_return_OK_if_server_handle_null(void)
     err = server_stop();
 
     TEST_ASSERT_EQUAL_UINT8(SERVER_OK, err);
+}
+
+void test_send_to_all_clients(void)
+{
+    mock_server(&web_server, ESP_OK);
+    server_err_t err = server_start();
+
+    const char* message = "test_message";
+
+    httpd_send_to_all_clients_Expect(message);
+    server_send_to_all_clients(message);
 }
 
 #endif // TEST
