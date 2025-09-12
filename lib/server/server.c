@@ -1,4 +1,5 @@
 #include "server.h"
+#include "server_Hardware.h"
 
 #include "esp_http_server.h"
 #include "esp_log.h"
@@ -112,6 +113,11 @@ server_err_t server_stop(void)
             return SERVER_ERROR;
     }
     return SERVER_OK;
+}
+
+void server_send_to_all_clients(const char* message)
+{
+    httpd_send_to_all_clients(message);
 }
 
 void server_destroy(void)
