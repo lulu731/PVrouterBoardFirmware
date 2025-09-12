@@ -39,7 +39,7 @@
   {init()};
   function init()// open WebSocket
   {
-    wskt = new WebSocket('ws://' + window.location.hostname + ':81/');
+    wskt = new WebSocket('ws://' + window.location.hostname + ':80/');
     wskt.onmessage = function(rx)
     {  // client receive message
       var obj = rx.data;
