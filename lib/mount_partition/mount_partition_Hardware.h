@@ -15,7 +15,7 @@ typedef struct
     const char *partition_label;      /**< Label of partition to use.*/
 } fs_config_t;
 
-void init_fs(const char* partition_name, const char* mount_point);
-hardware_mount_error_t mount_fs();
+void fs_init(const char* partition_name, const char* mount_point);
+hardware_mount_error_t fs_mount();
 
 #endif // MOUNT_PARTITION_HARDWARE_H>

@@ -10,13 +10,13 @@ static esp_vfs_littlefs_conf_t fs_config = {
     .dont_mount = false
 };
 
-void init_fs(const char* partition_name, const char* mount_point)
+void fs_init(const char* partition_name, const char* mount_point)
 {
     fs_config.base_path = mount_point;
     fs_config.partition_label = partition_name;
 }
 
-hardware_mount_error_t mount_fs()
+hardware_mount_error_t fs_mount()
 {
     esp_err_t error = esp_vfs_littlefs_register(&fs_config);
 

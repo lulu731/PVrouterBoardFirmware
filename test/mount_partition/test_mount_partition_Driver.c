@@ -20,7 +20,7 @@ void tearDown(void)
 
 void test_mount_partition_Driver_create(void)
 {
-    init_fs_Expect(partition_name, mount_point);
+    fs_init_Expect(partition_name, mount_point);
     mount_part_create(partition_name, mount_point);
 }
 
@@ -31,7 +31,7 @@ static fs_config_t conf = {
 
 void test_mount_partition_Driver(void)
 {
-    mount_fs_ExpectAndReturn(HARD_MOUNT_OK);
+    fs_mount_ExpectAndReturn(HARD_MOUNT_OK);
     mount_error_t error = mount_part();
 
     TEST_ASSERT_EQUAL(MOUNT_OK, error);
@@ -39,7 +39,7 @@ void test_mount_partition_Driver(void)
 
 void test_mount_partition_Driver_error(void)
 {
-    mount_fs_ExpectAndReturn(HARD_MOUNT_ERROR);
+    fs_mount_ExpectAndReturn(HARD_MOUNT_ERROR);
     mount_error_t error = mount_part();
 
     TEST_ASSERT_EQUAL(MOUNT_ERROR, error);

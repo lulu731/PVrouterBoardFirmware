@@ -11,7 +11,7 @@
 
 void setUp(void)
 {
-    init_fs("partition_name", "/mount_point");
+    fs_init("partition_name", "/mount_point");
 }
 
 void tearDown(void)
@@ -21,14 +21,14 @@ void tearDown(void)
 void test_mount_partition_Hardware(void)
 {
     esp_vfs_littlefs_register_ExpectAnyArgsAndReturn(ESP_OK);
-    hardware_mount_error_t res = mount_fs();
+    hardware_mount_error_t res = fs_mount();
     TEST_ASSERT_EQUAL_UINT8(HARD_MOUNT_OK, res);
 }
 
 void test_mount_partition_Hardware_error(void)
 {
     esp_vfs_littlefs_register_ExpectAnyArgsAndReturn(ESP_ERR_NOT_FOUND);
-    hardware_mount_error_t res = mount_fs();
+    hardware_mount_error_t res = fs_mount();
     TEST_ASSERT_EQUAL_UINT8(HARD_MOUNT_ERROR, res);
 }
 
