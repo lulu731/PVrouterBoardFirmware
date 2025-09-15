@@ -98,13 +98,12 @@ void test_get_first_nvs_data_invalid_arg_should_not_release_iterator(void)
 
 void test_get_next_nvs_data(void)
 {
-    test_get_first_nvs_data();
+    nvs_entry_info_t entry_info;
+    uint16_t param_value;
+
     int_iterator++;
     nvs_entry_next_ExpectAnyArgsAndReturn(ESP_OK);
     nvs_entry_next_ReturnThruPtr_iterator(&iterator);
-
-    nvs_entry_info_t entry_info;
-    uint16_t param_value;
     mock_get_u16(&entry_info, &param_value);
 
     nvs_data_t actual_nvs_data = get_next_nvs_data();
@@ -115,7 +114,15 @@ void test_get_next_nvs_data(void)
 
 void mock_get_next_nvs_data_with_error(const esp_err_t nvs_error)
 {
-    test_get_first_nvs_data();
+    nvs_entry_find_ExpectAnyArgsAndReturn(ESP_OK);
+    nvs_entry_find_ReturnThruPtr_output_iterator(&iterator);
+
+    nvs_entry_info_t entry_info;
+    uint16_t param_value;
+
+    mock_get_u16(&entry_info, &param_value);
+    get_first_nvs_data();
+
     nvs_entry_next_ExpectAnyArgsAndReturn(nvs_error);
     nvs_release_iterator_ExpectAnyArgs();
 }
