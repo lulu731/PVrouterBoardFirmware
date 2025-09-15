@@ -8,12 +8,6 @@
 #include <stddef.h>
 #include <string.h>
 
-#ifndef TEST
-#define STATIC static
-#else
-#define STATIC
-#endif
-
 #define TAG "server.c: "
 
 static httpd_handle_t web_server;
@@ -66,7 +60,7 @@ static esp_err_t index_handler(httpd_req_t *req)
     return ESP_OK;
 }
 
-STATIC httpd_uri_t index_uri = {
+static httpd_uri_t index_uri = {
     .uri       = "/",
     .method    = HTTP_GET,
     .handler   = index_handler,
