@@ -5,20 +5,20 @@
 
 static const char *TAG = "mount_partition_hardware.c";
 
-static esp_vfs_littlefs_conf_t fs_config = {
+static esp_vfs_littlefs_conf_t esp_fs_config = {
     .format_if_mount_failed = false,
-    .dont_mount = false
+    .dont_mount =             false
 };
 
-void fs_init(const char* partition_name, const char* mount_point)
+void fs_init(const fs_config_t *fs_config)
 {
-    fs_config.base_path = mount_point;
-    fs_config.partition_label = partition_name;
+    esp_fs_config.base_path =       fs_config->base_path;
+    esp_fs_config.partition_label = fs_config->partition_label;
 }
 
 hardware_mount_error_t fs_mount()
 {
-    esp_err_t error = esp_vfs_littlefs_register(&fs_config);
+    esp_err_t error = esp_vfs_littlefs_register(&esp_fs_config);
 
     if (error != ESP_OK) {
         if (error == ESP_FAIL) {

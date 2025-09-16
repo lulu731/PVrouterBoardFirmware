@@ -2,9 +2,14 @@
 #include "mount_partition_Hardware.h"
 #include "mount_partition_Driver.h"
 
-void mount_part_create(const char *partition_name, const char *mount_point)
+void mount_part_create(const partition_config_t* config)
 {
-    fs_init(partition_name, mount_point);
+    const fs_config_t fs_config =
+    {
+        .base_path = config->base_path,
+        .partition_label = config->partition_label
+    };
+    fs_init(&fs_config);
 }
 
 mount_error_t mount_part()

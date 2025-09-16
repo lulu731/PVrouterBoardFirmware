@@ -9,9 +9,14 @@
 
 #include "esp_err.h"
 
+const fs_config_t conf = {
+    .base_path = "/mount_point",
+    .partition_label = "partition_name"
+};
+
 void setUp(void)
 {
-    fs_init("partition_name", "/mount_point");
+    fs_init(&conf);
 }
 
 void tearDown(void)
