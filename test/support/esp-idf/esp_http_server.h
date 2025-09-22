@@ -88,6 +88,7 @@ enum http_method
 typedef enum http_method httpd_method_t;
 
 typedef struct httpd_req_t{
+    int method;
 } httpd_req_t;
 
 typedef struct httpd_uri_t{
