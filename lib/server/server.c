@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <stddef.h>
 #include <string.h>
+#include <assert.h>
+#include <stdlib.h>
 
 #define TAG "server.c: "
 
@@ -40,22 +42,6 @@ static esp_err_t index_handler(httpd_req_t *req)
 			}
 		}
 		fclose(pfile);
-
-        /*int i = 0;
-        while (1) {
-            char data[11];
-            sprintf(data, "%d", i++);
-
-            httpd_ws_frame_t frame =
-            {
-                .fragmented = 0,
-                .type = HTTPD_WS_TYPE_TEXT,
-                .payload = (uint8_t*)data,
-                .len = strlen(data)
-            };
-            httpd_ws_send_frame(req, &frame);
-            vTaskDelay(1000 / portTICK_PERIOD_MS);
-        }*/
 	}
     return ESP_OK;
 }
@@ -102,9 +88,46 @@ server_err_t server_stop(void)
     return SERVER_OK;
 }
 
-void server_send_to_all_clients(const char* message)
+struct work_fn_arg
 {
-    httpd_send_to_all_clients(message);
+    httpd_ws_frame_t* frame;
+    int               sock_fd;
+};
+
+static void httpd_work_fn(void *arg)
+{
+    struct work_fn_arg* work_arg = (struct work_fn_arg*)arg;
+    httpd_ws_send_frame_async(web_server, work_arg->sock_fd, work_arg->frame);
+    free(work_arg->frame);
+    free(work_arg);
+}
+
+size_t server_send_to_all_clients(const char* message)
+{
+    size_t fds = 5;
+    int* client_fds;// = NULL;
+
+    esp_err_t err = httpd_get_client_list(web_server, &fds, client_fds);
+
+    assert(*client_fds == 10);
+    assert(*(++client_fds) == 11);
+
+    for (size_t index_client_fds = 0; index_client_fds < fds; index_client_fds++)
+    {
+        struct work_fn_arg* arg = malloc(sizeof(struct work_fn_arg));
+        httpd_ws_frame_t* frame = malloc(sizeof(httpd_ws_frame_t));
+
+        frame->fragmented = 0;
+        frame->type = HTTPD_WS_TYPE_TEXT;
+        frame->payload = (uint8_t*)message;
+        frame->len = strlen(message);
+
+        arg->frame = frame;
+        arg->sock_fd = client_fds[index_client_fds];
+        httpd_queue_work(web_server, httpd_work_fn, arg);
+    }
+
+   return fds;
 }
 
 void server_destroy(void)
