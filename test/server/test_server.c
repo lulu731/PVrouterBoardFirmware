@@ -11,8 +11,6 @@
 static httpd_handle_t web_server = NULL;
 static int server_handle = 100;
 
-extern httpd_uri_t index_uri;
-
 static void server_start_expectations(httpd_handle_t *server_handle, const esp_err_t start_error)
 {
     httpd_start_ExpectAndReturn(NULL, NULL, start_error);
@@ -84,15 +82,35 @@ void test_server_stop_should_return_OK_if_server_handle_null(void)
     TEST_ASSERT_EQUAL_UINT8(SERVER_OK, err);
 }
 
-/*void test_send_to_all_clients(void)
+void test_send_to_all_clients_should_return_number_of_clients(void)
 {
-    mock_server_functions_calls(&web_server, ESP_OK);
+    server_start_expectations(&web_server, ESP_OK);
     server_err_t err = server_start();
 
     const char* message = "test_message";
 
-    httpd_send_to_all_clients_Expect(message);
-    server_send_to_all_clients(message);
-}*/
+    size_t fds = 2;
+    int client_fds[2] = {10, 11};
+    httpd_get_client_list_ExpectAnyArgsAndReturn(ESP_OK);
+    httpd_get_client_list_ReturnThruPtr_fds(&fds);
+    httpd_get_client_list_ReturnArrayThruPtr_client_fds(client_fds, fds);
+
+    //httpd_queue_work_ExpectAndReturn(web_server, NULL, &client_fds[0], ESP_OK);
+    //httpd_queue_work_IgnoreArg_work();
+    //httpd_ws_send_frame_async_ExpectAndReturn(web_server, client_fds[0], NULL, ESP_OK);
+    //httpd_ws_send_frame_async_IgnoreArg_frame();
+
+    //httpd_queue_work_ExpectAndReturn(web_server, NULL, &client_fds[1], ESP_OK);
+    //httpd_queue_work_IgnoreArg_work();
+    //httpd_ws_send_frame_async_ExpectAndReturn(web_server, client_fds[1], NULL, ESP_OK);
+    //httpd_ws_send_frame_async_IgnoreArg_frame();
+
+    httpd_queue_work_ExpectAnyArgsAndReturn(ESP_OK);
+    httpd_queue_work_ExpectAnyArgsAndReturn(ESP_OK);
+
+    size_t result = server_send_to_all_clients(message);
+
+    TEST_ASSERT_EQUAL_UINT8(fds, result);
+}
 
 #endif // TEST

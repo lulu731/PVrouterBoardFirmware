@@ -4,6 +4,7 @@
 #include "esp_err.h"
 
 #include <stdbool.h>
+#include <stddef.h>
 
 typedef void* httpd_handle_t;
 
@@ -121,5 +122,12 @@ esp_err_t httpd_resp_sendstr_chunk(httpd_req_t *r, const char *str);
 esp_err_t httpd_ws_send_frame(httpd_req_t *req, httpd_ws_frame_t *pkt);
 
 #define vTaskDelay(x)
+
+
+esp_err_t httpd_get_client_list(httpd_handle_t handle, size_t *fds, int *client_fds);
+
+typedef void (*httpd_work_fn_t)(void *arg);
+esp_err_t httpd_queue_work(httpd_handle_t handle, httpd_work_fn_t work, void *arg);
+esp_err_t httpd_ws_send_frame_async(httpd_handle_t hd, int fd, httpd_ws_frame_t *frame);
 
 #endif // ESP_HTTP_SERVER_H
