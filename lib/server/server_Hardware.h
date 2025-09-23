@@ -1,7 +1,12 @@
-
 #ifndef SERVER_HARDWARE_H
 #define SERVER_HARDWARE_H
 
-void httpd_send_to_all_clients(const char* message);
+#include "esp_http_server.h"
+
+struct work_fn_arg
+{
+    int               sock_fd;
+    httpd_ws_frame_t* frame;
+};
 
 #endif // SERVER_HARDWARE_H

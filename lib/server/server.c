@@ -88,12 +88,6 @@ server_err_t server_stop(void)
     return SERVER_OK;
 }
 
-struct work_fn_arg
-{
-    httpd_ws_frame_t* frame;
-    int               sock_fd;
-};
-
 static void httpd_work_fn(void *arg)
 {
     struct work_fn_arg* work_arg = (struct work_fn_arg*)arg;
@@ -105,12 +99,9 @@ static void httpd_work_fn(void *arg)
 size_t server_send_to_all_clients(const char* message)
 {
     size_t fds = 5;
-    int* client_fds;// = NULL;
+    int* client_fds = malloc(sizeof(int) * fds);
 
     esp_err_t err = httpd_get_client_list(web_server, &fds, client_fds);
-
-    assert(*client_fds == 10);
-    assert(*(++client_fds) == 11);
 
     for (size_t index_client_fds = 0; index_client_fds < fds; index_client_fds++)
     {
@@ -123,10 +114,11 @@ size_t server_send_to_all_clients(const char* message)
         frame->len = strlen(message);
 
         arg->frame = frame;
-        arg->sock_fd = client_fds[index_client_fds];
+        arg->sock_fd = *(client_fds + index_client_fds);
         httpd_queue_work(web_server, httpd_work_fn, arg);
     }
 
+    free(client_fds);
    return fds;
 }
 
