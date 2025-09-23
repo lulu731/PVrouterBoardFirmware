@@ -25,8 +25,15 @@ void app_main(void)
     load_nvs_params(nvs_handle);
     nvs_close(nvs_handle);*/
 
-    mount_part_create("littlefs", "/littlefs");
-    mount_part();
+    partition_config_t conf = {
+        .base_path = "/littlefs",
+        .partition_label = "littlefs"
+    };
+
+    mount_part_create(&conf);
+    if (mount_part() != MOUNT_OK) {
+        printf("littlefs mount error\n");
+    };
 
     connect_to_wifi();
 
@@ -57,5 +64,6 @@ void app_main(void)
 
     while (1) {
         vTaskDelay(1000 / portTICK_PERIOD_MS);
+        server_send_to_all_clients("test");
     }
 }
