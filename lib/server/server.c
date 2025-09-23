@@ -92,34 +92,23 @@ static void httpd_work_fn(void *arg)
 {
     struct work_fn_arg* work_arg = (struct work_fn_arg*)arg;
     httpd_ws_send_frame_async(web_server, work_arg->sock_fd, work_arg->frame);
-    free(work_arg->frame);
-    free(work_arg);
+    work_fn_arg_destroy(work_arg);
 }
 
 size_t server_send_to_all_clients(const char* message)
 {
     size_t fds = 5;
     int* client_fds = malloc(sizeof(int) * fds);
-
     esp_err_t err = httpd_get_client_list(web_server, &fds, client_fds);
 
     for (size_t index_client_fds = 0; index_client_fds < fds; index_client_fds++)
     {
-        struct work_fn_arg* arg = malloc(sizeof(struct work_fn_arg));
-        httpd_ws_frame_t* frame = malloc(sizeof(httpd_ws_frame_t));
-
-        frame->fragmented = 0;
-        frame->type = HTTPD_WS_TYPE_TEXT;
-        frame->payload = (uint8_t*)message;
-        frame->len = strlen(message);
-
-        arg->frame = frame;
-        arg->sock_fd = *(client_fds + index_client_fds);
+        struct work_fn_arg* arg = work_fn_arg_create(*(client_fds + index_client_fds), message);
         httpd_queue_work(web_server, httpd_work_fn, arg);
     }
 
     free(client_fds);
-   return fds;
+    return fds;
 }
 
 void server_destroy(void)

@@ -2,7 +2,7 @@
 
 #include "unity.h"
 #include "mock_esp_http_server.h"
-#include "mock_server_Hardware.h"
+#include "server_Hardware.h"
 
 #include "server.h"
 
@@ -98,35 +98,18 @@ void test_send_to_all_clients_should_return_number_of_clients(void)
     httpd_get_client_list_ReturnThruPtr_fds(&fds);
     httpd_get_client_list_ReturnArrayThruPtr_client_fds(client_fds, fds);
 
-    struct work_fn_arg* arg = malloc(sizeof(struct work_fn_arg));
-    httpd_ws_frame_t* frame = malloc(sizeof(httpd_ws_frame_t));
-    frame->fragmented = 0;
-    frame->type = HTTPD_WS_TYPE_TEXT;
-    frame->payload = (uint8_t*)message;
-    frame->len = strlen(message);
-    arg->frame = frame;
-    arg->sock_fd = client_fds[0];
-
+    struct work_fn_arg* arg = work_fn_arg_create(client_fds[0], message);
     httpd_queue_work_ExpectWithArrayAndReturn(web_server, NULL, arg, 1, ESP_OK);
     httpd_queue_work_IgnoreArg_work();
 
-    struct work_fn_arg* arg2 = malloc(sizeof(struct work_fn_arg));
-    httpd_ws_frame_t* frame2 = malloc(sizeof(httpd_ws_frame_t));
-    frame2->fragmented = 0;
-    frame2->type = HTTPD_WS_TYPE_TEXT;
-    frame2->payload = (uint8_t*)message;
-    frame2->len = strlen(message);
-    arg2->frame = frame2;
-    arg2->sock_fd = client_fds[1];
+    struct work_fn_arg* arg2 = work_fn_arg_create(client_fds[1], message);
     httpd_queue_work_ExpectWithArrayAndReturn(web_server, NULL, arg2, 1, ESP_OK);
     httpd_queue_work_IgnoreArg_work();
 
     size_t result = server_send_to_all_clients(message);
 
-    free(frame);
-    free(arg);
-    free(frame2);
-    free(arg2);
+    work_fn_arg_destroy(arg);
+    work_fn_arg_destroy(arg2);
 
     TEST_ASSERT_EQUAL_UINT8(fds, result);
 }
