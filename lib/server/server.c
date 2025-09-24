@@ -36,7 +36,7 @@ static esp_err_t index_handler(httpd_req_t *req)
     {
 		char line[128];
 		while (fgets(line, sizeof(line), pfile) != NULL) {
-			esp_err_t ret = httpd_resp_sendstr_chunk(req, line);//, HTTPD_RESP_USE_STRLEN);
+			esp_err_t ret = httpd_resp_sendstr_chunk(req, line);
 			if (ret != ESP_OK) {
 				ESP_LOGE(TAG, "httpd_resp_sendstr_chunk fail %d", ret);
 			}
@@ -77,7 +77,7 @@ server_err_t server_start(void)
     return SERVER_OK;
 }
 
-server_err_t server_stop(void)
+/*server_err_t server_stop(void)
 {
     if (web_server != NULL)
     {
@@ -109,7 +109,7 @@ size_t server_send_to_all_clients(const char* message)
 
     free(client_fds);
     return fds;
-}
+}*/
 
 void server_destroy(void)
 {
