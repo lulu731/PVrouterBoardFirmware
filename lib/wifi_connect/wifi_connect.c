@@ -11,6 +11,14 @@
 #include "lwip/err.h"
 #include "lwip/sys.h"
 
+#ifndef SSID
+#define SSID "WIFI_SSID"
+#endif
+
+#ifndef PASSWD
+#define PASSWD "WIFI_PASSWORD"
+#endif
+
 /* FreeRTOS event group to signal when we are connected*/
 static EventGroupHandle_t s_wifi_event_group;
 
