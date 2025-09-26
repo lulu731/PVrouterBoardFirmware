@@ -99,6 +99,12 @@ size_t server_send_to_all_clients(const char* message)
 {
     size_t fds = 5;
     int* client_fds = malloc(sizeof(int) * fds);
+    if (client_fds == NULL)
+    {
+        ESP_LOGE(TAG, "malloc of client_fds in send_to_all_clients fail");
+        return 0;
+    }
+
     esp_err_t err = httpd_get_client_list(web_server, &fds, client_fds);
 
     for (size_t index_client_fds = 0; index_client_fds < fds; index_client_fds++)
