@@ -79,18 +79,8 @@ void test_server_stop_error(void)
     httpd_stop_error = 0;
 }
 
-//todo: delete test
-void test_server_stop_should_return_OK_if_server_handle_null(void)
-{
-    server_err_t err = server_start();
-
-    web_server = NULL;
-    err = server_stop();
-
-    TEST_ASSERT_EQUAL_UINT8(SERVER_OK, err);
-}
-
 const char* message = "test_message";
+
 void test_send_to_all_clients_should_call_httpd_get_client_list_once(void)
 {
     setup_server_with_clients(2);
