@@ -77,7 +77,7 @@ server_err_t server_start(void)
     return SERVER_OK;
 }
 
-/*server_err_t server_stop(void)
+server_err_t server_stop(void)
 {
     if (web_server != NULL)
     {
@@ -109,7 +109,7 @@ size_t server_send_to_all_clients(const char* message)
 
     free(client_fds);
     return fds;
-}*/
+}
 
 void server_destroy(void)
 {

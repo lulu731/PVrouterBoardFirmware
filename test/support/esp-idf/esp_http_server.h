@@ -130,4 +130,6 @@ typedef void (*httpd_work_fn_t)(void *arg);
 esp_err_t httpd_queue_work(httpd_handle_t handle, httpd_work_fn_t work, void *arg);
 esp_err_t httpd_ws_send_frame_async(httpd_handle_t hd, int fd, httpd_ws_frame_t *frame);
 
+void client_fds_create_stub(int nber_fds, int* client_fds);
+
 #endif // ESP_HTTP_SERVER_H
