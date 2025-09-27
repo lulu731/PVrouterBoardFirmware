@@ -111,4 +111,17 @@ void test_send_to_all_clients_should_not_call_httpd_queue_work(void)
     TEST_ASSERT(httpd_queue_work_counter == nber_clients);
 }
 
+int send_to_all_clients_error = 0;
+void test_send_to_all_clients_should_return_0_if_get_list_error(void)
+{
+    int nber_clients = 2;
+    setup_server_with_clients(nber_clients);
+
+    send_to_all_clients_error = 1;
+    size_t fds = server_send_to_all_clients(message);
+
+    TEST_ASSERT_EQUAL(0, fds);
+    send_to_all_clients_error = 0;
+}
+
 #endif // TEST

@@ -55,10 +55,16 @@ void client_fds_create_stub(int nber_fds, int* client_fds)
 int httpd_client_list_counter = 0;
 esp_err_t httpd_get_client_list(httpd_handle_t handle, size_t *fds, int *client_fds)
 {
+    extern int send_to_all_clients_error;
     httpd_client_list_counter++;
 
     *fds = nber_fds_fake;
     client_fds = client_fds_fake;
+
+    if (send_to_all_clients_error == 1)
+    {
+        return ESP_ERR_INVALID_ARG;
+    }
 
     return ESP_OK;
 }

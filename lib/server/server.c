@@ -77,17 +77,6 @@ server_err_t server_start(void)
     return SERVER_OK;
 }
 
-server_err_t server_stop(void)
-{
-    if (web_server != NULL)
-    {
-        esp_err_t err = httpd_stop(web_server);
-        if (err != ESP_OK)
-            return SERVER_ERROR;
-    }
-    return SERVER_OK;
-}
-
 static void httpd_work_fn(void *arg)
 {
     struct work_fn_arg* work_arg = (struct work_fn_arg*)arg;
@@ -97,7 +86,7 @@ static void httpd_work_fn(void *arg)
 
 size_t server_send_to_all_clients(const char* message)
 {
-    size_t fds = 5;
+    size_t fds = config.max_open_sockets;
     int* client_fds = malloc(sizeof(int) * fds);
     if (client_fds == NULL)
     {
@@ -107,6 +96,13 @@ size_t server_send_to_all_clients(const char* message)
 
     esp_err_t err = httpd_get_client_list(web_server, &fds, client_fds);
 
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "httpd_get_client_list fail");
+        free(client_fds);
+        return 0;
+    }
+
     for (size_t index_client_fds = 0; index_client_fds < fds; index_client_fds++)
     {
         struct work_fn_arg* arg = work_fn_arg_create(*(client_fds + index_client_fds), message);
@@ -115,6 +111,17 @@ size_t server_send_to_all_clients(const char* message)
 
     free(client_fds);
     return fds;
+}
+
+server_err_t server_stop(void)
+{
+    if (web_server != NULL)
+    {
+        esp_err_t err = httpd_stop(web_server);
+        if (err != ESP_OK)
+            return SERVER_ERROR;
+    }
+    return SERVER_OK;
 }
 
 void server_destroy(void)

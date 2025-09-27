@@ -70,6 +70,7 @@ typedef void* httpd_handle_t;
 }*/
 
 typedef struct httpd_config {
+    uint16_t    max_open_sockets;
 } httpd_config_t;
 
 #define HTTPD_DEFAULT_CONFIG() { }
