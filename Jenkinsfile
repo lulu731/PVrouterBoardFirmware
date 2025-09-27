@@ -14,7 +14,7 @@ pipeline {
    }
    post {
       failure {
-            mail bcc:'', body: 'Jenkins reports a failed pipeline', cc: '', from: 'jenkins', replyTo: '', subject: 'Pipeline failed', to: 'lulu@msikatana'
+            mail bcc:'', body: "Jenkins reports a failed pipeline : #${BUILD_NUMBER} in ${BRANCH_NAME}", cc: '', from: 'jenkins', replyTo: '', subject: 'Pipeline failed', to: 'lulu@msikatana'
       }
    }
 }
