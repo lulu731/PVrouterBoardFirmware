@@ -73,7 +73,7 @@ server_err_t server_start(void)
         ESP_LOGE(TAG, "httpd_start fail");
         return SERVER_ERROR;
     }
-
+    ESP_LOGI(TAG, "server started");
     return SERVER_OK;
 }
 

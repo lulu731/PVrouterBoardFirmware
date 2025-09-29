@@ -11,6 +11,8 @@
 #include "mount_partition_Driver.h"
 #include "server.h"
 
+#include "esp_log.h"
+
 
 #define GPIO_HEATER    18
 #define GPIO_RESET_ADC 40
@@ -32,7 +34,7 @@ void app_main(void)
 
     mount_part_create(&conf);
     if (mount_part() != MOUNT_OK) {
-        printf("littlefs mount error\n");
+        ESP_LOGE("main", "mount create error");
     };
 
     connect_to_wifi();
