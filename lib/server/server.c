@@ -17,10 +17,10 @@ static httpd_config_t config = HTTPD_DEFAULT_CONFIG();
 
 static esp_err_t index_handler(httpd_req_t *req)
 {
-    if (req->method == HTTP_GET)
+    if (req->method != HTTP_GET)
     {
-        ESP_LOGI(TAG, "handshake done");
-        return ESP_OK;
+        ESP_LOGI(TAG, "incompatible method %d", req->method);
+        return ESP_FAIL;
     }
 
     ESP_LOGI(TAG, "Reading %s", "/index.html");
@@ -43,6 +43,8 @@ static esp_err_t index_handler(httpd_req_t *req)
 		}
 		fclose(pfile);
 	}
+    httpd_resp_send_chunk(req, NULL, 0);
+    ESP_LOGI(TAG, "handshake done");
     return ESP_OK;
 }
 
