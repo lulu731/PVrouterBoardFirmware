@@ -14,6 +14,11 @@ esp_err_t httpd_start(httpd_handle_t *handle, const httpd_config_t *config)
     return ESP_OK;
 }
 
+int httpd_req_to_sockfd(httpd_req_t *r)
+{
+    return 0;
+}
+
 const httpd_uri_t *uri = NULL;
 httpd_handle_t handle_param;
 esp_err_t httpd_register_uri_handler(httpd_handle_t handle,

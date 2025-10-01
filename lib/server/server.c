@@ -17,34 +17,43 @@ static httpd_config_t config = HTTPD_DEFAULT_CONFIG();
 
 static esp_err_t index_handler(httpd_req_t *req)
 {
-    if (req->method != HTTP_GET)
+    if (req->method == HTTP_GET)
     {
-        ESP_LOGI(TAG, "incompatible method %d", req->method);
-        return ESP_FAIL;
-    }
+        if (!req->sess_ctx)
+        {
+            req->sess_ctx = malloc(sizeof(int));
+            if (req->sess_ctx == NULL)
+            {
+                ESP_LOGE(TAG, "malloc req->sess_ctx fail");
+                return ESP_FAIL;
+            }
+            *(int*)(req->sess_ctx) = httpd_req_to_sockfd(req);
 
-    ESP_LOGI(TAG, "Reading %s", "/index.html");
-    FILE* pfile = fopen("/littlefs/index.html", "r");
+            ESP_LOGI(TAG, "Reading %s", "/index.html");
+            FILE* pfile = fopen("/littlefs/index.html", "r");
 
-    if (pfile == NULL)
-    {
-        httpd_resp_send_err(req, 404, "File Not Found");
-        ESP_LOGE(TAG, "fopen fail.");
-        return ESP_FAIL;
+            if (pfile == NULL)
+            {
+                httpd_resp_send_err(req, 404, "File Not Found");
+                ESP_LOGE(TAG, "fopen fail.");
+                return ESP_FAIL;
+            }
+            else
+            {
+        		char line[128];
+        		while (fgets(line, sizeof(line), pfile) != NULL) {
+        			esp_err_t ret = httpd_resp_sendstr_chunk(req, line);
+        			if (ret != ESP_OK) {
+        				ESP_LOGE(TAG, "httpd_resp_sendstr_chunk fail %d", ret);
+        			}
+        		}
+        		fclose(pfile);
+        	}
+            httpd_resp_send_chunk(req, NULL, 0);
+        }
+        ESP_LOGI(TAG, "handshake done");
+        return ESP_OK;
     }
-    else
-    {
-		char line[128];
-		while (fgets(line, sizeof(line), pfile) != NULL) {
-			esp_err_t ret = httpd_resp_sendstr_chunk(req, line);
-			if (ret != ESP_OK) {
-				ESP_LOGE(TAG, "httpd_resp_sendstr_chunk fail %d", ret);
-			}
-		}
-		fclose(pfile);
-	}
-    httpd_resp_send_chunk(req, NULL, 0);
-    ESP_LOGI(TAG, "handshake done");
     return ESP_OK;
 }
 
