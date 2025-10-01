@@ -34,6 +34,11 @@ esp_err_t httpd_resp_sendstr_chunk(httpd_req_t *r, const char *str)
     return ESP_OK;
 }
 
+esp_err_t httpd_resp_send_chunk(httpd_req_t *r, const char *buf, size_t buf_len)
+{
+    return ESP_OK;
+}
+
 esp_err_t httpd_stop(httpd_handle_t handle)
 {
     extern int httpd_stop_error;

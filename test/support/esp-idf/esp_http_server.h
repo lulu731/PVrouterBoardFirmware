@@ -130,6 +130,8 @@ esp_err_t httpd_get_client_list(httpd_handle_t handle, size_t *fds, int *client_
 typedef void (*httpd_work_fn_t)(void *arg);
 esp_err_t httpd_queue_work(httpd_handle_t handle, httpd_work_fn_t work, void *arg);
 esp_err_t httpd_ws_send_frame_async(httpd_handle_t hd, int fd, httpd_ws_frame_t *frame);
+esp_err_t httpd_resp_send_chunk(httpd_req_t *r, const char *buf, size_t buf_len);
+
 
 void client_fds_create_stub(int nber_fds, int* client_fds);
 
