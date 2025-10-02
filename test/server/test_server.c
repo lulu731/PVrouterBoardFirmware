@@ -26,7 +26,7 @@ int httpd_stop_error  = 0;
 
 extern httpd_handle_t web_server;
 
-void test_server_start_should_define_uri_as_websocket(void)
+void test_server_start_should_define_last_uri_as_websocket(void)
 {
     extern int server_start_counter;
     extern const httpd_uri_t *uri;
@@ -36,7 +36,7 @@ void test_server_start_should_define_uri_as_websocket(void)
 
     TEST_ASSERT_EQUAL_INT(*(int*)web_server, *(int*)handle_param);
 
-    TEST_ASSERT_EQUAL_STRING("/", uri->uri);
+    TEST_ASSERT_EQUAL_STRING("/ws", uri->uri);
     TEST_ASSERT(uri->is_websocket == true);
     TEST_ASSERT_EQUAL_UINT8(SERVER_OK, err);
 }
