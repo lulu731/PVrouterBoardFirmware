@@ -39,9 +39,14 @@
   {init()};
   function init()// open WebSocket
   {
-    wskt = new WebSocket('ws://' + window.location.hostname + ':80/');
+    console.log('Trying to open a WebSocket connection...');
+    wskt = new WebSocket('ws://' + window.location.hostname + '/ws');
+    wskt.onopen =  function(event){console.log('connection opened');};
+    wskt.onclose = function(event){console.log('connection closed');};
     wskt.onmessage = function(rx)
     {  // client receive message
+      console.log('message received');
+      console.log('rx' + rx);
       var obj = rx.data;
       try {
         document.getElementById('rxText').value +=

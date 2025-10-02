@@ -17,41 +17,37 @@ static httpd_config_t config = HTTPD_DEFAULT_CONFIG();
 
 static esp_err_t index_handler(httpd_req_t *req)
 {
-    if (req->method == HTTP_GET)
+    if (!req->sess_ctx)
     {
-        if (!req->sess_ctx)
+        req->sess_ctx = malloc(sizeof(int));
+        if (req->sess_ctx == NULL)
         {
-            req->sess_ctx = malloc(sizeof(int));
-            if (req->sess_ctx == NULL)
-            {
-                ESP_LOGE(TAG, "malloc req->sess_ctx fail");
-                return ESP_FAIL;
-            }
-            *(int*)(req->sess_ctx) = httpd_req_to_sockfd(req);
-
-            ESP_LOGI(TAG, "Reading %s", "/index.html");
-            FILE* pfile = fopen("/littlefs/index.html", "r");
-
-            if (pfile == NULL)
-            {
-                httpd_resp_send_err(req, 404, "File Not Found");
-                ESP_LOGE(TAG, "fopen fail.");
-                return ESP_FAIL;
-            }
-            else
-            {
-        		char line[128];
-        		while (fgets(line, sizeof(line), pfile) != NULL) {
-        			esp_err_t ret = httpd_resp_sendstr_chunk(req, line);
-        			if (ret != ESP_OK) {
-        				ESP_LOGE(TAG, "httpd_resp_sendstr_chunk fail %d", ret);
-        			}
-        		}
-        		fclose(pfile);
-        	}
-            httpd_resp_send_chunk(req, NULL, 0);
+            ESP_LOGE(TAG, "malloc req->sess_ctx fail");
+            return ESP_FAIL;
         }
-        ESP_LOGI(TAG, "handshake done");
+        *(int*)(req->sess_ctx) = httpd_req_to_sockfd(req);
+
+        ESP_LOGI(TAG, "Reading %s", "/index.html");
+        FILE* pfile = fopen("/littlefs/index.html", "r");
+
+        if (pfile == NULL)
+        {
+            httpd_resp_send_err(req, 404, "File Not Found");
+            ESP_LOGE(TAG, "fopen fail.");
+            return ESP_FAIL;
+        }
+        else
+        {
+            char line[128];
+            while (fgets(line, sizeof(line), pfile) != NULL) {
+                esp_err_t ret = httpd_resp_sendstr_chunk(req, line);
+                if (ret != ESP_OK) {
+                    ESP_LOGE(TAG, "httpd_resp_sendstr_chunk fail %d", ret);
+                }
+            }
+            fclose(pfile);
+        }
+        httpd_resp_sendstr_chunk(req, NULL);
         return ESP_OK;
     }
     return ESP_OK;
@@ -62,8 +58,21 @@ static httpd_uri_t index_uri = {
     .method    = HTTP_GET,
     .handler   = index_handler,
     .user_ctx  = NULL,
+};
+
+static esp_err_t ws_handler(httpd_req_t *req)
+{
+    return ESP_OK;
+}
+
+static httpd_uri_t ws_uri = {
+    .uri       = "/ws",
+    .method    = HTTP_GET,
+    .handler   = ws_handler,
+    .user_ctx  = NULL,
     .is_websocket = true
 };
+
 
 void server_create(void)
 {
@@ -77,7 +86,13 @@ server_err_t server_start(void)
     esp_err_t err = httpd_start(&web_server, &config);
 
     if (err == ESP_OK)
+    {
         err = httpd_register_uri_handler(web_server, &index_uri);
+        if (err == ESP_OK)
+        {
+            err = httpd_register_uri_handler(web_server, &ws_uri);
+        }
+    }
 
     if (err != ESP_OK)
     {
