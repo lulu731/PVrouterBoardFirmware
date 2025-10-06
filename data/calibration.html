@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>PV router esp32</title>
+    <title>calibration PV router</title>
     <style>
     body {font-family:Arial; background-color: white;}
     td {vertical-align: top;}
@@ -9,18 +9,11 @@
     </style>
   </head>
   <body id='initialise'>
-  <button onclick='clickHeaterON()'>Heater ON</button>
-  <button onclick='clickHeaterOFF()'>Heater OFF</button>
+  <button onclick='click_Ib_calibration()'>Ib calibration</button>
+  <button onclick='click_no_current_calibration()'>No current calibration</button>
   <br></br>
-  <button onclick='clickUpdate()'>UPDATE</button>
-  <br></br>
-  <button onclick='clickResetDivE()'>Reset Div Energy</button>
-  <br></br>
-  <h2>PV_router data</h2>
+  <h2>Calibration</h2>
   <table>
-    <tr>
-      <td>from serial</td>
-    </tr>
     <tr>
       <td>
         <textarea id='rxText' onfocus='this.value=""'></textarea>
@@ -30,9 +23,6 @@
         <textarea id='errorText' onfocus='this.value=""'></textarea>
         <br>
       </td>
-    </tr>
-    <tr>
-      <td><a href="calibration.html">calibration</a>
     </tr>
   </table>
 
@@ -49,7 +39,7 @@
     wskt.onmessage = function(rx)
     {  // client receive message
       console.log('message received');
-      console.log('rx' + rx);
+      console.log('rx : ' + rx);
       var obj = rx.data;
       try {
         document.getElementById('rxText').value +=
@@ -62,29 +52,17 @@
     };
   }
 
-  function clickUpdate()
+  function click_Ib_calibration()
   {
-    wskt.send('9');
+    wskt.send('4');
+    document.getElementById('errorText').value += "Ib calibration\n";
   };
 
-  function clickHeaterON()
+  function click_no_current_calibration()
   {
-    wskt.send('1');
-    document.getElementById('errorText').value += "Heater ON\n";
+    wskt.send('5');
+    document.getElementById('errorText').value += "No current calibration\n";
   };
-
-  function clickHeaterOFF()
-  {
-    wskt.send('0');
-    document.getElementById('errorText').value += "Heater OFF\n";
-  };
-
-  function clickResetDivE()
-  {
-    wskt.send('8');
-    document.getElementById('errorText').value += "Reset Div Energy\n";
-  };
-
   </script>
   </body>
 </html>
