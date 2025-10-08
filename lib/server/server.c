@@ -15,6 +15,31 @@
 static httpd_handle_t web_server;
 static httpd_config_t config = HTTPD_DEFAULT_CONFIG();
 
+static esp_err_t load_html(const char* file, httpd_req_t *req)
+{
+    ESP_LOGI(TAG, "Reading %s", file);
+    FILE* pfile = fopen(file, "r");
+    if (pfile == NULL)
+    {
+        httpd_resp_send_err(req, 404, "File Not Found");
+        ESP_LOGE(TAG, "fopen fail.");
+        return ESP_FAIL;
+    }
+    else
+    {
+        char line[128];
+        while (fgets(line, sizeof(line), pfile) != NULL) {
+            esp_err_t ret = httpd_resp_sendstr_chunk(req, line);
+            if (ret != ESP_OK) {
+                ESP_LOGE(TAG, "httpd_resp_sendstr_chunk fail %d", ret);
+            }
+        }
+        fclose(pfile);
+    }
+    return httpd_resp_sendstr_chunk(req, NULL);
+}
+
+
 static esp_err_t index_handler(httpd_req_t *req)
 {
     if (!req->sess_ctx)
@@ -27,28 +52,7 @@ static esp_err_t index_handler(httpd_req_t *req)
         }
         *(int*)(req->sess_ctx) = httpd_req_to_sockfd(req);
 
-        ESP_LOGI(TAG, "Reading %s", "/index.html");
-        FILE* pfile = fopen("/littlefs/index.html", "r");
-
-        if (pfile == NULL)
-        {
-            httpd_resp_send_err(req, 404, "File Not Found");
-            ESP_LOGE(TAG, "fopen fail.");
-            return ESP_FAIL;
-        }
-        else
-        {
-            char line[128];
-            while (fgets(line, sizeof(line), pfile) != NULL) {
-                esp_err_t ret = httpd_resp_sendstr_chunk(req, line);
-                if (ret != ESP_OK) {
-                    ESP_LOGE(TAG, "httpd_resp_sendstr_chunk fail %d", ret);
-                }
-            }
-            fclose(pfile);
-        }
-        httpd_resp_sendstr_chunk(req, NULL);
-        return ESP_OK;
+        return load_html("/littlefs/index.html", req);
     }
     return ESP_OK;
 }
@@ -57,6 +61,31 @@ static httpd_uri_t index_uri = {
     .uri       = "/",
     .method    = HTTP_GET,
     .handler   = index_handler,
+    .user_ctx  = NULL,
+};
+
+
+static esp_err_t calibration_handler(httpd_req_t *req)
+{
+    if (!req->sess_ctx)
+    {
+        req->sess_ctx = malloc(sizeof(int));
+        if (req->sess_ctx == NULL)
+        {
+            ESP_LOGE(TAG, "malloc req->sess_ctx fail");
+            return ESP_FAIL;
+        }
+        *(int*)(req->sess_ctx) = httpd_req_to_sockfd(req);
+
+        return load_html("/littlefs/calibration.html", req);
+    }
+    return ESP_OK;
+}
+
+static httpd_uri_t calibration_uri = {
+    .uri       = "/",
+    .method    = HTTP_GET,
+    .handler   = calibration_handler,
     .user_ctx  = NULL,
 };
 
@@ -87,11 +116,9 @@ server_err_t server_start(void)
 
     if (err == ESP_OK)
     {
-        err = httpd_register_uri_handler(web_server, &index_uri);
-        if (err == ESP_OK)
-        {
-            err = httpd_register_uri_handler(web_server, &ws_uri);
-        }
+        err = httpd_register_uri_handler(web_server, &index_uri) ||
+              httpd_register_uri_handler(web_server, &calibration_uri) ||
+              httpd_register_uri_handler(web_server, &ws_uri);
     }
 
     if (err != ESP_OK)
