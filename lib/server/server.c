@@ -39,22 +39,35 @@ static esp_err_t load_html(const char* file, httpd_req_t *req)
     return httpd_resp_sendstr_chunk(req, NULL);
 }
 
+static esp_err_t save_req_session_context(httpd_req_t *req)
+{
+    req->sess_ctx = malloc(sizeof(int));
+    if (req->sess_ctx == NULL)
+    {
+        ESP_LOGE(TAG, "malloc req->sess_ctx fail");
+        return ESP_FAIL;
+    }
+    *(int*)(req->sess_ctx) = httpd_req_to_sockfd(req);
+    return ESP_OK;
+}
+
+static esp_err_t handler_first_call(httpd_req_t *req, const char* file)
+{
+    esp_err_t err = ESP_OK;
+    if (!req->sess_ctx)
+    {
+        err = save_req_session_context(req);
+        if (err == ESP_OK)
+            err = load_html(file, req);
+    }
+    return err;
+}
 
 static esp_err_t index_handler(httpd_req_t *req)
 {
-    if (!req->sess_ctx)
-    {
-        req->sess_ctx = malloc(sizeof(int));
-        if (req->sess_ctx == NULL)
-        {
-            ESP_LOGE(TAG, "malloc req->sess_ctx fail");
-            return ESP_FAIL;
-        }
-        *(int*)(req->sess_ctx) = httpd_req_to_sockfd(req);
-
-        return load_html("/littlefs/index.html", req);
-    }
-    return ESP_OK;
+    esp_err_t err = ESP_OK;
+    err = handler_first_call(req, "/littlefs/index.html");
+    return err;
 }
 
 static httpd_uri_t index_uri = {
@@ -67,19 +80,9 @@ static httpd_uri_t index_uri = {
 
 static esp_err_t calibration_handler(httpd_req_t *req)
 {
-    if (!req->sess_ctx)
-    {
-        req->sess_ctx = malloc(sizeof(int));
-        if (req->sess_ctx == NULL)
-        {
-            ESP_LOGE(TAG, "malloc req->sess_ctx fail");
-            return ESP_FAIL;
-        }
-        *(int*)(req->sess_ctx) = httpd_req_to_sockfd(req);
-
-        return load_html("/littlefs/calibration.html", req);
-    }
-    return ESP_OK;
+    esp_err_t err = ESP_OK;
+    err = handler_first_call(req, "/littlefs/calibration.html");
+    return err;
 }
 
 static httpd_uri_t calibration_uri = {
