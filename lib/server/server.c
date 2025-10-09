@@ -1,5 +1,6 @@
 #include "server.h"
 #include "server_Hardware.h"
+#include "uri_handlers.h"
 
 #include "esp_http_server.h"
 #include "esp_log.h"
@@ -21,14 +22,6 @@ static httpd_uri_t index_uri = {
     .handler   = index_handler,
     .user_ctx  = NULL,
 };
-
-
-static esp_err_t calibration_handler(httpd_req_t *req)
-{
-    esp_err_t err = ESP_OK;
-    err = handler_first_call(req, "/littlefs/calibration.html");
-    return err;
-}
 
 static httpd_uri_t calibration_uri = {
     .uri       = "/",

@@ -61,3 +61,10 @@ esp_err_t index_handler(httpd_req_t *req)
     err = handler_first_call(req, "/littlefs/index.html");
     return err;
 }
+
+esp_err_t calibration_handler(httpd_req_t *req)
+{
+    esp_err_t err = ESP_OK;
+    err = handler_first_call(req, "/littlefs/calibration.html");
+    return err;
+}
