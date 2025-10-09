@@ -21,8 +21,8 @@ void tearDown(void)
     server_destroy();
 }
 
-int httpd_start_error = 0;
-int httpd_stop_error  = 0;
+extern int httpd_start_error;
+extern int httpd_stop_error;
 
 extern httpd_handle_t web_server;
 
@@ -111,7 +111,7 @@ void test_send_to_all_clients_should_not_call_httpd_queue_work(void)
     TEST_ASSERT(httpd_queue_work_counter == nber_clients);
 }
 
-int send_to_all_clients_error = 0;
+extern int send_to_all_clients_error;
 void test_send_to_all_clients_should_return_0_if_get_list_error(void)
 {
     int nber_clients = 2;

@@ -3,9 +3,10 @@
 int server_handle = 100;
 httpd_handle_t web_server = &server_handle;
 
+int httpd_start_error = 0;
 esp_err_t httpd_start(httpd_handle_t *handle, const httpd_config_t *config)
 {
-    extern int httpd_start_error;
+
     if (httpd_start_error == 1)
         return ESP_ERR_INVALID_ARG;
 
@@ -21,6 +22,7 @@ int httpd_req_to_sockfd(httpd_req_t *r)
 
 const httpd_uri_t *uri = NULL;
 httpd_handle_t handle_param;
+
 esp_err_t httpd_register_uri_handler(httpd_handle_t handle,
                                      const httpd_uri_t *uri_handler)
 {
@@ -44,9 +46,9 @@ esp_err_t httpd_resp_send_chunk(httpd_req_t *r, const char *buf, size_t buf_len)
     return ESP_OK;
 }
 
+int httpd_stop_error = 0;
 esp_err_t httpd_stop(httpd_handle_t handle)
 {
-    extern int httpd_stop_error;
     if (httpd_stop_error  == 1)
         return ESP_ERR_INVALID_ARG;
 
@@ -63,9 +65,10 @@ void client_fds_create_stub(int nber_fds, int* client_fds)
 }
 
 int httpd_client_list_counter = 0;
+int send_to_all_clients_error = 0;
 esp_err_t httpd_get_client_list(httpd_handle_t handle, size_t *fds, int *client_fds)
 {
-    extern int send_to_all_clients_error;
+
     httpd_client_list_counter++;
 
     *fds = nber_fds_fake;
