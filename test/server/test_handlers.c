@@ -19,13 +19,18 @@ void tearDown(void)
 
 void test_index_handler_with_null_session_ctx_should_create_ctx(void)
 {
-    httpd_req_t req =
-    {
-        .sess_ctx = NULL
-    };
+    httpd_req_t req = {.sess_ctx = NULL};
     esp_err_t err = index_handler(&req);
     TEST_ASSERT_NOT_NULL(req.sess_ctx);
     free(req.sess_ctx);
+}
+
+void test_index_handler_with_non_null_session_ctx_should_not_create_ctx(void)
+{
+    int session_ctx = 1;
+    httpd_req_t req = {.sess_ctx = &session_ctx};
+    esp_err_t err = index_handler(&req);
+    TEST_ASSERT_EQUAL_INT(session_ctx, *(int*)req.sess_ctx);
 }
 
 #endif // TEST
