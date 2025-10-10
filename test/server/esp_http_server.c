@@ -17,7 +17,7 @@ esp_err_t httpd_start(httpd_handle_t *handle, const httpd_config_t *config)
 
 int httpd_req_to_sockfd(httpd_req_t *r)
 {
-    return 0;
+    return 10;
 }
 
 const httpd_uri_t *uri = NULL;

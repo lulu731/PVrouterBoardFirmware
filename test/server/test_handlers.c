@@ -8,29 +8,56 @@
 #include "esp_err.h"
 
 #include <stdlib.h>
+#include <string.h>
+
+httpd_req_t req;
 
 void setUp(void)
 {
+    req.sess_ctx = NULL;
 }
 
 void tearDown(void)
 {
+    if (req.sess_ctx)
+        free(req.sess_ctx);
 }
 
 void test_index_handler_with_null_session_ctx_should_create_ctx(void)
 {
-    httpd_req_t req = {.sess_ctx = NULL};
     esp_err_t err = index_handler(&req);
+
     TEST_ASSERT_NOT_NULL(req.sess_ctx);
-    free(req.sess_ctx);
 }
 
+
+void test_index_handler_with_null_session_ctx_should_return_ok(void)
+{
+    extern char* index_file;
+    index_file = "data/index.html";
+
+    esp_err_t err = index_handler(&req);
+
+    TEST_ASSERT_EQUAL_INT(ESP_OK, err);
+}
+
+int session_ctx = 10;
 void test_index_handler_with_non_null_session_ctx_should_not_create_ctx(void)
 {
-    int session_ctx = 1;
-    httpd_req_t req = {.sess_ctx = &session_ctx};
+    save_req_session_context(&req);
+
     esp_err_t err = index_handler(&req);
+
     TEST_ASSERT_EQUAL_INT(session_ctx, *(int*)req.sess_ctx);
+}
+
+void test_index_handler_with_non_null_session_ctx_should_return_ok(void)
+{
+    save_req_session_context(&req);
+
+    esp_err_t err = index_handler(&req);
+
+    TEST_ASSERT_EQUAL_INT(ESP_OK, err);
 }
 
 #endif // TEST
