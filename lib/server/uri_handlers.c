@@ -4,6 +4,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <assert.h>
 
 static const char TAG[] = "uri_handlers.c";
 
@@ -31,7 +33,7 @@ static esp_err_t load_html(const char* file, httpd_req_t *req)
     return httpd_resp_sendstr_chunk(req, NULL);
 }
 
-static esp_err_t save_req_session_context(httpd_req_t *req)
+esp_err_t save_req_session_context(httpd_req_t *req)
 {
     req->sess_ctx = malloc(sizeof(int));
     if (req->sess_ctx == NULL)
@@ -55,10 +57,11 @@ static esp_err_t handler_first_call(httpd_req_t *req, const char* file)
     return err;
 }
 
+char* index_file ="/littlefs/index.html";
 esp_err_t index_handler(httpd_req_t *req)
 {
     esp_err_t err = ESP_OK;
-    err = handler_first_call(req, "/littlefs/index.html");
+    err = handler_first_call(req, index_file);
     return err;
 }
 
