@@ -6,11 +6,13 @@
 
 #include "esp_http_server.h"
 #include "esp_err.h"
+#include "esp_log.h"
 
 #include <stdlib.h>
 #include <string.h>
 
 httpd_req_t req;
+extern char* index_file;
 
 void setUp(void)
 {
@@ -33,12 +35,20 @@ void test_index_handler_with_null_session_ctx_should_create_ctx(void)
 
 void test_index_handler_with_null_session_ctx_should_return_ok(void)
 {
-    extern char* index_file;
     index_file = "data/index.html";
 
     esp_err_t err = index_handler(&req);
 
     TEST_ASSERT_EQUAL_INT(ESP_OK, err);
+}
+
+void test_index_handler_with_unexistant_file_should_fail(void)
+{
+    index_file = "/data/xindex.html";
+
+    esp_err_t err = index_handler(&req);
+
+    TEST_ASSERT_EQUAL_INT_MESSAGE(ESP_FAIL, err, "index_handler should return ESP_FAIL");
 }
 
 int session_ctx = 10;
