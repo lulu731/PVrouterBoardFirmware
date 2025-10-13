@@ -12,6 +12,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+TEST_INCLUDE_PATH("test/support/include/common")
+
 void setUp(void)
 {
     server_create();

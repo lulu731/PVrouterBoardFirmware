@@ -9,6 +9,8 @@
 
 #include "esp_err.h"
 
+TEST_INCLUDE_PATH("test/support/include/common/")
+
 const fs_config_t conf = {
     .base_path = "/mount_point",
     .partition_label = "partition_name"

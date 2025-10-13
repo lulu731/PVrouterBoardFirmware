@@ -11,12 +11,17 @@
 #include <stdlib.h>
 #include <string.h>
 
+TEST_INCLUDE_PATH("test/support/include/handlers")
+
 httpd_req_t req;
 extern char* index_file;
+
+int ESP_LOGE_called;
 
 void setUp(void)
 {
     req.sess_ctx = NULL;
+    ESP_LOGE_called = 0;
 }
 
 void tearDown(void)
@@ -48,6 +53,7 @@ void test_index_handler_with_unexistant_file_should_fail(void)
 
     esp_err_t err = index_handler(&req);
 
+    TEST_ASSERT_EQUAL_INT_MESSAGE(1, ESP_LOGE_called, "ESP_LOGE should be called");
     TEST_ASSERT_EQUAL_INT_MESSAGE(ESP_FAIL, err, "index_handler should return ESP_FAIL");
 }
 
