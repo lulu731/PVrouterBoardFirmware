@@ -1,5 +1,7 @@
 #include "esp_http_server.h"
 
+#include <string.h>
+
 int server_handle = 100;
 httpd_handle_t web_server = &server_handle;
 
@@ -92,4 +94,13 @@ esp_err_t httpd_queue_work(httpd_handle_t handle, httpd_work_fn_t work_fn, void 
 esp_err_t httpd_ws_send_frame_async(httpd_handle_t hd, int fd, httpd_ws_frame_t *frame)
 {
     return ESP_OK;
+}
+
+int returned_nbytes = 0;
+int httpd_req_recv(httpd_req_t *r, char *buf, size_t buf_len)
+{
+    char* message_sent = "a message sent";
+    strncpy(buf, message_sent, buf_len);
+    returned_nbytes = strlen(message_sent);
+    return strlen(message_sent);
 }

@@ -69,13 +69,16 @@ esp_err_t index_handler(httpd_req_t *req)
 char* calibration_file ="/littlefs/calibration.html";
 esp_err_t calibration_handler(httpd_req_t *req)
 {
-    extern char* message;
+    extern char* message_received;
     esp_err_t err = ESP_OK;
     if (req->method == HTTP_GET)
     {
         err = handler_first_call(req, calibration_file);
         return err;
     }
-    message = "a message sent";
+
+    message_received = malloc(20);
+    int nbytes = httpd_req_recv(req, message_received, strlen(message_received));
+
     return ESP_OK;
 }

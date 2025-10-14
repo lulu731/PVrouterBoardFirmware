@@ -101,7 +101,7 @@ void test_calibration_handler_with_non_null_session_ctx_should_return_ok(void)
     TEST_ASSERT_EQUAL_INT(ESP_OK, err);
 }
 
-    char* message = NULL;
+char* message_received = NULL;
 void test_calibration_handler_with_not_HTTP_TEXT_should_process_WS(void)
 {
     req.method = HTTP_GET;
@@ -111,8 +111,11 @@ void test_calibration_handler_with_not_HTTP_TEXT_should_process_WS(void)
     req.method = HTTP_POST;
     err = calibration_handler(&req);
 
-    TEST_ASSERT_EQUAL_INT(ESP_OK, err);
-    TEST_ASSERT_EQUAL_STRING("a message sent", message);
+    extern int returned_nbytes; //from httpd_req_recv mock
+    TEST_ASSERT_EQUAL_INT(strlen("a message sent"), returned_nbytes);
 
+    TEST_ASSERT_EQUAL_INT(ESP_OK, err);
+    TEST_ASSERT_EQUAL_STRING("a message sent", message_received);
 }
+
 #endif // TEST
