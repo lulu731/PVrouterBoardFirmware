@@ -1,6 +1,7 @@
 #include "uri_handlers.h"
 
 #include "esp_log.h"
+#include "esp_http_server.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -65,9 +66,16 @@ esp_err_t index_handler(httpd_req_t *req)
     return err;
 }
 
+char* calibration_file ="/littlefs/calibration.html";
 esp_err_t calibration_handler(httpd_req_t *req)
 {
+    extern char* message;
     esp_err_t err = ESP_OK;
-    err = handler_first_call(req, "/littlefs/calibration.html");
-    return err;
+    if (req->method == HTTP_GET)
+    {
+        err = handler_first_call(req, calibration_file);
+        return err;
+    }
+    message = "a message sent";
+    return ESP_OK;
 }
