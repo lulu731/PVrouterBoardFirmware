@@ -76,10 +76,10 @@
 # Specify which reports you'd like from the log factory
 :report_tests_log_factory:
   :reports:
-    - json
-    - junit
-    - cppunit
-    - html
+    #- json
+    #- junit
+    #- cppunit
+    #- html
 
 # override the default extensions for your system and toolchain
 :extension:
