@@ -67,9 +67,46 @@ esp_err_t index_handler(httpd_req_t *req)
 }
 
 char* calibration_file ="/littlefs/calibration.html";
+char* ws_payload; // caller is responsible to free
+
+static esp_err_t get_ws_payload(httpd_req_t *req, char* payload)
+{
+    httpd_ws_frame_t ws_pkt;
+    memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
+    ws_pkt.type = HTTPD_WS_TYPE_TEXT;
+
+    ws_payload = NULL;
+
+    /* Set max_len = 0 to get the frame len */
+    esp_err_t ret = httpd_ws_recv_frame(req, &ws_pkt, 0);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "httpd_ws_recv_frame failed to get frame len with %d", ret);
+        return ret;
+    }
+    ESP_LOGI(TAG, "frame len is %d", ws_pkt.len);
+
+    if (ws_pkt.len) {
+        /* ws_pkt.len + 1 is for NULL termination as we are expecting a string */
+        ws_payload = calloc(1, ws_pkt.len + 1);
+        if (ws_payload == NULL) {
+            ESP_LOGE(TAG, "Failed to calloc memory for buf");
+            return ESP_ERR_NO_MEM;
+        }
+        ws_pkt.payload = ws_payload;
+        /* Set max_len = ws_pkt.len to get the frame payload */
+        ret = httpd_ws_recv_frame(req, &ws_pkt, ws_pkt.len);
+        if (ret != ESP_OK) {
+            ESP_LOGE(TAG, "httpd_ws_recv_frame failed with %d", ret);
+            free(ws_payload);
+            return ret;
+        }
+        ESP_LOGI(TAG, "Got packet with message: %s", ws_pkt.payload);
+    }
+    return ESP_OK;
+}
+
 esp_err_t calibration_handler(httpd_req_t *req)
 {
-    extern char* message_received;
     esp_err_t err = ESP_OK;
     if (req->method == HTTP_GET)
     {
@@ -77,8 +114,7 @@ esp_err_t calibration_handler(httpd_req_t *req)
         return err;
     }
 
-    message_received = malloc(20);
-    int nbytes = httpd_req_recv(req, message_received, strlen(message_received));
+    get_ws_payload(req, ws_payload);
 
     return ESP_OK;
 }

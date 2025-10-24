@@ -31,6 +31,7 @@ void tearDown(void)
 {
     if (req.sess_ctx)
         free(req.sess_ctx);
+    req.sess_ctx = NULL;
 }
 
 void test_index_handler_with_null_session_ctx_should_create_ctx(void)
@@ -93,7 +94,6 @@ void test_calibration_handler_with_non_null_session_ctx_should_not_create_ctx(vo
     TEST_ASSERT_EQUAL_INT(session_ctx, *(int*)req.sess_ctx);
 }
 
-
 void test_calibration_handler_with_non_null_session_ctx_should_return_ok(void)
 {
     when_session_ctx_is_not_null(&req);
@@ -101,21 +101,53 @@ void test_calibration_handler_with_non_null_session_ctx_should_return_ok(void)
     TEST_ASSERT_EQUAL_INT(ESP_OK, err);
 }
 
-char* message_received = NULL;
+static esp_err_t call_calibration_handler_with_GET_then_POST(httpd_req_t *req)
+{
+    req->method = HTTP_GET;
+    esp_err_t err = calibration_handler(req);
+    TEST_ASSERT_EQUAL_INT(ESP_OK, err);
+    req->method = HTTP_POST;
+    err = calibration_handler(req);
+    return err;
+}
+
+extern char* ws_payload;
+extern char* message_sent;
+
 void test_calibration_handler_with_not_HTTP_TEXT_should_process_WS(void)
 {
-    req.method = HTTP_GET;
-    esp_err_t err = calibration_handler(&req);
-    TEST_ASSERT_EQUAL_INT(ESP_OK, err);
+    message_sent = "a message sent";
 
-    req.method = HTTP_POST;
-    err = calibration_handler(&req);
-
-    extern int returned_nbytes; //from httpd_req_recv mock
-    TEST_ASSERT_EQUAL_INT(strlen("a message sent"), returned_nbytes);
+    esp_err_t err = call_calibration_handler_with_GET_then_POST(&req);
 
     TEST_ASSERT_EQUAL_INT(ESP_OK, err);
-    TEST_ASSERT_EQUAL_STRING("a message sent", message_received);
+    TEST_ASSERT_EQUAL_STRING(message_sent, ws_payload);
+    free(ws_payload);
+    ws_payload = NULL;
+}
+
+void test_calibration_handler_with_big_message_sent_should_process_WS(void)
+{
+    message_sent = "the message sent is a rather big one";
+
+    esp_err_t err = call_calibration_handler_with_GET_then_POST(&req);
+
+    TEST_ASSERT_EQUAL_INT(ESP_OK, err);
+    TEST_ASSERT_EQUAL_STRING(message_sent, ws_payload);
+    free(ws_payload);
+    ws_payload = NULL;
+}
+
+extern bool return_error;
+void test_calibration_handler_ws_receive_return_error_should_keep_ws(void)
+{
+    return_error = true;
+    message_sent = "the message sent is a rather big one";
+
+    esp_err_t err = call_calibration_handler_with_GET_then_POST(&req);
+
+    TEST_ASSERT_EQUAL_INT(ESP_OK, err);
+    TEST_ASSERT_NULL(ws_payload);
 }
 
 #endif // TEST

@@ -97,10 +97,38 @@ esp_err_t httpd_ws_send_frame_async(httpd_handle_t hd, int fd, httpd_ws_frame_t 
 }
 
 int returned_nbytes = 0;
+char* message_sent;
+bool buffer_too_low = false;
 int httpd_req_recv(httpd_req_t *r, char *buf, size_t buf_len)
 {
-    char* message_sent = "a message sent";
-    strncpy(buf, message_sent, buf_len);
-    returned_nbytes = strlen(message_sent);
-    return strlen(message_sent);
+    if (!buffer_too_low)
+    {
+        strncpy(buf, message_sent, strlen(message_sent));
+        returned_nbytes = strlen(message_sent);
+        return strlen(message_sent);
+    }
+    else
+    {
+
+    }
+
+    return 0;
+}
+
+bool return_error = false;
+esp_err_t httpd_ws_recv_frame(httpd_req_t *req, httpd_ws_frame_t *pkt, size_t max_len)
+{
+    if (return_error)
+    {
+        return ESP_ERR_INVALID_ARG;
+    }
+
+    if (max_len == 0)
+    {
+        pkt->len = strlen(message_sent);
+        return ESP_OK;
+    };
+
+    strncpy(pkt->payload, message_sent, strlen(message_sent));
+    return ESP_OK;
 }
