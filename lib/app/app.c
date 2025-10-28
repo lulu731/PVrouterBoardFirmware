@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-static const int POWER_THRESHOLD = 100;
+//static const int POWER_THRESHOLD = 100;
 
 void init_ADC(void)
 {

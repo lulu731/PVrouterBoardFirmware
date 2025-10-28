@@ -67,9 +67,9 @@ esp_err_t index_handler(httpd_req_t *req)
 }
 
 char* calibration_file ="/littlefs/calibration.html";
-char* ws_payload; // caller is responsible to free
+unsigned char* ws_payload; // caller is responsible to free
 
-static esp_err_t get_ws_payload(httpd_req_t *req, char* payload)
+static esp_err_t get_ws_payload(httpd_req_t *req, unsigned char* payload)
 {
     httpd_ws_frame_t ws_pkt;
     memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
