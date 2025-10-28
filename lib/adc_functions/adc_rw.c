@@ -1,7 +1,7 @@
 #include "adc_rw.h"
 
 #include "adc_registers.h"
-#include "spi_functions.h"
+#include "calibration_helpers.h"
 
 #include "esp_err.h"
 #include "driver/spi_master.h"

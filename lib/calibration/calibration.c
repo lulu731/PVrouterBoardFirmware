@@ -18,19 +18,19 @@ void exec_metering_calibration()
 
     write_PL_constant();
 
-    L_GAIN.data = 0; // all gains are null
+    /*L_GAIN.data = 0; // all gains are null
     N_GAIN.data = 0;
     L_PHI.data = 0;
     N_PHI.data = 0;
     write_gain_register(L_GAIN);
-    write_gain_register(N_GAIN);
-    write_phi_register(L_PHI);
-    write_phi_register(N_PHI);
+    write_gain_register(N_GAIN);*/
+    /*write_phi_register(L_PHI);
+    write_phi_register(N_PHI);*/
 
-    write_threshold_register(P_START_TH);
+    /*write_threshold_register(P_START_TH);
     write_threshold_register(P_NO_L_TH);
     write_threshold_register(Q_START_TH);
-    write_threshold_register(Q_NO_L_TH);
+    write_threshold_register(Q_NO_L_TH);*/
 
     write_MMODE();
 

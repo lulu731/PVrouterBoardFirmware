@@ -1,5 +1,5 @@
-#ifndef SPI_FUNCTIONS_H
-#define SPI_FUNCTIONS_H
+#ifndef CALIBRATION_HELPERS_H
+#define CALIBRATION_HELPERS_H
 
 #include "adc_registers.h"
 
@@ -17,4 +17,4 @@ uint16_t get_threshold(const uint8_t K); //K in per mille
 
 uint16_t get_offset_from_measured(const uint16_t measured_value, const uint16_t gain);
 
-#endif // SPI_FUNCTIONS_H
+#endif // CALIBRATION_HELPERS_H
