@@ -7,16 +7,18 @@
 #include "esp_gpio.h"
 
 #include "driver/spi_master.h"
+#include "calibration_load_params.h"
 #include "calibration_params.h"
 #include "calibration.h"
+#include "nvs_driver.h"
 #include "adc_rw.h"
 #include "adc_registers.h"
 #include "calibration_helpers.h"
 #include "adc_functions.h"
 #include "system.h"
 
-//TEST_SOURCE_FILE("test/system/fake_adc_rw.c");
-
+TEST_SOURCE_FILE("test/app/stub_nvs.c");
+TEST_SOURCE_FILE("test/app/stub_nvs_flash.c");
 
 static const int POWER_THRESHOLD = 100;
 spi_device_handle_t meter_handle;

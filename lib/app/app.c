@@ -1,5 +1,6 @@
 #include "app.h"
 #include "calibration.h"
+#include "calibration_load_params.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -8,5 +9,6 @@
 
 void init_ADC(void)
 {
+    load_calibration_params();
     exec_metering_calibration();
 }
