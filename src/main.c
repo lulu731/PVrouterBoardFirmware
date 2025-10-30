@@ -2,20 +2,20 @@
 #include "trigger_relay.h"
 #include "system.h"
 
-/*#include "wifi_connect.h"
+#include "wifi_connect.h"
 
-#include <stdio.h>
+/*#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <inttypes.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
-#include "driver/gpio.h"
+#include "driver/gpio.h"*/
 #include "mount_partition_Driver.h"
 #include "server.h"
 
-#include "esp_log.h"*/
+#include "esp_log.h"
 
 #include "spi_master.h"
 
@@ -28,24 +28,7 @@ static const int POWER_THRESHOLD = 100;
 
 void app_main(void)
 {
-    init_ADC();
-
-    for (uint8_t i = 0; i < 10; i++)
-    {
-        if (get_main_real_power() < -POWER_THRESHOLD)
-        {
-            trigger_relay();
-        }
-    }
-
-    /*esp_err_t nvs_error = nvs_init();
-    assert(nvs_error == ESP_OK);
-    nvs_handle_t nvs_handle;// = 0;
-    nvs_open_file("meter_config", &nvs_handle);
-    load_nvs_params(nvs_handle);
-    nvs_close(nvs_handle);*/
-
-    /*partition_config_t conf = {
+    partition_config_t conf = {
         .base_path = "/littlefs",
         .partition_label = "littlefs"
     };
@@ -56,6 +39,30 @@ void app_main(void)
     };
 
     connect_to_wifi();
+
+    server_create();
+    server_start();
+
+    init_ADC();
+
+    while (true)
+    {
+        if (get_main_real_power() < -POWER_THRESHOLD)
+        {
+            trigger_relay();
+        }
+    }
+}
+
+    /*esp_err_t nvs_error = nvs_init();
+    assert(nvs_error == ESP_OK);
+    nvs_handle_t nvs_handle;// = 0;
+    nvs_open_file("meter_config", &nvs_handle);
+    load_nvs_params(nvs_handle);
+    nvs_close(nvs_handle);*/
+
+
+    /*connect_to_wifi();
 
     server_create();
     server_start();
@@ -86,4 +93,3 @@ void app_main(void)
         vTaskDelay(1000 / portTICK_PERIOD_MS);
         server_send_to_all_clients("test");
     }*/
-}
