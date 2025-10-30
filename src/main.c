@@ -1,42 +1,20 @@
 #include "app.h"
-#include "trigger_relay.h"
-#include "system.h"
 
 #include "wifi_connect.h"
 
-/*#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <inttypes.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
-#include "driver/gpio.h"*/
-#include "mount_partition_Driver.h"
 #include "server.h"
-
-#include "esp_log.h"
-
 #include "spi_master.h"
 
-#define GPIO_HEATER    18
-#define GPIO_RESET_ADC 40
-#define GPIO_PIN_SEL   ((1ULL<<GPIO_HEATER) | (1ULL<<GPIO_RESET_ADC))
+#include <stdbool.h>
 
 static const int POWER_THRESHOLD = 100;
 
-
 void app_main(void)
 {
-    partition_config_t conf = {
-        .base_path = "/littlefs",
-        .partition_label = "littlefs"
-    };
-
-    mount_part_create(&conf);
-    if (mount_part() != MOUNT_OK) {
-        ESP_LOGE("main", "mount create error");
-    };
+    mount_littlefs_partition();
 
     connect_to_wifi();
 
@@ -47,10 +25,8 @@ void app_main(void)
 
     while (true)
     {
-        if (get_main_real_power() < -POWER_THRESHOLD)
-        {
-            trigger_relay();
-        }
+        trigger_relay_when_power_below_threshold(POWER_THRESHOLD);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
 
