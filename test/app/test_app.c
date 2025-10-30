@@ -19,6 +19,7 @@
 
 TEST_SOURCE_FILE("test/app/stub_nvs.c");
 TEST_SOURCE_FILE("test/app/stub_nvs_flash.c");
+TEST_SOURCE_FILE("test/app/fake_mount_partition.c");
 
 static const int POWER_THRESHOLD = 100;
 spi_device_handle_t meter_handle;
