@@ -102,6 +102,7 @@
   :source:
     - src/**
     - lib/**
+    - .pio/libdeps/**
   :include:
     - include/**
     - lib/**
