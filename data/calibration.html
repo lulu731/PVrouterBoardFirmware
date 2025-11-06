@@ -77,7 +77,8 @@
 
   function sendGain()
   {
-    const obj = {id: event.target.id, value: event.target.value};
+    const obj = '{"' + event.target.id + '":' + event.target.value + "}";
+    console.log(obj);
     wskt.send(JSON.stringify(obj));
     console.log(JSON.stringify(obj));
   };

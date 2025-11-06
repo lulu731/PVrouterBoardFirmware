@@ -40,5 +40,13 @@ void test_json_print_object_array(void)
     free(json);
 }
 
+void test_json_get_gain_object(void)
+{
+    char* json = "{\"UGain\":100}";
+    gain_object* object = json_parse_gain_object(json);
+    TEST_ASSERT_EQUAL_STRING("UGain", object->key);
+    TEST_ASSERT_EQUAL_INT(100, object->value);
+    free(object);
+}
 
 #endif // TEST
