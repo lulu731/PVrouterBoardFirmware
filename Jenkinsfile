@@ -3,7 +3,7 @@ pipeline {
    stages {
       stage('install_dependencies') {
          steps {
-            sh 'pio pkg install -e jenkins'
+            sh '/home/lulu/.platformio/penv/bin/pio pkg install -e jenkins'
          }
       }
       stage('test') {
