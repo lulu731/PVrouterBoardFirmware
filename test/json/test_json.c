@@ -18,16 +18,27 @@ void tearDown(void)
 
 void test_json_print_null_object(void)
 {
-    char* json = json_stringify("null", 0);
+    gain_object object = {"null", 0};
+    char* json = json_stringify(&object, 1);
     TEST_ASSERT_EQUAL_STRING("{\"null\":0}", json);
     free(json);
 }
 
 void test_json_print_object(void)
 {
-    char* json = json_stringify("UGain", 100);
+    gain_object object = {"UGain", 100};
+    char* json = json_stringify(&object, 1);
     TEST_ASSERT_EQUAL_STRING("{\"UGain\":100}", json);
     free(json);
 }
+
+void test_json_print_object_array(void)
+{
+    gain_object objects[3] = {{"UGain", 100}, {"IGain", 200}, {"VGain", 300}};
+    char* json = json_stringify(objects, 3);
+    TEST_ASSERT_EQUAL_STRING("{\"UGain\":100,\"IGain\":200,\"VGain\":300}", json);
+    free(json);
+}
+
 
 #endif // TEST
