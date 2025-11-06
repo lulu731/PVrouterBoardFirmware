@@ -1,13 +1,9 @@
 pipeline {
    agent any
    stages {
-      stage('install_dependencies') {
-         steps {
-            sh '/home/lulu/.platformio/penv/bin/pio pkg install -e jenkins'
-         }
-      }
       stage('test') {
          steps {
+            sh 'sed -i "s|test/cJSON|jenkins/cJSON|" test/json/test_json.c'
             sh 'ceedling'
          }
       }
