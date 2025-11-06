@@ -1,6 +1,11 @@
 pipeline {
    agent any
    stages {
+      stage('install_dependencies') {
+         steps {
+            sh 'pio pkg install -e jenkins'
+         }
+      }
       stage('test') {
          steps {
             sh 'ceedling'
