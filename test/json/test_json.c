@@ -37,8 +37,7 @@ void test_json_print_object_array(void)
     gain_object objects[3] = {{"UGain", 100}, {"IGain", 200}, {"VGain", 300}};
     char* json = json_stringify(objects, 3);
     TEST_ASSERT_EQUAL_STRING("{\"UGain\":100,\"IGain\":200,\"VGain\":300}", json);
-    if (json != &null_gain_object)
-        free(json);
+    free(json);
 }
 
 void test_json_get_gain_object(void)
