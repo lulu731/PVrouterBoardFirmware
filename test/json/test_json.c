@@ -37,7 +37,8 @@ void test_json_print_object_array(void)
     gain_object objects[3] = {{"UGain", 100}, {"IGain", 200}, {"VGain", 300}};
     char* json = json_stringify(objects, 3);
     TEST_ASSERT_EQUAL_STRING("{\"UGain\":100,\"IGain\":200,\"VGain\":300}", json);
-    free(json);
+    if (json != &null_gain_object)
+        free(json);
 }
 
 void test_json_get_gain_object(void)
@@ -46,7 +47,8 @@ void test_json_get_gain_object(void)
     gain_object* object = json_parse_gain_object(json);
     TEST_ASSERT_EQUAL_STRING("UGain", object->key);
     TEST_ASSERT_EQUAL_INT(100, object->value);
-    free(object);
+    if (object != &null_gain_object)
+        free(object);
 }
 
 void test_json_should_return_null_when_bad_json_string(void)
@@ -55,7 +57,8 @@ void test_json_should_return_null_when_bad_json_string(void)
     gain_object* object = json_parse_gain_object(json);
     TEST_ASSERT_EQUAL_STRING(NULL, object->key);
     TEST_ASSERT_EQUAL_INT(0, object->value);
-    free(object);
+    if (object != &null_gain_object)
+        free(object);
 }
 
 #endif // TEST

@@ -9,6 +9,8 @@ typedef struct gain_object
     uint16_t value;
 } gain_object;
 
+extern gain_object null_gain_object;
+
 char* json_stringify(gain_object* object, uint8_t size);
 gain_object* json_parse_gain_object(const char* json_string);
 

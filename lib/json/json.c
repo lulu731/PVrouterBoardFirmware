@@ -34,8 +34,5 @@ gain_object* json_parse_gain_object(const char* json_string)
         return object;
     }
     cJSON_Delete(root);
-    gain_object* object = malloc(sizeof(gain_object));
-    object->key = NULL;
-    object->value = 0;
-    return object;
+    return &null_gain_object;
 }
