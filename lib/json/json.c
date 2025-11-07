@@ -24,7 +24,7 @@ char *json_stringify(gain_object* object, uint8_t size){
 gain_object* json_parse_gain_object(const char* json_string)
 {
     cJSON *root = cJSON_Parse(json_string);
-    if (cJSON_IsNumber(root->child))
+    if (root && cJSON_IsNumber(root->child))
     {
         gain_object* object = malloc(sizeof(gain_object));
         object->key = malloc(strlen(root->child->string) + 1);

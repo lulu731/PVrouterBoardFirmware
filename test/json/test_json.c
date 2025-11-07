@@ -60,4 +60,14 @@ void test_json_should_return_null_when_bad_json_string(void)
         free(object);
 }
 
+void test_json_should_return_null_when_string_is_not_json_string(void)
+{
+    char* json = "{\"UGain\"}";
+    gain_object* object = json_parse_gain_object(json);
+    TEST_ASSERT_EQUAL_STRING(NULL, object->key);
+    TEST_ASSERT_EQUAL_INT(0, object->value);
+    if (object != &null_gain_object)
+        free(object);
+}
+
 #endif // TEST
