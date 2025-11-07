@@ -6,6 +6,8 @@
 #include "esp_gpio.h"
 #include "driver/gpio.h"
 
+TEST_SOURCE_FILE("test/trigger_relay/stub_gpio.c");
+
 extern int calls_to_set_level_h;
 extern int calls_to_set_level_l;
 
