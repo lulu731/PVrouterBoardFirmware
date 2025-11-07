@@ -3,6 +3,7 @@ pipeline {
    stages {
       stage('test') {
          steps {
+            sh '/home/lulu/.platformio/penv/bin/pio pkg install -e jenkins'
             sh 'sed -i "s|test/cJSON|jenkins/cJSON|" test/json/test_json.c'
             sh 'ceedling'
          }
