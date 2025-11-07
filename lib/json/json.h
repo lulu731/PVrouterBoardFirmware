@@ -5,7 +5,7 @@
 
 typedef struct gain_object
 {
-    const char* key;
+    char* key;
     uint16_t value;
 } gain_object;
 

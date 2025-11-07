@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+gain_object null_gain_object = {NULL, 0};
+
 char *json_stringify(gain_object* object, uint8_t size){
     cJSON *root = cJSON_CreateObject();
 
@@ -31,4 +33,9 @@ gain_object* json_parse_gain_object(const char* json_string)
         cJSON_Delete(root);
         return object;
     }
+    cJSON_Delete(root);
+    gain_object* object = malloc(sizeof(gain_object));
+    object->key = NULL;
+    object->value = 0;
+    return object;
 }

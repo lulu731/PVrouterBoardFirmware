@@ -49,4 +49,13 @@ void test_json_get_gain_object(void)
     free(object);
 }
 
+void test_json_should_return_null_when_bad_json_string(void)
+{
+    char* json = "{\"UGain\":\"100\"}";
+    gain_object* object = json_parse_gain_object(json);
+    TEST_ASSERT_EQUAL_STRING(NULL, object->key);
+    TEST_ASSERT_EQUAL_INT(0, object->value);
+    free(object);
+}
+
 #endif // TEST
