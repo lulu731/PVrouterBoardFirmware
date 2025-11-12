@@ -28,22 +28,33 @@ char *json_stringify(gain_object* gain_object, uint8_t size){
 gain_object* json_parse_gain_object(const char* json_string)
 {
     cJSON *root = cJSON_Parse(json_string);
+
+    cJSON *json_array = NULL;
+    cJSON *json_object = NULL;
+    cJSON *json_id = NULL;
+    cJSON *json_value = NULL;
+
     if (root && cJSON_IsArray(root->child))
     {
-        cJSON *json_array = cJSON_GetObjectItemCaseSensitive(root, "objects");
-        cJSON *json_object = json_array->child;
-        cJSON *json_id = cJSON_GetObjectItemCaseSensitive(json_object, "id");
-        cJSON *json_value = cJSON_GetObjectItemCaseSensitive(json_object, "value");
+        json_array = cJSON_GetObjectItemCaseSensitive(root, "objects");
+        cJSON_ArrayForEach(json_object, json_array)
+        {
+            json_id = cJSON_GetObjectItemCaseSensitive(json_object, "id");
+            json_value = cJSON_GetObjectItemCaseSensitive(json_object, "value");
+        }
+    }
 
-        gain_object* object = malloc(sizeof(gain_object));
+    gain_object* object = NULL;
+    if (json_id && json_value)
+    {
+        object = malloc(sizeof(gain_object));
         object->key = malloc(strlen(json_id->valuestring) + 1);
         strncpy(object->key, json_id->valuestring, sizeof(object->key));
         object->value = (json_value->valueint);
-
-        cJSON_Delete(root);
-
-        return object;
     }
+    else
+        object = &null_gain_object;
+
     cJSON_Delete(root);
-    return &null_gain_object;
+    return object;
 }
