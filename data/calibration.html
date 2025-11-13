@@ -25,11 +25,11 @@
       </td>
       <td>
         <label for="Ugain">Ugain</label><br>
-        <input type="number" id='Ugain' onchange='sendGain()'><br><br>
+        <input type="number" id='Ugain' onchange='sendGain(event)'><br><br>
         <label for="IgainL">IgainL</label><br>
-        <input type="number" id='IgainL' onchange='sendGain()'><br><br>
+        <input type="number" id='IgainL' onchange='sendGain(event)'><br><br>
         <label for="IgainN">IgainN</label><br>
-        <input type="number" id='IgainN' onchange='sendGain()'><br><br>
+        <input type="number" id='IgainN' onchange='sendGain(event)'><br><br>
       </td>
     </tr>
   </table>
@@ -50,9 +50,9 @@
       console.log('rx : ' + rx);
       var obj = JSON.parse(rx.data);
       try {
-        let gainsLen = obj.gains.length;
+        let gainsLen = obj.objects.length;
         for (let i = 0; i < gainsLen; i++) {
-        document.getElementById(obj.gains[i].id).value = obj.gains[i].value;
+        document.getElementById(obj.objects[i].id).value = obj.gains[i].value;
         }
       }
       catch(e)
@@ -64,20 +64,20 @@
 
   function click_Ib_calibration()
   {
-    //wskt.send('4');
-    document.getElementById('Ugain').value = 44;
-    document.getElementById('errorText').value += "Ib calibration\n";
+    const obj = { "objects": [{ "id": "cmd", "value": 4 }] };
+    wskt.send(JSON.stringify(obj));
   };
 
   function click_no_current_calibration()
   {
-    wskt.send('5');
+    const obj = { "objects": [{ "id": "cmd", "value": 5 }] };
+    wskt.send(JSON.stringify(obj));
     document.getElementById('errorText').value += "No current calibration\n";
   };
 
-  function sendGain()
+  function sendGain(event)
   {
-    const obj = '{"' + event.target.id + '":' + event.target.value + "}";
+    const obj = { "objects": [{ "id": event.target.id, "value": event.target.value }] };
     console.log(obj);
     wskt.send(JSON.stringify(obj));
     console.log(JSON.stringify(obj));
@@ -85,6 +85,5 @@
   </script>
   </body>
 </html>
-
 
 // test esp32 WS
