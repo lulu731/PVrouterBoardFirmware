@@ -65,25 +65,14 @@ void exec_gain_calibration()
     IgainN = get_line_gain(Ib, &I_RMS_2, &I_GAIN_N); // needs measure at Ib
 }
 
-extern adc_data Uoffset, IoffsetL, IoffsetN;
-extern adc_data PoffsetL, QoffsetL, PoffsetN, QoffsetN;
 extern struct adc_register P_MEAN, Q_MEAN, P_MEAN_2, Q_MEAN_2;
 
 /// needs measure no current
 void exec_offset_calibration()
 {
-    Uoffset = get_offset(U_RMS, Ugain);
-    IoffsetL = get_offset(I_RMS, IgainL);
-    IoffsetN = get_offset(I_RMS_2, IgainN);
-
     extern struct adc_register SMALL_P_MOD;
     SMALL_P_MOD.data = 0xA987;
     write_adc_register(SMALL_P_MOD); // small power mode
-
-    PoffsetL = get_power_offset(&P_MEAN);
-    PoffsetN = get_power_offset(&P_MEAN_2);
-    QoffsetL = get_power_offset(&P_MEAN);
-    QoffsetN = get_power_offset(&Q_MEAN_2);
 
     SMALL_P_MOD.data = 0xA980;
     write_adc_register(SMALL_P_MOD);
@@ -94,9 +83,6 @@ extern struct adc_register U_OFFSET, I_OFFSET_L, I_OFFSET_N;
 /// needs measure no current
 void exec_offset_calibration_write()
 {
-    U_OFFSET.data = Uoffset;
-    I_OFFSET_L.data = IoffsetL;
-    I_OFFSET_N.data = IoffsetN;
     write_adc_register(U_OFFSET);
     write_adc_register(I_OFFSET_L);
     write_adc_register(I_OFFSET_N);
@@ -138,23 +124,6 @@ void exec_measurement_calibration()
         save_nvs_param("PoffsetN", PoffsetN);
         save_nvs_param("QoffsetN", QoffsetN);
     #endif
-
-    U_OFFSET.data = Uoffset;
-    write_adc_register(U_OFFSET);
-    I_OFFSET_L.data = IoffsetL;
-    write_adc_register(I_OFFSET_L);
-    I_OFFSET_N.data = IoffsetN;
-    write_adc_register(I_OFFSET_N);
-
-    P_OFFSET_L.data = PoffsetL;
-    Q_OFFSET_L.data = QoffsetL;
-    write_adc_register(P_OFFSET_L);
-    write_adc_register(Q_OFFSET_L);
-
-    P_OFFSET_N.data = PoffsetN;
-    Q_OFFSET_N.data = QoffsetN;
-    write_adc_register(P_OFFSET_N);
-    write_adc_register(Q_OFFSET_N);
 
     ///update CS2 register
     extern struct adc_register CS2;

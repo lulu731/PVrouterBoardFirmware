@@ -55,7 +55,7 @@ static uint16_t key2_value = 0x2702;
 static char key3[5] = "key3";
 static uint16_t key3_value = 0x2703;
 
-static int expected_keys_count = 24;
+static int expected_keys_count = 17;
 
 void test_load()
 {
