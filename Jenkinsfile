@@ -1,22 +1,34 @@
 pipeline {
-   agent any
+   agent { label 'linux'}
    stages {
+      stage('run container'){
+         when { environment name: 'NODE_NAME', value :'server'}
+         steps {
+            sh 'echo node name is $NODE_NAME'
+            sh './jenkins/run_container.sh'
+         }
+      }
       stage('test') {
          steps {
-            sh '/home/lulu/.platformio/penv/bin/pio pkg install -e jenkins'
-            sh 'sed -i "s|test/cJSON|jenkins/cJSON|" test/json/test_json.c'
-            sh 'ceedling'
+            sh './jenkins/ceedling_test.sh $NODE_NAME'
          }
       }
       stage('build') {
          steps {
-            sh '/home/lulu/.platformio/penv/bin/pio run -e jenkins'
+            sh './jenkins/platformio_build.sh $NODE_NAME'
          }
       }
    }
    post {
+      always {
+         script{
+            if (env.NODE_NAME == 'server') {
+               sh './jenkins/stop_container.sh'
+            }
+         }
+      }
       failure {
-            mail bcc:'', body: "Jenkins reports a failed pipeline : #${BUILD_NUMBER} in ${BRANCH_NAME}", cc: '', from: 'jenkins', replyTo: '', subject: 'Pipeline failed', to: 'lulu@msikatana'
+         mail bcc:'', body: "Jenkins reports a failed pipeline : #${BUILD_NUMBER} in ${BRANCH_NAME}", cc: '', from: 'jenkins', replyTo: '', subject: 'Pipeline failed', to: 'lulu@msikatana'
       }
    }
 }
