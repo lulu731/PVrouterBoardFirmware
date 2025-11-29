@@ -35,6 +35,7 @@ pipeline {
          script {
             if (env.BRANCH_NAME == 'develop') {
                sh 'git push $REMOTE_URL "HEAD:refs/heads/develop"'
+               sh 'git pull'
             }
          }
       }
