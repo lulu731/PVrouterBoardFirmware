@@ -1,12 +1,6 @@
 #!/usr/bin/bash
 
-if [ "$1" == "server" ]
-then
-  build='podman exec jenkins_ctr /bin/bash -c "/root/.platformio/penv/bin/pio run -e jenkins"'
-else
-  build='/home/lulu/.platformio/penv/bin/pio run -e jenkins';
-fi
-
 echo launch build;
-bash -c "$build";
+bash -c 'podman run -i --rm -v $(pwd):/home/dev/project -v pio_jenkins:/root pio_run_e_jenkins:1.0.0'
+
 exit;

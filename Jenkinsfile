@@ -1,36 +1,25 @@
 pipeline {
    agent { label 'linux'}
+
    environment {
       GITHUB_CREDS = credentials('838f205e-7093-420e-9f0a-b308b8bd3202')
       REMOTE_URL   = "https://x-access-token:$GITHUB_CREDS_PSW@github.com/$GITHUB_CREDS_USR/PVrouterBoardFirmware.git"
    }
+
    stages {
-      stage('run container'){
-         when { environment name: 'NODE_NAME', value :'server'}
+      stage('build') {
          steps {
-            sh 'echo node name is $NODE_NAME'
-            sh './jenkins/run_container.sh'
+            sh './jenkins/platformio_build.sh'
          }
       }
       stage('test') {
          steps {
-            sh './jenkins/ceedling_test.sh $NODE_NAME'
-         }
-      }
-      stage('build') {
-         steps {
-            sh './jenkins/platformio_build.sh $NODE_NAME'
+            sh './jenkins/ceedling_test.sh'
          }
       }
    }
+
    post {
-      always {
-         script {
-            if (env.NODE_NAME == 'server') {
-               sh './jenkins/stop_container.sh'
-            }
-         }
-      }
       success {
          script {
             if (env.BRANCH_NAME == 'develop') {
