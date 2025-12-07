@@ -36,32 +36,8 @@
     </tr>
   </table>
 
+  <script src="script.js"></script>
   <script>
-  var wskt;
-  document.getElementById('initialise').onload = function()
-  {init()};
-  function init()// open WebSocket
-  {
-    console.log('Trying to open a WebSocket connection...');
-    wskt = new WebSocket('ws://' + window.location.hostname + '/ws');
-    wskt.onopen =  function(event){console.log('connection opened');};
-    wskt.onclose = function(event){console.log('connection closed');};
-    wskt.onmessage = function(rx)
-    {  // client receive message
-      console.log('message received');
-      console.log('rx' + rx);
-      var obj = rx.data;
-      try {
-        document.getElementById('rxText').value +=
-          "received : " + obj + "\n";
-      }
-      catch(e)
-      {
-        document.getElementById('errorText').value += obj + "\n";
-      }
-    };
-  }
-
   function clickUpdate()
   {
     wskt.send('9');
@@ -84,7 +60,6 @@
     wskt.send('8');
     document.getElementById('errorText').value += "Reset Div Energy\n";
   };
-
   </script>
   </body>
 </html>
