@@ -7,6 +7,12 @@
 
 gain_object null_gain_object = {NULL, 0};
 
+/**
+ * @brief converts an array of gain_object structs to a JSON string
+ * @param gain_object an array of gain_object structs
+ * @param size the number of elements in the array
+ * @return a JSON string representing the array of gain_object structs
+ */
 char *json_stringify(gain_object* gain_object, uint8_t size){
     cJSON *root = cJSON_CreateObject();
     cJSON *objects = cJSON_AddArrayToObject(root, "objects");
@@ -25,6 +31,11 @@ char *json_stringify(gain_object* gain_object, uint8_t size){
     return json_string;
 }
 
+/**
+ * @brief parses a JSON string representing an array of gain_object structs
+ * @param json_string a JSON string representing an array of gain_object structs
+ * @return a gain_object struct representing the first element in the array
+ */
 gain_object* json_parse_gain_object(const char* json_string)
 {
     cJSON *root = cJSON_Parse(json_string);

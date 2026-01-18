@@ -14,6 +14,11 @@ extern spi_device_handle_t meter_handle;
 /* READ and WRITE data */
 /***********************/
 
+/**
+ * @brief read the value of a given adc register
+ * @param reg the adc register to read
+ * @return ESP_OK if the read operation was successful, otherwise an error code
+ */
 int read_adc_register(struct adc_register* reg)
 {
     spi_transaction_t trans = {
@@ -30,6 +35,11 @@ int read_adc_register(struct adc_register* reg)
     return ret;
 }
 
+/**
+ * @brief write the value of a given adc register
+ * @param reg the adc register to write
+ * @return ESP_OK if the write operation was successful, otherwise an error code
+ */
 int write_adc_register(const struct adc_register reg)
 {
     spi_transaction_t trans = {

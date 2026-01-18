@@ -9,6 +9,14 @@ static const char TAG[] = "spi_master.c";
 
 spi_device_handle_t meter_handle;
 
+/**
+ * @brief Initialize SPI bus and meter, and execute meter calibration
+ *
+ * This function initializes the SPI bus and adds the meter device to the bus.
+ * It then calls the exec_calibration() function to execute the meter calibration.
+ *
+ * @return ESP_OK if the calibration was successful, ESP_ERR_* otherwise
+ */
 esp_err_t calibrate_adc()
 {
     esp_err_t ret;

@@ -11,6 +11,13 @@ extern adc_data CAL_NEEDED, CAL_END;
 extern struct adc_register P_START_TH, P_NO_L_TH, Q_START_TH, Q_NO_L_TH;
 extern struct adc_register CS1;
 
+/**
+ * @brief Executing metering calibration procedure
+ *
+ * This function is responsible for executing metering calibration procedure.
+ * It sets calibration start flag, writes PL constant, sets gains and phases to 0,
+ * writes thresholds, MMODE, updates CS1 register and sets calibration end flag.
+ */
 void exec_metering_calibration()
 {
     CAL_START.data = CAL_NEEDED;
@@ -91,6 +98,14 @@ void exec_offset_calibration_write()
 extern struct adc_register P_OFFSET_L, Q_OFFSET_L;
 extern struct adc_register P_OFFSET_N, Q_OFFSET_N;
 
+/**
+ * @brief Executing measurement calibration
+ *
+ * This function starts the measurement calibration by setting the ADJ_START register to CAL_NEEDED.
+ * Depending on the CALIBRATION_AT_IB macro, it executes gain calibration and saves the results to nvs.
+ * Depending on the CALIBRATION_NO_CURRENT macro, it executes offset calibration and saves the results to nvs.
+ * Finally, it ends the measurement calibration by setting the ADJ_START register to CAL_END.
+ */
 void exec_measurement_calibration()
 {
     extern struct adc_register ADJ_START;
@@ -139,6 +154,12 @@ void exec_measurement_calibration()
 /* Measure calibration */
 /***********************/
 
+/**
+ * @brief Executing calibration procedure
+ *
+ * This function is responsible for executing calibration procedure.
+ * It executes metering calibration procedure and measurement calibration procedure.
+ */
 void exec_calibration(void)
 {
     exec_metering_calibration();

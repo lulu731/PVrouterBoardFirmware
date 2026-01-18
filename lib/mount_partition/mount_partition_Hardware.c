@@ -10,12 +10,27 @@ static esp_vfs_littlefs_conf_t esp_fs_config = {
     .dont_mount =             false
 };
 
+/**
+ * @brief Initializes the LittleFS filesystem with the given configuration.
+ *
+ * @param fs_config Configuration for the LittleFS filesystem.
+ *
+ * This function initializes the LittleFS filesystem with the given base path and partition label.
+ */
 void fs_init(const fs_config_t *fs_config)
 {
     esp_fs_config.base_path =       fs_config->base_path;
     esp_fs_config.partition_label = fs_config->partition_label;
 }
 
+/**
+ * @brief Mount a LittleFS partition
+ *
+ * @return HARD_MOUNT_OK if the mounting was successful, HARD_MOUNT_ERROR otherwise
+ *
+ * @details This function mounts a LittleFS partition based on the configuration set in fs_init.
+ * If the mounting fails, it logs an error message with the reason for the failure.
+ */
 hardware_mount_error_t fs_mount()
 {
     esp_err_t error = esp_vfs_littlefs_register(&esp_fs_config);

@@ -10,6 +10,14 @@ static const char* namespace = "meter_config";
 nvs_handle_t handle = 0;
 static nvs_iterator_t iterator = NULL;
 
+/**
+ * @brief Initializes the NVS driver.
+ *
+ * This function initializes the NVS driver by calling @ref nvs_flash_init.
+ * If the initialization fails, it returns @ref NVS_INIT_ERROR. Otherwise, it returns @ref NVS_OK.
+ *
+ * @return NVS_OK if the initialization succeeds, NVS_INIT_ERROR if it fails.
+ */
 nvs_err_t nvs_init(void)
 {
     if (nvs_flash_init() != ESP_OK)
@@ -19,6 +27,14 @@ nvs_err_t nvs_init(void)
     return NVS_OK;
 };
 
+/**
+ * @brief Returns the first NVS data entry.
+ *
+ * This function returns the first NVS data entry found in the NVS partition.
+ * If the entry is not found, it returns an NVS data entry with key set to NULL and value set to 0.
+ *
+ * @return The first NVS data entry found in the NVS partition if the entry is found, an NVS data entry with key set to NULL and value set to 0 if the entry is not found.
+ */
 const nvs_data_t get_first_nvs_data(void)
 {
     nvs_data_t nvs_data =
@@ -52,6 +68,14 @@ const nvs_data_t get_first_nvs_data(void)
     return nvs_data;
 }
 
+/**
+ * @brief Returns the next NVS data entry.
+ *
+ * This function returns the next NVS data entry found in the NVS partition.
+ * If the entry is not found, it releases the iterator and returns an NVS data entry with key set to NULL and value set to 0.
+ *
+ * @return The next NVS data entry found in the NVS partition if the entry is found, an NVS data entry with key set to NULL and value set to 0 if the entry is not found.
+ */
 const nvs_data_t get_next_nvs_data(void)
 {
     nvs_data_t nvs_data =

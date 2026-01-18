@@ -6,6 +6,12 @@
 
 #include <assert.h>
 
+/**
+ * @brief calculates the average of adc register values
+ * @param reg pointer to adc register to read from
+ * @param nbr_datas number of times to read from adc register
+ * @return average of adc register values
+ */
 adc_data get_average_data_fm_register(struct adc_register* reg, const int nbr_datas)
 {
     adc_data data_array[nbr_datas];
@@ -19,6 +25,12 @@ adc_data get_average_data_fm_register(struct adc_register* reg, const int nbr_da
     return get_average_data_in_array(data_array, nbr_datas);
 }
 
+/**
+ * @brief calculates the complement average of adc register values
+ * @param source_reg pointer to adc register to read from
+ * @param nbr_datas number of times to read from adc register
+ * @return complement average of adc register values
+ */
 adc_data get_complement_average_fm_register(struct adc_register* source_reg, const int nbr_datas)
 {
     adc_data average_value = get_average_data_fm_register(source_reg, nbr_datas);

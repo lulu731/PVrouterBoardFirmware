@@ -2,6 +2,14 @@
 
 #include "driver/gpio.h"
 
+/**
+ * @brief Initialize GPIO configuration for a given GPIO number
+ *
+ * This function will set the GPIO mode to output and disable interrupts, pull-up and pull-down.
+ * It will then set the GPIO level to 0.
+ *
+ * @param gpio_num GPIO number to be configured
+ */
 void init_gpio_config_for_gpio(gpio_num_t gpio_num)
 {
     gpio_config_t io_conf = {};

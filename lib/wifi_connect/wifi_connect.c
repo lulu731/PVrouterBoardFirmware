@@ -35,6 +35,16 @@ static const char *TAG = "wifi station";
 static int s_retry_num = 0;
 
 
+/**
+ * This function is an event handler for WIFI events.
+ a handler for each event
+ * type. It is called when the event is triggered and it will handle the event accordingly.
+
+ * @param arg is the base object of the event. It contains information about the event.
+
+ * @param event_id is the ID of the event. It is used to distinguish between different events.
+ * @param event_data is a pointer to the data of the event. The data type depends on the type of event.
+ */
 static void event_handler(void* arg, esp_event_base_t event_base,
                                 int32_t event_id, void* event_data)
 {

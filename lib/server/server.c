@@ -43,12 +43,28 @@ static httpd_uri_t ws_uri = {
     .is_websocket = true
 };
 
+/**
+ * @brief Initialize the server
+ *
+ * This function initializes the server by setting the web_server handle to NULL.
+ *
+ */
 void server_create(void)
 {
     ESP_LOGI(TAG, "creating server");
     web_server = NULL;
 }
 
+/**
+ * @brief Start the server
+ *
+ * This function starts the server by calling httpd_start and registering three URI handlers.
+ * The URI handlers are for the index, calibration and websocket endpoints.
+ * If any of the operations fail, an error is logged and SERVER_ERROR is returned.
+ * If all operations succeed, SERVER_OK is returned.
+ *
+ * @return SERVER_OK if the server was started successfully, SERVER_ERROR otherwise
+ */
 server_err_t server_start(void)
 {
     ESP_LOGI(TAG, "starting server");
@@ -70,6 +86,14 @@ server_err_t server_start(void)
     return SERVER_OK;
 }
 
+/**
+ * @brief Send a websocket frame to a client
+ *
+ * This function sends a websocket frame to a client by calling httpd_ws_send_frame_async.
+ * It is intended to be used as a work function for httpd_queue_work.
+ *
+ * @param arg A pointer to a work_fn_arg struct containing the websocket frame to be sent
+ */
 static void httpd_work_fn(void *arg)
 {
     struct work_fn_arg* work_arg = (struct work_fn_arg*)arg;
@@ -77,6 +101,14 @@ static void httpd_work_fn(void *arg)
     work_fn_arg_destroy(work_arg);
 }
 
+/**
+ * @brief Send a message to all connected clients
+ *
+ * This function sends a message to all connected clients by calling httpd_get_client_list to get the list of client file descriptors, then iterating over the list and calling httpd_queue_work to send the message to each client.
+ *
+ * @param message The message to be sent to all connected clients
+ * @return The number of clients the message was sent to
+ */
 size_t server_send_to_all_clients(const char* message)
 {
     size_t fds = config.max_open_sockets;
@@ -106,6 +138,13 @@ size_t server_send_to_all_clients(const char* message)
     return fds;
 }
 
+/**
+ * @brief Stop the HTTP server
+ *
+ * This function stops the HTTP server by calling httpd_stop with the web_server handle.
+ * If httpd_stop returns an error, this function returns SERVER_ERROR.
+ * Otherwise, it returns SERVER_OK.
+ */
 server_err_t server_stop(void)
 {
     if (web_server != NULL)
@@ -117,6 +156,11 @@ server_err_t server_stop(void)
     return SERVER_OK;
 }
 
+/**
+ * @brief Destroys the server
+ *
+ * This function sets the web_server handle to NULL, effectively destroying the server.
+ */
 void server_destroy(void)
 {
     web_server = NULL;
