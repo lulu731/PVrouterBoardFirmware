@@ -11,6 +11,7 @@
   <body id='initialise'>
   <button onclick='click_Ib_calibration()'>Ib calibration</button>
   <button onclick='click_no_current_calibration()'>No current calibration</button>
+  <button onclick='click_save_calibration()'>Save</button>
   <br></br>
   <h2>Calibration</h2>
   <table>
@@ -48,6 +49,13 @@
     const obj2 = { "objects": [{ "id": "cmd", "value": 5 }] };
     wskt.send(JSON.stringify(obj2));
     document.getElementById('errorText').value += "No current calibration\n";
+  };
+
+  function click_save_calibration()
+  {
+    const obj2 = { "objects": [{ "id": "cmd", "value": 6 }] };
+    wskt.send(JSON.stringify(obj2));
+    document.getElementById('errorText').value += "Save calibration\n";
   };
 
   function sendGain(event)
