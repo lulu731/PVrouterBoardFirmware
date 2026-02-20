@@ -5,9 +5,7 @@
 #include "json.h"
 #include <stdlib.h>
 #include <string.h>
-
-TEST_INCLUDE_PATH(".pio/libdeps/test/cJSON/")
-TEST_SOURCE_FILE("cJSON.c")
+#include "cJSON.h"
 
 void setUp(void)
 {

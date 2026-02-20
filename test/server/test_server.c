@@ -14,6 +14,14 @@
 
 TEST_INCLUDE_PATH("test/support/include/common")
 
+// Include cJSON for JSON parsing (needed by uri_handlers.c)
+#include "cJSON.h"
+#include "json.h"
+
+// Include calibration_params and adc_rw (needed by uri_handlers.c ws_handler)
+TEST_SOURCE_FILE("calibration_params.c")
+TEST_SOURCE_FILE("adc_rw.c")
+
 void setUp(void)
 {
     server_create();
