@@ -1,7 +1,6 @@
 #!/usr/bin/bash
 
-command="sed -i 's|test/cJSON|jenkins/cJSON|' test/json/test_json.c && \
-         ceedling"
+command="ceedling"
 
 echo launch test stage;
 
