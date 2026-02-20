@@ -1,6 +1,10 @@
 #include "server.h"
 #include "server_Hardware.h"
 #include "uri_handlers.h"
+#include "json.h"
+#include "calibration_params.h"
+#include "adc_rw.h"
+#include "adc_registers.h"
 
 #include "esp_http_server.h"
 #include "esp_log.h"
@@ -14,7 +18,41 @@
 #define TAG "server.c: "
 
 static httpd_handle_t web_server;
+/*
+// External calibration parameters
+extern uint16_t Ugain, IgainL, IgainN;
+
+// ADC registers for gain parameters
+extern struct adc_register U_GAIN, I_GAIN_L, I_GAIN_N, CS2;
+*/
 static httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+
+/**
+ * @brief Apply calibration gains from parameters to ADC registers and save to NVS
+ */
+/*static void apply_calibration_gains_from_params(void)
+{
+    ESP_LOGI(TAG, "Applying calibration gains: Ugain=%d, IgainL=%d, IgainN=%d", Ugain, IgainL, IgainN);
+
+    // Write gains to ADC registers
+    U_GAIN.data = Ugain;
+    write_adc_register(U_GAIN);
+
+    I_GAIN_L.data = IgainL;
+    write_adc_register(I_GAIN_L);
+
+    I_GAIN_N.data = IgainN;
+    write_adc_register(I_GAIN_N);
+
+    // Update checksum register
+    read_adc_register(&CS2);
+    write_adc_register(CS2);
+
+    // Save to NVS
+    // Note: save_nvs_param function is not available in current includes
+    // This would need to be added if NVS persistence is required
+    ESP_LOGI(TAG, "Calibration gains applied to ADC registers");
+}*/
 
 static httpd_uri_t index_uri = {
     .uri       = "/",
@@ -29,11 +67,6 @@ static httpd_uri_t calibration_uri = {
     .handler   = calibration_handler,
     .user_ctx  = NULL,
 };
-
-static esp_err_t ws_handler(httpd_req_t *req)
-{
-    return ESP_OK;
-}
 
 static httpd_uri_t ws_uri = {
     .uri       = "/ws",
