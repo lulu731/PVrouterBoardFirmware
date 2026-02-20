@@ -1,5 +1,10 @@
 #include "uri_handlers.h"
 
+#include "adc_registers.h"
+#include "adc_rw.h"
+#include "calibration_params.h"
+#include "json.h"
+
 #include "esp_log.h"
 #include "esp_http_server.h"
 
@@ -115,6 +120,50 @@ esp_err_t calibration_handler(httpd_req_t *req)
     }
 
     get_ws_payload(req, ws_payload);
+
+    return ESP_OK;
+}
+
+extern uint16_t Ugain;
+extern uint16_t IgainL;
+extern uint16_t IgainN;
+
+esp_err_t ws_handler(httpd_req_t *req)
+{
+    get_ws_payload(req, ws_payload);
+
+    if (ws_payload) {
+        // Parse JSON to get the ID and value
+        gain_object* obj = json_parse_gain_object((const char*)ws_payload);
+
+        if (obj != NULL && obj->key != NULL) {
+            // Update the appropriate variable based on the ID
+            if (strcmp(obj->key, "Ugain") == 0) {
+                Ugain = obj->value;
+                const struct adc_register reg = { .address = 0x23, .data = Ugain };
+                write_adc_register(reg);
+            }
+            else if (strcmp(obj->key, "IgainL") == 0) {
+                IgainL = obj->value;
+                const struct adc_register reg = { .address = 0x23, .data = IgainL };
+                write_adc_register(reg);
+            }
+            else if (strcmp(obj->key, "IgainN") == 0) {
+                IgainN = obj->value;
+                const struct adc_register reg = { .address = 0x23, .data = IgainN };
+                write_adc_register(reg);
+            }
+
+            // Free the allocated memory
+            if (obj != &null_gain_object) {
+                free(obj->key);
+                free(obj);
+            }
+        }
+
+        free(ws_payload);
+        ws_payload = NULL;
+    }
 
     return ESP_OK;
 }
