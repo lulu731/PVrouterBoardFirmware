@@ -128,42 +128,79 @@ extern uint16_t Ugain;
 extern uint16_t IgainL;
 extern uint16_t IgainN;
 
-esp_err_t ws_handler(httpd_req_t *req)
+static const uint16_t ADC_GAIN_REG_ADDRESS = 0x23;
+
+/**
+ * @brief Updates a gain value and writes it to the ADC register
+ * @param key The gain parameter key ("Ugain", "IgainL", "IgainN")
+ * @param value The new value to set
+ * @return ESP_OK on success, ESP_FAIL otherwise
+ */
+static esp_err_t update_gain_value(const char* key, uint16_t value)
 {
-    get_ws_payload(req, ws_payload);
+    uint16_t* gain_ptr = NULL;
 
-    if (ws_payload) {
-        // Parse JSON to get the ID and value
-        gain_object* obj = json_parse_gain_object((const char*)ws_payload);
-
-        if (obj != NULL && obj->key != NULL) {
-            // Update the appropriate variable based on the ID
-            if (strcmp(obj->key, "Ugain") == 0) {
-                Ugain = obj->value;
-                const struct adc_register reg = { .address = 0x23, .data = Ugain };
-                write_adc_register(reg);
-            }
-            else if (strcmp(obj->key, "IgainL") == 0) {
-                IgainL = obj->value;
-                const struct adc_register reg = { .address = 0x23, .data = IgainL };
-                write_adc_register(reg);
-            }
-            else if (strcmp(obj->key, "IgainN") == 0) {
-                IgainN = obj->value;
-                const struct adc_register reg = { .address = 0x23, .data = IgainN };
-                write_adc_register(reg);
-            }
-
-            // Free the allocated memory
-            if (obj != &null_gain_object) {
-                free(obj->key);
-                free(obj);
-            }
-        }
-
-        free(ws_payload);
-        ws_payload = NULL;
+    if (strcmp(key, "Ugain") == 0) {
+        gain_ptr = &Ugain;
+    } else if (strcmp(key, "IgainL") == 0) {
+        gain_ptr = &IgainL;
+    } else if (strcmp(key, "IgainN") == 0) {
+        gain_ptr = &IgainN;
+    } else {
+        ESP_LOGW(TAG, "Unknown gain key: %s", key);
+        return ESP_FAIL;
     }
 
+    *gain_ptr = value;
+
+    const struct adc_register reg = { .address = ADC_GAIN_REG_ADDRESS, .data = value };
+    write_adc_register(reg);
+
+    ESP_LOGI(TAG, "Updated %s to %u", key, value);
     return ESP_OK;
+}
+
+esp_err_t ws_handler(httpd_req_t *req)
+{
+    esp_err_t ret = get_ws_payload(req, ws_payload);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to get WebSocket payload: %d", ret);
+        return ret;
+    }
+
+    if (ws_payload == NULL) {
+        ESP_LOGW(TAG, "No WebSocket payload received");
+        return ESP_OK;
+    }
+
+    gain_object* obj = json_parse_gain_object((const char*)ws_payload);
+    if (obj == NULL) {
+        ESP_LOGE(TAG, "Failed to parse gain object from JSON");
+        free(ws_payload);
+        ws_payload = NULL;
+        return ESP_FAIL;
+    }
+
+    if (obj->key != NULL) {
+        ret = update_gain_value(obj->key, obj->value);
+        if (ret != ESP_OK) {
+            /* Unknown key is not a fatal error - log warning and continue */
+            ESP_LOGW(TAG, "Unknown or invalid key: %s", obj->key);
+            ret = ESP_OK;
+        }
+    } else {
+        ESP_LOGW(TAG, "Parsed gain object has NULL key");
+    }
+
+    /* Free the parsed object */
+    if (obj != &null_gain_object) {
+        free(obj->key);
+        free(obj);
+    }
+
+    /* Free the WebSocket payload */
+    free(ws_payload);
+    ws_payload = NULL;
+
+    return ret;
 }
