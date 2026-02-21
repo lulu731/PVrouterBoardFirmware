@@ -1,6 +1,6 @@
 var wskt;
 
-document.getElementById('initialise').onload = function()
+window.onload = function()
 {init()};
 
 function init()// open WebSocket

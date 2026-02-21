@@ -60,7 +60,7 @@
 
   function sendGain(event)
   {
-    const obj2 = { "objects": [{ "id": event.target.id, "value": event.target.value }] };
+    const obj2 = { "objects": [{ "id": event.target.id, "value": parseInt(event.target.value) }] };
     //console.log(obj);
     wskt.send(JSON.stringify(obj2));
     console.log(JSON.stringify(obj2));
