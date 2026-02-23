@@ -5,6 +5,12 @@
 #include "uri_handlers.h"
 #include "calibration_params.h"
 #include "adc_rw.h"
+
+#include "calibration_helpers.h"
+
+#include "driver/spi_master.h"
+
+
 #include "json.h"
 
 #include "esp_http_server.h"
@@ -18,6 +24,9 @@
 #include "cJSON.h"
 #include "json.h"
 
+spi_device_handle_t meter_handle;
+
+
 // ============================================================================
 // Test Setup and Teardown
 // ============================================================================
@@ -25,9 +34,11 @@
 // External variables from esp_http_server.c stub
 extern char* message_sent;
 extern int write_adc_register_call_count;
+extern int write_adc_caller;
 
 void setUp(void)
 {
+    write_adc_caller = 1;
     // Reset ADC write counter
     write_adc_register_call_count = 0;
 

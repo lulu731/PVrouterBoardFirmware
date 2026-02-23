@@ -2,9 +2,13 @@
 
 #include "unity.h"
 
+#include "adc_rw.h"
 #include "server.h"
 #include "server_Hardware.h"
 #include "uri_handlers.h"
+#include "calibration_helpers.h"
+
+#include "driver/spi_master.h"
 
 #include "esp_err.h"
 #include "esp_http_server.h"
@@ -20,7 +24,8 @@ TEST_INCLUDE_PATH("test/support/include/common")
 
 // Include calibration_params and adc_rw (needed by uri_handlers.c ws_handler)
 TEST_SOURCE_FILE("calibration_params.c")
-TEST_SOURCE_FILE("adc_rw.c")
+
+spi_device_handle_t meter_handle;
 
 void setUp(void)
 {

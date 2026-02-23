@@ -21,7 +21,6 @@ TEST_SOURCE_FILE("test/app/stub_nvs.c");
 TEST_SOURCE_FILE("test/app/stub_nvs_flash.c");
 TEST_SOURCE_FILE("test/app/fake_mount_partition.c");
 TEST_SOURCE_FILE("test/app/stub_gpio.c");
-TEST_SOURCE_FILE("test/app/stub_spi_master.c");
 
 static const int POWER_THRESHOLD = 100;
 spi_device_handle_t meter_handle;
@@ -49,7 +48,7 @@ int16_t p_main_data[] = {0b1111111100110111, 0b0000000100101100, 0b1111111011010
 void test_app_skeleton(void)
 {
     init_ADC();
-    //TEST_ASSERT_EQUAL_INT(7, nbr_access_to_adc);
+    TEST_ASSERT_EQUAL_INT(7, nbr_access_to_adc);
 
     for (uint8_t i = 0; i < 10; i++)
     {

@@ -2,8 +2,11 @@
 
 #include "unity.h"
 
+#include "adc_rw.h"
 #include "uri_handlers.h"
+#include "calibration_helpers.h"
 
+#include "driver/spi_master.h"
 #include "esp_http_server.h"
 #include "esp_err.h"
 #include "esp_log.h"
@@ -19,14 +22,16 @@ TEST_INCLUDE_PATH("test/support/include/handlers")
 
 // Include calibration_params and adc_rw (needed by uri_handlers.c ws_handler)
 TEST_SOURCE_FILE("calibration_params.c")
-TEST_SOURCE_FILE("adc_rw.c")
 
 httpd_req_t req;
 extern char* index_file;
 extern char* calibration_file;
 
+spi_device_handle_t meter_handle;
+
 int ESP_LOGE_called;
 int session_ctx;
+
 void setUp(void)
 {
     req.sess_ctx = NULL;
