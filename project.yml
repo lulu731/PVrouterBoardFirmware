@@ -108,7 +108,6 @@
     - lib/**
   :support:
     - test/support/**
-    - -:test/support/include/**
   :libraries: []
 
 # You can even specify specific files to add or remove from your test

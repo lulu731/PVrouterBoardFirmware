@@ -16,7 +16,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-TEST_INCLUDE_PATH("test/support/include/common")
+TEST_INCLUDE_PATH("test/support/esp-idf/include/common")
 
 // Include cJSON for JSON parsing (needed by uri_handlers.c)
 #include "cJSON.h"
