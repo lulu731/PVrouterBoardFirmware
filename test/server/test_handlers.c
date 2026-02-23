@@ -5,6 +5,7 @@
 #include "adc_rw.h"
 #include "uri_handlers.h"
 #include "calibration_helpers.h"
+#include "calibration_params.h"
 
 #include "driver/spi_master.h"
 #include "esp_http_server.h"
@@ -21,7 +22,6 @@ TEST_INCLUDE_PATH("test/support/esp-idf/include/handlers")
 #include "json.h"
 
 // Include calibration_params and adc_rw (needed by uri_handlers.c ws_handler)
-TEST_SOURCE_FILE("calibration_params.c")
 
 httpd_req_t req;
 extern char* index_file;
