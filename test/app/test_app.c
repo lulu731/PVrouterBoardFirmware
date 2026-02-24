@@ -17,6 +17,13 @@
 #include "adc_functions.h"
 #include "system.h"
 
+// launching server
+#include "server.h"
+#include "server_Hardware.h"
+#include "uri_handlers.h"
+#include "json.h"
+#include "cJSON.h"
+
 TEST_SOURCE_FILE("test/app/stub_nvs.c");
 TEST_SOURCE_FILE("test/app/stub_nvs_flash.c");
 TEST_SOURCE_FILE("test/app/fake_mount_partition.c");
@@ -49,6 +56,8 @@ void test_app_skeleton(void)
 {
     init_ADC();
     TEST_ASSERT_EQUAL_INT(7, nbr_access_to_adc);
+
+    launch_server();
 
     for (uint8_t i = 0; i < 10; i++)
     {

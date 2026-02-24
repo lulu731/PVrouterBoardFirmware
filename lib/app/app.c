@@ -6,6 +6,8 @@
 #include "trigger_relay.h"
 #include "system.h"
 
+#include "server.h"
+
 #include "esp_log.h"
 
 #include <stddef.h>
@@ -29,6 +31,12 @@ void init_ADC(void)
 {
     load_calibration_params();
     exec_metering_calibration();
+}
+
+void launch_server()
+{
+    server_create();
+    server_err_t server_start();
 }
 
 void trigger_relay_when_power_below_threshold(const int threshold)
