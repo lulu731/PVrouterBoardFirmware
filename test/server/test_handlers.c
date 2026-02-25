@@ -6,6 +6,7 @@
 #include "uri_handlers.h"
 #include "calibration_helpers.h"
 #include "calibration_params.h"
+#include "nvs_storage.h"
 
 #include "driver/spi_master.h"
 #include "esp_http_server.h"
@@ -16,6 +17,8 @@
 #include <string.h>
 
 TEST_INCLUDE_PATH("test/support/esp-idf/include/handlers")
+
+TEST_SOURCE_FILE("test/app/stub_nvs.c")
 
 // Include cJSON for JSON parsing (needed by uri_handlers.c)
 #include "cJSON.h"

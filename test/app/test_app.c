@@ -24,6 +24,8 @@
 #include "json.h"
 #include "cJSON.h"
 
+#include "nvs_storage.h"
+
 TEST_SOURCE_FILE("test/app/stub_nvs.c");
 TEST_SOURCE_FILE("test/app/stub_nvs_flash.c");
 TEST_SOURCE_FILE("test/app/fake_mount_partition.c");
