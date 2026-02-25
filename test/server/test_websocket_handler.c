@@ -2,6 +2,10 @@
 
 #include "unity.h"
 
+#include "nvs_storage.h"
+
+TEST_SOURCE_FILE("test/app/stub_nvs.c")
+
 #include "uri_handlers.h"
 #include "calibration_params.h"
 #include "adc_rw.h"
@@ -216,6 +220,33 @@ void test_ws_handler_multiple_parameter_updates(void)
 
     // Total ADC writes should be 3
     TEST_ASSERT_EQUAL(3, write_adc_register_call_count);
+}
+
+extern int nvs_commit_called;
+void test_ws_handler_should_save_calibration_to_nvs(void)
+{
+    // First set calibration values
+    Ugain = 1500;
+    IgainL = 2500;
+    IgainN = 3500;
+
+    // Setup WebSocket frame with save calibration command (cmd=6)
+    message_sent = "{\"objects\":[{\"id\":\"cmd\",\"value\":6}]}";
+
+    // Create a mock request with POST method
+    httpd_req_t req;
+    req.method = HTTP_POST;
+
+    // Call ws_handler
+    esp_err_t result = ws_handler(&req);
+
+    // Verify results
+    TEST_ASSERT_EQUAL_INT(3, nvs_commit_called);
+    TEST_ASSERT_EQUAL(ESP_OK, result);
+    // Calibration values should remain unchanged after save
+    TEST_ASSERT_EQUAL(1500, Ugain);
+    TEST_ASSERT_EQUAL(2500, IgainL);
+    TEST_ASSERT_EQUAL(3500, IgainN);
 }
 
 #endif // TEST
