@@ -45,3 +45,26 @@ void nvs_storage_close()
 {
     nvs_close(handle);
 }
+
+/**
+ * @brief Save data to NVS storage.
+ *
+ * This function saves the given data to the NVS storage.
+ *
+ * @param data The nvs_data_t structure containing the key and value to save.
+ * @return NVS_STORAGE_OK if the save succeeds, NVS_STORAGE_ERROR if it fails.
+ */
+nvs_err_t nvs_storage_save(nvs_data_t data)
+{
+    esp_err_t nvs_error = nvs_set_u16(handle, data.key, data.value);
+    if (nvs_error != ESP_OK)
+    {
+        return NVS_STORAGE_ERROR;
+    }
+    nvs_error = nvs_commit(handle);
+    if (nvs_error != ESP_OK)
+    {
+        return NVS_STORAGE_ERROR;
+    }
+    return NVS_STORAGE_OK;
+}

@@ -14,5 +14,6 @@
 void nvs_storage_create(const char* namespace);
 nvs_err_t nvs_storage_open();
 void nvs_storage_close();
+nvs_err_t nvs_storage_save(nvs_data_t data);
 
 #endif // NVS_STORAGE_H

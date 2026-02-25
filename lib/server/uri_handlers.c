@@ -4,6 +4,7 @@
 #include "adc_rw.h"
 #include "calibration_params.h"
 #include "json.h"
+#include "nvs_storage.h"
 
 #include "esp_log.h"
 #include "esp_http_server.h"
@@ -131,6 +132,52 @@ extern uint16_t IgainN;
 static const uint16_t ADC_GAIN_REG_ADDRESS = 0x23;
 
 /**
+ * @brief Saves all calibration parameters to NVS storage
+ * @return ESP_OK on success, ESP_FAIL otherwise
+ */
+static esp_err_t save_calibration_to_nvs(void)
+{
+    nvs_data_t data;
+    nvs_storage_create("meter_config");
+
+    if (nvs_storage_open() != NVS_STORAGE_OK) {
+        ESP_LOGE(TAG, "Failed to open NVS storage");
+        return ESP_FAIL;
+    }
+
+    // Save Ugain
+    data.key = "Ugain";
+    data.value = Ugain;
+    if (nvs_storage_save(data) != NVS_STORAGE_OK) {
+        ESP_LOGE(TAG, "Failed to save Ugain to NVS");
+        nvs_storage_close();
+        return ESP_FAIL;
+    }
+
+    // Save IgainL
+    data.key = "IgainL";
+    data.value = IgainL;
+    if (nvs_storage_save(data) != NVS_STORAGE_OK) {
+        ESP_LOGE(TAG, "Failed to save IgainL to NVS");
+        nvs_storage_close();
+        return ESP_FAIL;
+    }
+
+    // Save IgainN
+    data.key = "IgainN";
+    data.value = IgainN;
+    if (nvs_storage_save(data) != NVS_STORAGE_OK) {
+        ESP_LOGE(TAG, "Failed to save IgainN to NVS");
+        nvs_storage_close();
+        return ESP_FAIL;
+    }
+
+    nvs_storage_close();
+    ESP_LOGI(TAG, "Calibration saved to NVS");
+    return ESP_OK;
+}
+
+/**
  * @brief Updates a gain value and writes it to the ADC register
  * @param key The gain parameter key ("Ugain", "IgainL", "IgainN")
  * @param value The new value to set
@@ -182,11 +229,20 @@ esp_err_t ws_handler(httpd_req_t *req)
     }
 
     if (obj->key != NULL) {
-        ret = update_gain_value(obj->key, obj->value);
-        if (ret != ESP_OK) {
-            /* Unknown key is not a fatal error - log warning and continue */
-            ESP_LOGW(TAG, "Unknown or invalid key: %s", obj->key);
-            ret = ESP_OK;
+        // Check for save calibration command (cmd=6)
+        if (strcmp(obj->key, "cmd") == 0 && obj->value == 6) {
+            ESP_LOGI(TAG, "Save calibration command received");
+            ret = save_calibration_to_nvs();
+            if (ret != ESP_OK) {
+                ESP_LOGE(TAG, "Failed to save calibration to NVS");
+            }
+        } else {
+            ret = update_gain_value(obj->key, obj->value);
+            if (ret != ESP_OK) {
+                /* Unknown key is not a fatal error - log warning and continue */
+                ESP_LOGW(TAG, "Unknown or invalid key: %s", obj->key);
+                ret = ESP_OK;
+            }
         }
     } else {
         ESP_LOGW(TAG, "Parsed gain object has NULL key");

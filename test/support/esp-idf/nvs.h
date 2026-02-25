@@ -37,6 +37,8 @@ esp_err_t nvs_entry_next(nvs_iterator_t *iterator);
 esp_err_t nvs_entry_info(const nvs_iterator_t iterator, nvs_entry_info_t *out_info);
 
 esp_err_t nvs_get_u16 (nvs_handle_t handle, const char* key, uint16_t* out_value);
+esp_err_t nvs_set_u16(nvs_handle_t handle, const char* key, uint16_t value);
+esp_err_t nvs_commit(nvs_handle_t handle);
 
 void nvs_release_iterator(nvs_iterator_t iterator);
 
