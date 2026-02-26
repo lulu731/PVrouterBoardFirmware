@@ -31,7 +31,10 @@ esp_err_t nvs_set_u16(nvs_handle_t handle, const char *key, uint16_t value)
     return ESP_OK;
 }
 
+int nvs_open_called   = 0;
 int nvs_commit_called = 0;
+int nvs_close_called  = 0;
+
 esp_err_t nvs_commit(nvs_handle_t handle)
 {
     nvs_commit_called++;
@@ -40,9 +43,11 @@ esp_err_t nvs_commit(nvs_handle_t handle)
 
 esp_err_t nvs_open(const char* namespace_name, nvs_open_mode_t open_mode, nvs_handle_t *out_handle)
 {
+    nvs_open_called++;
     return ESP_OK;
 }
 
 void nvs_close(nvs_handle_t handle)
 {
+    nvs_close_called++;
 }

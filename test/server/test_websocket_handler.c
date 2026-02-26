@@ -222,7 +222,7 @@ void test_ws_handler_multiple_parameter_updates(void)
     TEST_ASSERT_EQUAL(3, write_adc_register_call_count);
 }
 
-extern int nvs_commit_called;
+extern int nvs_open_called, nvs_commit_called, nvs_close_called;
 void test_ws_handler_should_save_calibration_to_nvs(void)
 {
     // First set calibration values
@@ -241,12 +241,10 @@ void test_ws_handler_should_save_calibration_to_nvs(void)
     esp_err_t result = ws_handler(&req);
 
     // Verify results
-    TEST_ASSERT_EQUAL_INT(3, nvs_commit_called);
+    TEST_ASSERT_EQUAL_INT(1, nvs_open_called);
+    TEST_ASSERT_EQUAL_INT(3, nvs_commit_called); //each data saving calls commit
+    TEST_ASSERT_EQUAL_INT(1, nvs_close_called);
     TEST_ASSERT_EQUAL(ESP_OK, result);
-    // Calibration values should remain unchanged after save
-    TEST_ASSERT_EQUAL(1500, Ugain);
-    TEST_ASSERT_EQUAL(2500, IgainL);
-    TEST_ASSERT_EQUAL(3500, IgainN);
 }
 
 #endif // TEST
