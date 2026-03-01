@@ -1,8 +1,11 @@
 #include "trigger_relay.h"
 
 #include "esp_gpio.h"
+#include "system.h"
 
 #include "driver/gpio.h"
+
+static uint8_t relay_trigger_flag = 0;
     /*vTaskDelay(1000 / portTICK_PERIOD_MS);
 
     gpio_set_level(GPIO_RESET_ADC, 0);
@@ -36,4 +39,26 @@ void trigger_relay(void)
     gpio_set_level(GPIO_HEATER, 1);
 
     gpio_set_level(GPIO_HEATER, 0);
+}
+
+/**
+ * @brief ISR handler for power monitoring
+ *
+ * This function is designed to be called from an interrupt service routine.
+ * It checks if the relay should be triggered based on the previous power reading.
+ * If get_main_real_power() was less than -POWER_THRSHOLD in the previous ISR call,
+ * the relay will be triggered on this call.
+ */
+void power_isr(void)
+{
+    if (relay_trigger_flag)
+    {
+        trigger_relay();
+        relay_trigger_flag = 0;
+    }
+
+    if (get_main_real_power() < -POWER_THRSHOLD)
+    {
+        relay_trigger_flag = 1;
+    }
 }
