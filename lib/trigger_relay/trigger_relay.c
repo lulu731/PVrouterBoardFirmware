@@ -4,16 +4,52 @@
 #include "system.h"
 
 #include "driver/gpio.h"
+#include "esp_attr.h"
+#include "esp_intr_alloc.h"
+
+#include <stddef.h>
 
 static uint8_t relay_trigger_flag = 0;
-    /*vTaskDelay(1000 / portTICK_PERIOD_MS);
-
-    gpio_set_level(GPIO_RESET_ADC, 0);
-    vTaskDelay(10 / portTICK_PERIOD_MS);
-    gpio_set_level(GPIO_RESET_ADC, 1);
-    vTaskDelay(1000 / portTICK_PERIOD_MS);*/
 
 #define GPIO_HEATER    GPIO_NUM_18
+
+/**
+ * @brief ISR handler for GPIO pin_zx
+ *
+ * This function is called when pin_zx goes high (rising edge interrupt).
+ * It wraps the power_isr function for use with GPIO interrupt handler.
+ */
+static void IRAM_ATTR zx_gpio_isr_handler(void* arg)
+{
+    (void)arg;
+    power_isr();
+}
+
+/**
+ * @brief Initialize GPIO for pin_zx (zero-cross detection)
+ *
+ * This function configures the GPIO pin for zero-cross detection input.
+ * It sets the GPIO as input with pull-down resistor and configures
+ * a rising edge interrupt to call power_isr when the pin goes high.
+ */
+void init_zx_gpio(void)
+{
+    // Configure GPIO as input
+    gpio_set_direction(GPIO_ZX, GPIO_MODE_INPUT);
+
+    // Enable pull-down resistor to avoid floating pin
+    gpio_pullup_dis(GPIO_ZX);
+    gpio_pulldown_en(GPIO_ZX);
+
+    // Configure rising edge interrupt (trigger when pin goes HIGH)
+    gpio_set_intr_type(GPIO_ZX, GPIO_INTR_POSEDGE);
+
+    // Install GPIO ISR service (0 = use default flags)
+    gpio_install_isr_service(0);
+
+    // Add ISR handler for pin_zx
+    gpio_isr_handler_add(GPIO_ZX, zx_gpio_isr_handler, NULL);
+}
 
 /**
  * @brief Create a trigger relay using the given GPIO pin
@@ -25,6 +61,7 @@ static uint8_t relay_trigger_flag = 0;
 void create_trigger_relay(void)
 {
     init_gpio_config_for_gpio(GPIO_HEATER);
+    init_zx_gpio();
 }
 
 /**

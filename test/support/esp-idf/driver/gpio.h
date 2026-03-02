@@ -2,20 +2,25 @@
 #define GPIO_H
 
 #include "esp_err.h"
+#include "esp_intr_alloc.h"
 
 #include <stdbool.h>
 #include <stdint.h>
 
 typedef enum {
     GPIO_NUM_NC = -1,    /*!< Use to signal not connected to S/W */
+    GPIO_NUM_4 = 4,
     GPIO_NUM_18 = 18,
 } gpio_num_t;
 
+#define BIT0     0x00000001
 #define BIT1     0x00000002
-#define GPIO_MODE_DEF_OUTPUT          (BIT1)
+#define GPIO_MODE_DEF_INPUT          (BIT0)
+#define GPIO_MODE_DEF_OUTPUT         (BIT1)
 
 typedef enum {
-    GPIO_MODE_OUTPUT = GPIO_MODE_DEF_OUTPUT                                                           /*!< GPIO mode : output only mode                     */
+    GPIO_MODE_INPUT = GPIO_MODE_DEF_INPUT,
+    GPIO_MODE_OUTPUT = GPIO_MODE_DEF_OUTPUT,
 } gpio_mode_t;
 
 typedef enum {
@@ -48,7 +53,19 @@ typedef struct {
 
 esp_err_t gpio_config(const gpio_config_t *pGPIOConfig);
 
+esp_err_t gpio_set_direction(gpio_num_t gpio_num, gpio_mode_t mode);
+
+esp_err_t gpio_pullup_dis(gpio_num_t gpio_num);
+
+esp_err_t gpio_pulldown_en(gpio_num_t gpio_num);
+
+esp_err_t gpio_set_intr_type(gpio_num_t gpio_num, gpio_int_type_t intr_type);
+
 esp_err_t gpio_set_level(gpio_num_t gpio_num, uint32_t level);
+
+esp_err_t gpio_install_isr_service(int intr_alloc_flags);
+
+esp_err_t gpio_isr_handler_add(gpio_num_t gpio_num, void (*isr_handler)(void*), void* args);
 
 bool level_is_low(void);
 
