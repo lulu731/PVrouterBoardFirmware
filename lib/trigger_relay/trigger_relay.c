@@ -21,7 +21,6 @@ static uint8_t relay_trigger_flag = 0;
  */
 static void IRAM_ATTR zx_gpio_isr_handler(void* arg)
 {
-    (void)arg;
     power_isr();
 }
 
