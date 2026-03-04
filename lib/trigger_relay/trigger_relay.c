@@ -44,8 +44,8 @@ void init_zx_gpio(void)
     // Configure rising edge interrupt (trigger when pin goes HIGH)
     gpio_set_intr_type(GPIO_ZX, GPIO_INTR_POSEDGE);
 
-    // Install GPIO ISR service (0 = use default flags)
-    gpio_install_isr_service(0);
+    // Install GPIO ISR service
+    gpio_install_isr_service(ESP_INTR_FLAG_LOWMED);
 
     // Add ISR handler for pin_zx
     gpio_isr_handler_add(GPIO_ZX, zx_gpio_isr_handler, NULL);
