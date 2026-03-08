@@ -1,12 +1,20 @@
+---
+  description: Rules for placing and organizing cline rule files in the repository.
+  globs: ["**/.clinerules/*.md"]
+  priority: high
+  version: 1.0
+---
+
+
 # Cline Rules Location
 
 Rules for placing and organizing cline rule files in the repository.
 
 ## filters:
-  # Match any .md files
+  ### Match any .md files
   - type: file_extension
     pattern: "\\.md$"
-  # Match file creation events
+  ### Match file creation events
   - type: event
     pattern: "file_create"
 
@@ -49,15 +57,11 @@ Rules for placing and organizing cline rule files in the repository.
 
 ## Examples:
   - input: |
-      # Bad: Rule file in wrong location
+      ### Bad: Rule file in wrong location
       rules/my-rule.md
       my-rule.md
       .rules/my-rule.md
 
-      # Good: Rule file in correct location
+      ### Good: Rule file in correct location
       .clinerules/my-rule.md
     output: "Correctly placed rule file"
-
-## metadata:
-  priority: high
-  version: 1.0

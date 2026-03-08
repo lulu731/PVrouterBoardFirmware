@@ -3,10 +3,9 @@
 ## Current Work
 
 This is an ESP32-S3 firmware project (PVrouterBoardFirmware) for a photovoltaic router board. The project uses:
-- ESP-IDF 5.5.0 as the underlying framework
+- ESP-IDF as the underlying framework
 - PlatformIO as the build system
 - LittleFS for file system storage
-- Calibration system for ADC measurements
 - Web server for configuration and monitoring
 - NVS (Non-Volatile Storage) for persistent configuration
 
@@ -20,7 +19,7 @@ The firmware handles:
 ## Key Technical Concepts
 
 - **ESP32-S3**: Xtensa dual-core 32-bit LX7 microcontroller
-- **ESP-IDF 5.5.0**: Espressif IoT Development Framework
+- **ESP-IDF**: Espressif IoT Development Framework
 - **PlatformIO**: Cross-platform build system for embedded development
 - **LittleFS**: Little file system for embedded devices
 - **ADC**: Analog-to-Digital Converter for sensor readings

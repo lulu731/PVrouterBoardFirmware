@@ -1,3 +1,10 @@
+---
+  description: Rule for automatically committing changes made by Cline AI using conventional commits format.
+  priority: high
+  version: 1.1
+---
+
+
 # Git Conventional Commits
 
 Rule for automatically committing changes made by CursorAI using conventional commits format.
@@ -10,11 +17,11 @@ Rule for automatically committing changes made by CursorAI using conventional co
 
 ## actions:
   - type: execute
-    command: |
-      # Extract the change type and scope from the changes
+    command:
+      ### Extract the change type and scope from the changes
       CHANGE_TYPE=""
       case "$CHANGE_DESCRIPTION" in
-        *"add"*|*"create"*|*"implement"*) CHANGE_TYPE="feat";;
+        *"feat"*|*"create"*|*"implement"*) CHANGE_TYPE="feat";;
         *"fix"*|*"correct"*|*"resolve"*) CHANGE_TYPE="fix";;
         *"system"*|*"dependencies"*) CHANGE_TYPE="build";;
         *"revert"*|*"previous"*|*"commit"*) CHANGE_TYPE="revert";;
@@ -24,18 +31,18 @@ Rule for automatically committing changes made by CursorAI using conventional co
         *"doc"*|*"comment"*) CHANGE_TYPE="docs";;
         *"style"*|*"format"*) CHANGE_TYPE="style";;
         *"perf"*|*"optimize"*) CHANGE_TYPE="perf";;
-        *) CHANGE_TYPE="chore";;
+        *"rule"*|*"tool"*|*"auxiliary"*) CHANGE_TYPE="chore";;
       esac
 
-      # Extract scope from file path
+      ### Extract scope from file path
       SCOPE=$(dirname "$FILE" | tr '/' '-')
 
-      # Commit the changes
+      ### Commit the changes
       git add "$FILE"
       git commit -m "$CHANGE_TYPE($SCOPE): $CHANGE_DESCRIPTION"
 
   - type: suggest
-    message: |
+    message:
       Changes should be committed using conventional commits format:
 
       Format: <type>(<scope>): <description>
@@ -57,18 +64,14 @@ Rule for automatically committing changes made by CursorAI using conventional co
       The description should be clear and concise, written in imperative mood.
 
 ## examples:
-  - input: |
-      # After adding a new function
+  - input:
+      ### After adding a new function
       CHANGE_DESCRIPTION="add user authentication function"
       FILE="src/auth/login.c"
     output: "feat(src-auth): add user authentication function"
 
-  - input: |
-      # After fixing a bug
+  - input:
+      ### After fixing a bug
       CHANGE_DESCRIPTION="fix incorrect date parsing"
       FILE="lib/utils/date.c"
     output: "fix(lib-utils): fix incorrect date parsing"
-
-## metadata:
-  priority: high
-  version: 1.0
