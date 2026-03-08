@@ -1,14 +1,14 @@
 ---
-  description: Rules for placing and organizing cline rule files in the repository.
+  description: Rules for placing and organizing Cline rule files in the repository.
   globs: ["**/.clinerules/*.md"]
   priority: high
-  version: 1.0
+  version: 1.1
 ---
 
 
 # Cline Rules Location
 
-Rules for placing and organizing cline rule files in the repository.
+Rules for placing and organizing Cline rule files in the repository.
 
 ## filters:
   ### Match any .md files

@@ -1,13 +1,13 @@
 ---
   description: Rule for automatically committing changes made by Cline AI using conventional commits format.
   priority: high
-  version: 1.1
+  version: 1.2
 ---
 
 
 # Git Conventional Commits
 
-Rule for automatically committing changes made by CursorAI using conventional commits format.
+Rule for automatically committing changes made by Cline AI using conventional commits format.
 
 ## filters:
   - type: event
