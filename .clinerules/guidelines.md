@@ -27,3 +27,6 @@ The firmware handles:
 - **FreeRTOS**: Real-time operating system for task scheduling
 - **Conventional Commits**: Git commit message format (type(scope): description)
 - **Cline Rules**: AI assistant configuration rules stored in .clinerules directory
+
+## git commit
+- Before effectively execute git commit, ask the user to approve git message
