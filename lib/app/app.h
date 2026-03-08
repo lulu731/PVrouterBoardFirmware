@@ -1,9 +1,11 @@
-#ifndef APP_H
-#define APP_H
+#ifndef PVROUTER_APP_H
+#define PVROUTER_APP_H
 
-void mount_littlefs_partition(void);
-void init_ADC(void);
-void launch_server(void);
+#include <stdbool.h>
+
+bool mount_littlefs_partition(void);
+bool init_adc(void);
+bool launch_server(void);
 void trigger_relay_when_power_below_threshold(const int threshold);
 
-#endif // APP_H
+#endif // PVROUTER_APP_H

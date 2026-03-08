@@ -21,7 +21,7 @@ void app_main(void)
     server_create();
     server_start();
 
-    init_ADC();
+    init_adc();
 
     while (true)
     {

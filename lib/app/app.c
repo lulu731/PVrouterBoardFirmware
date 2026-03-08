@@ -13,7 +13,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-void mount_littlefs_partition(void)
+bool mount_littlefs_partition(void)
 {
     partition_config_t conf = {
         .base_path = "/littlefs",
@@ -23,21 +23,32 @@ void mount_littlefs_partition(void)
     mount_part_create(&conf);
     if (mount_part() != MOUNT_OK) {
         ESP_LOGE("main", "mount create error");
-    };
+        return false;
+    }
 
+    return true;
 }
 
-void init_ADC(void)
+bool init_adc(void)
 {
-    load_calibration_params();
+    if (load_calibration_params() != 0) {
+        ESP_LOGE("main", "failed to load calibration params");
+        return false;
+    }
+
     exec_metering_calibration();
+    return true;
 }
 
-void launch_server()
+bool launch_server(void)
 {
     server_create();
     server_err_t err = server_start();
-    (void)err;  // Suppress unused variable warning
+    if (err != SERVER_OK) {
+        ESP_LOGE("main", "failed to start server");
+        return false;
+    }
+    return true;
 }
 
 void trigger_relay_when_power_below_threshold(const int threshold)
