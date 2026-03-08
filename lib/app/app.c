@@ -36,7 +36,8 @@ void init_ADC(void)
 void launch_server()
 {
     server_create();
-    server_err_t server_start();
+    server_err_t err = server_start();
+    (void)err;  // Suppress unused variable warning
 }
 
 void trigger_relay_when_power_below_threshold(const int threshold)

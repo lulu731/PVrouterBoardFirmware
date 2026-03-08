@@ -5,6 +5,11 @@
 #include "esp_err.h"
 #include "esp_intr_alloc.h"
 
+// Configurable test GPIO pin - can be overridden at compile time
+#ifndef TEST_GPIO_PIN
+#define TEST_GPIO_PIN GPIO_NUM_18
+#endif
+
 int calls_to_set_level_h = 0;
 int calls_to_set_level_l = 0;
 
@@ -17,7 +22,7 @@ esp_err_t gpio_config(const gpio_config_t *pGPIOConfig)
 
 esp_err_t gpio_set_level(gpio_num_t gpio_num, uint32_t level)
 {
-    TEST_ASSERT_TRUE(gpio_num == GPIO_NUM_18);
+    TEST_ASSERT_TRUE(gpio_num == TEST_GPIO_PIN);
     if (level == 1)
         calls_to_set_level_h++;
     else

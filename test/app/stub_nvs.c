@@ -1,4 +1,8 @@
 #include "nvs.h"
+#include <stddef.h>
+
+// Static storage for test values
+static uint16_t stored_u16_value = 0;
 
 esp_err_t nvs_entry_info(const nvs_iterator_t iterator, nvs_entry_info_t *out_info)
 {
@@ -23,11 +27,15 @@ void nvs_release_iterator(nvs_iterator_t iterator)
 
 esp_err_t nvs_get_u16(nvs_handle_t handle, const char *key, uint16_t *out_value)
 {
+    if (out_value != NULL) {
+        *out_value = stored_u16_value;
+    }
     return ESP_OK;
 }
 
 esp_err_t nvs_set_u16(nvs_handle_t handle, const char *key, uint16_t value)
 {
+    stored_u16_value = value;
     return ESP_OK;
 }
 
