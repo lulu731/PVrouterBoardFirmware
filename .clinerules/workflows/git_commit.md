@@ -1,13 +1,13 @@
 ---
-  description: Rule for automatically committing changes made by Cline AI using conventional commits format.
+  description: Workflow for automatically committing changes made by Cline AI using conventional commits format.
   priority: high
-  version: 1.2
+  version: 1.3
 ---
 
 
 # Git Conventional Commits
 
-Rule for automatically committing changes made by Cline AI using conventional commits format.
+Workflow for automatically committing changes made by Cline AI using conventional commits format.
 
 ## filters:
   - type: event
