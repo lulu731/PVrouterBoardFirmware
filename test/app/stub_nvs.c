@@ -9,7 +9,8 @@ esp_err_t nvs_entry_info(const nvs_iterator_t iterator, nvs_entry_info_t *out_in
     return ESP_OK;
 }
 
-// return error to pass app test
+// Return error to indicate no entries found - this allows load_calibration_params
+// to properly handle the "no calibration data" case without hanging
 esp_err_t nvs_entry_find(const char *part_name, const char *namespace_name, nvs_type_t type, nvs_iterator_t *output_iterator)
 {
     return ESP_ERR_INVALID_ARG;
