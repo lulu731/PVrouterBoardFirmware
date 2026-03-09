@@ -1,6 +1,7 @@
 #ifdef TEST
 
 #include "unity.h"
+#include "fake_mount_partition_Driver.h"
 
 #include "app.h"
 #include "trigger_relay.h"
@@ -60,13 +61,29 @@ int16_t p_main_data[] = {0b1111111100110111, 0b0000000100101100, 0b1111111011010
                          0b1111111100110111};
 
 // ============================================================================
-// Integration Test 1: mount_littlefs_partition - Mount the LittleFS partition
+// Integration Test 1: mount_littlefs_partition - Mount the LittleFS partition (success)
 // ============================================================================
 
 void test_mount_littlefs_partition_succeeds(void)
 {
+    extern mount_error_t fake_mount_result;
+    fake_mount_result = MOUNT_OK;
     bool result = mount_littlefs_partition();
     TEST_ASSERT_TRUE(result);
+}
+
+// ============================================================================
+// Integration Test 1b: mount_littlefs_partition - Mount fails when mount_part fails
+// ============================================================================
+
+void test_mount_littlefs_partition_fails_when_mount_part_fails(void)
+{
+    extern mount_error_t fake_mount_result;
+    fake_mount_result = MOUNT_ERROR;
+    bool result = mount_littlefs_partition();
+    TEST_ASSERT_FALSE(result);
+    // Reset for other tests
+    fake_mount_result = MOUNT_OK;
 }
 
 // ============================================================================

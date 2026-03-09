@@ -1,4 +1,6 @@
-#include "mount_partition_Driver.h"
+#include "fake_mount_partition_Driver.h"
+
+mount_error_t fake_mount_result = MOUNT_OK;
 
 void mount_part_create(const partition_config_t* config)
 {
@@ -7,5 +9,5 @@ void mount_part_create(const partition_config_t* config)
 
 mount_error_t mount_part()
 {
-    return MOUNT_OK;
+    return fake_mount_result;
 }
