@@ -38,16 +38,20 @@ spi_device_handle_t meter_handle;
 extern int nbr_access_to_adc;
 int nbr_calls_to_trigger;
 
+extern mount_error_t fake_mount_result;
+
 void setUp(void)
 {
     nbr_calls_to_trigger = 0;
     nbr_access_to_adc = 0;
+    fake_mount_result = MOUNT_OK;
     // Initialize the relay before each test
     create_trigger_relay();
 }
 
 void tearDown(void)
 {
+    fake_mount_result = MOUNT_OK;
 }
 
 extern struct adc_register P_MEAN;
@@ -61,14 +65,22 @@ int16_t p_main_data[] = {0b1111111100110111, 0b0000000100101100, 0b1111111011010
                          0b1111111100110111};
 
 // ============================================================================
+// Helper function for mount_littlefs_partition tests
+// ============================================================================
+
+static bool mount_littlefs_partition_with_error(mount_error_t error)
+{
+    fake_mount_result = error;
+    return mount_littlefs_partition();
+}
+
+// ============================================================================
 // Integration Test 1: mount_littlefs_partition - Mount the LittleFS partition (success)
 // ============================================================================
 
 void test_mount_littlefs_partition_succeeds(void)
 {
-    extern mount_error_t fake_mount_result;
-    fake_mount_result = MOUNT_OK;
-    bool result = mount_littlefs_partition();
+    bool result = mount_littlefs_partition_with_error(MOUNT_OK);
     TEST_ASSERT_TRUE(result);
 }
 
@@ -78,12 +90,8 @@ void test_mount_littlefs_partition_succeeds(void)
 
 void test_mount_littlefs_partition_fails_when_mount_part_fails(void)
 {
-    extern mount_error_t fake_mount_result;
-    fake_mount_result = MOUNT_ERROR;
-    bool result = mount_littlefs_partition();
+    bool result = mount_littlefs_partition_with_error(MOUNT_ERROR);
     TEST_ASSERT_FALSE(result);
-    // Reset for other tests
-    fake_mount_result = MOUNT_OK;
 }
 
 // ============================================================================
