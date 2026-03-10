@@ -1,32 +1,45 @@
 ---
   description: Workflow for automatically committing changes made by Cline AI using conventional commits format.
   priority: high
-  version: 1.3
+  version: 1.4
 ---
-
 
 # Git Conventional Commits
 
 Workflow for automatically committing changes made by Cline AI using conventional commits format.
 
-## filters:
-  - type: event
-    pattern: "build_success"
-  - type: file_change
-    pattern: "*"
+  Changes should be committed using conventional commits format:
+  Format: <type>(<scope>): <description>
+  Types:
+  - feat - a new feature
+  - fix - a bug fix
+  - build - changes that affect the build system or external dependencies
+  - chore - changes to the build process or auxiliary tools and libraries
+  - ci - changes to our CI configuration files and scripts
+  - docs - documentation only changes
+  - perf - a code change that improves performance
+  - refactor - a code change that neither fixes a bug nor adds a feature
+  - revert - reverts a previous commit
+  - style - changes that do not affect the meaning of the code
+  - test - adding missing tests or correcting existing tests
+  The scope should be derived from the file path or affected component.
+  The description should be clear and concise, written in imperative mood.
 
-## actions:
-  - type: execute
-    command:
-      ### Get list of all changed files (space-separated)
-      CHANGED_FILES=$(git diff --name-only HEAD 2>/dev/null || echo "$FILE")
+## Step 1: Get list of all changed files (space-separated)
+  ```bash
+  CHANGED_FILES=$(git diff --name-only HEAD 2>/dev/null || echo "$FILE")
+  ```
 
-      ### Extract unique scopes from changed files
-      SCOPES=$(for f in $CHANGED_FILES; do dirname "$f" | tr '/' '-'; done | sort -u)
+## Step 2: Extract unique scopes from changed files
+  ```bash
+  SCOPES=$(for f in $CHANGED_FILES; do dirname "$f" | tr '/' '-'; done | sort -u)
+  ```
 
-      ### For each unique scope, create a separate commit
+## Step 3: Populate CHANGE_DESCRIPTION according to previous task
+  Read the conversation of task to populate bash CHANGE_DESCRIPTION variable
+
+## Step 4: For each unique scope, create a separate commit
       for SCOPE in $SCOPES; do
-        ### Extract the change type from the description
         CHANGE_TYPE=""
         case "$CHANGE_DESCRIPTION" in
           *"feat"*|*"create"*|*"implement"*) CHANGE_TYPE="feat";;
@@ -41,8 +54,10 @@ Workflow for automatically committing changes made by Cline AI using conventiona
           *"perf"*|*"optimize"*) CHANGE_TYPE="perf";;
           *"rule"*|*"tool"*|*"auxiliary"*) CHANGE_TYPE="chore";;
         esac
+      done
 
-        ### Find files belonging to this scope
+## Step 5: Find files belonging to this scope
+  ```bash
         SCOPE_FILES=""
         for f in $CHANGED_FILES; do
           FILE_SCOPE=$(dirname "$f" | tr '/' '-')
@@ -50,35 +65,15 @@ Workflow for automatically committing changes made by Cline AI using conventiona
             SCOPE_FILES="$SCOPE_FILES $f"
           fi
         done
+  ```
 
-        ### Add files and commit if any files match this scope
-        if [ -n "$SCOPE_FILES" ]; then
-          git add $SCOPE_FILES
-          git commit -m "$CHANGE_TYPE($SCOPE): $CHANGE_DESCRIPTION"
-        fi
-      done
-
-  - type: suggest
-    message:
-      Changes should be committed using conventional commits format:
-
-      Format: <type>(<scope>): <description>
-
-      Types:
-      - feat - a new feature
-      - fix - a bug fix
-      - build - changes that affect the build system or external dependencies
-      - chore - changes to the build process or auxiliary tools and libraries
-      - ci - changes to our CI configuration files and scripts
-      - docs - documentation only changes
-      - perf - a code change that improves performance
-      - refactor - a code change that neither fixes a bug nor adds a feature
-      - revert - reverts a previous commit
-      - style - changes that do not affect the meaning of the code
-      - test - adding missing tests or correcting existing tests
-
-      The scope should be derived from the file path or affected component.
-      The description should be clear and concise, written in imperative mood.
+## Step 6: Add files and commit if any files match this scope
+  ```bash
+  if [ -n "$SCOPE_FILES" ]; then
+    git add $SCOPE_FILES
+    git commit -m "$CHANGE_TYPE($SCOPE): $CHANGE_DESCRIPTION"
+  fi
+  ```
 
 ## examples:
   - input:
@@ -100,3 +95,6 @@ Workflow for automatically committing changes made by Cline AI using conventiona
       When multiple scopes are detected, separate commits are created:
       - feat(lib-adc): <description> (commits lib/adc/adc.c, lib/adc/adc.h)
       - test(adc): <description> (commits test/test_adc.c)
+
+## Step 7: suggest git message to be approved
+  Make a proposal of the git message. Request approval.
