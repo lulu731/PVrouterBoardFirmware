@@ -1,28 +1,24 @@
 #include "app.h"
 
-#include "wifi_connect.h"
-
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "freertos/queue.h"
-#include "server.h"
-#include "spi_master.h"
 
-#include <stdbool.h>
+#include "spi_master.h"
 
 static const int POWER_THRESHOLD = 100;
 
 void app_main(void)
 {
+    // Step 1: Mount LittleFS partition
     mount_littlefs_partition();
 
-    connect_to_wifi();
-
-    server_create();
-    server_start();
-
+    // Step 2: Initialize ADC (load calibration params)
     init_adc();
 
+    // Step 3: Launch web server
+    launch_server();
+
+    // Step 4: Main loop - power monitoring and relay triggering
     while (true)
     {
         trigger_relay_when_power_below_threshold(POWER_THRESHOLD);
