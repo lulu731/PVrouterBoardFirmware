@@ -170,12 +170,10 @@ void test_full_integration_flow(void)
     TEST_ASSERT_TRUE(adc_result);
 
     // Step 3: Launch web server
-    server_create();
     bool server_result = launch_server();
     TEST_ASSERT_TRUE(server_result);
 
     // Step 4: Simulate power monitoring and relay triggering
-    int trigger_count = 0;
     extern int calls_to_set_level_h;
     calls_to_set_level_h = 0;
 
@@ -185,16 +183,11 @@ void test_full_integration_flow(void)
         // p_main_data[i] contains raw register values
         // When sign bit (bit 15) is set, it's interpreted as negative power
         P_MEAN.data = p_main_data[i];
-        if (get_main_real_power() < -POWER_THRESHOLD)
-        {
-            trigger_relay_when_power_below_threshold(POWER_THRESHOLD);
-            trigger_count++;
-        }
+        trigger_relay_when_power_below_threshold(POWER_THRESHOLD);
     }
 
     // Verify that relay was triggered for negative power values
     // 7 out of 10 values have sign bit set (negative power)
-    TEST_ASSERT_EQUAL_INT(7, trigger_count);
     TEST_ASSERT_EQUAL_INT(7, calls_to_set_level_h);
 
     server_destroy();
