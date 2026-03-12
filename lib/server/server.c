@@ -8,6 +8,7 @@
 
 #include "esp_http_server.h"
 #include "esp_log.h"
+#include "esp_timer.h"
 
 #include <stdio.h>
 #include <stddef.h>
@@ -26,6 +27,7 @@ extern uint16_t Ugain, IgainL, IgainN;
 extern struct adc_register U_GAIN, I_GAIN_L, I_GAIN_N, CS2;
 */
 static httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+static esp_timer_handle_t periodic_broadcast_timer = NULL;
 
 /**
  * @brief Apply calibration gains from parameters to ADC registers and save to NVS
@@ -186,6 +188,114 @@ server_err_t server_stop(void)
         if (err != ESP_OK)
             return SERVER_ERROR;
     }
+    return SERVER_OK;
+}
+
+/**
+ * @brief Periodic timer callback to broadcast JSON to all connected WebSocket clients
+ *
+ * This function is called every 2 seconds. It checks if any clients are connected
+ * before sending the JSON message to avoid unnecessary work when no clients are present.
+ */
+static void periodic_broadcast_callback(void* arg)
+{
+    (void)arg;
+
+    // Check if there are any connected clients
+    size_t fds = config.max_open_sockets;
+    int* client_fds = malloc(sizeof(int) * fds);
+    if (client_fds == NULL)
+    {
+        return;
+    }
+
+    esp_err_t err = httpd_get_client_list(web_server, &fds, client_fds);
+    free(client_fds);
+
+    if (err != ESP_OK || fds == 0)
+    {
+        // No clients connected, don't send
+        return;
+    }
+
+    // Send the JSON message to all connected clients
+    const char* json_message = "{\"objects\":[{\"id\":\"Umain\",\"value\":230}, {\"id\":\"IL\",\"value\":2}, {\"id\":\"IN\",\"value\":3}]}";
+    server_send_to_all_clients(json_message);
+}
+
+/**
+ * @brief Start the periodic broadcast timer
+ *
+ * Creates and starts a timer that fires every 2 seconds to broadcast
+ * JSON data to all connected WebSocket clients.
+ *
+ * @return SERVER_OK on success, SERVER_ERROR on failure
+ */
+server_err_t server_start_periodic_broadcast(void)
+{
+    if (periodic_broadcast_timer != NULL)
+    {
+        ESP_LOGW(TAG, "Periodic broadcast timer already running");
+        return SERVER_OK;
+    }
+
+    const esp_timer_create_args_t timer_args = {
+        .callback = &periodic_broadcast_callback,
+        .name = "periodic_broadcast"
+    };
+
+    esp_err_t err = esp_timer_create(&timer_args, &periodic_broadcast_timer);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Failed to create periodic broadcast timer: %d", err);
+        return SERVER_ERROR;
+    }
+
+    // Start timer with 2 second period (2,000,000 microseconds)
+    err = esp_timer_start_periodic(periodic_broadcast_timer, 2000000);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Failed to start periodic broadcast timer: %d", err);
+        esp_timer_delete(periodic_broadcast_timer);
+        periodic_broadcast_timer = NULL;
+        return SERVER_ERROR;
+    }
+
+    ESP_LOGI(TAG, "Periodic broadcast timer started (2 second interval)");
+    return SERVER_OK;
+}
+
+/**
+ * @brief Stop the periodic broadcast timer
+ *
+ * Stops and deletes the periodic broadcast timer.
+ *
+ * @return SERVER_OK on success, SERVER_ERROR on failure
+ */
+server_err_t server_stop_periodic_broadcast(void)
+{
+    if (periodic_broadcast_timer == NULL)
+    {
+        ESP_LOGW(TAG, "Periodic broadcast timer not running");
+        return SERVER_OK;
+    }
+
+    esp_err_t err = esp_timer_stop(periodic_broadcast_timer);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Failed to stop periodic broadcast timer: %d", err);
+        return SERVER_ERROR;
+    }
+
+    err = esp_timer_delete(periodic_broadcast_timer);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Failed to delete periodic broadcast timer: %d", err);
+        return SERVER_ERROR;
+    }
+
+    periodic_broadcast_timer = NULL;
+    ESP_LOGI(TAG, "Periodic broadcast timer stopped");
     return SERVER_OK;
 }
 

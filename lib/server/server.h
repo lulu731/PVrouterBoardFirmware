@@ -14,5 +14,7 @@ server_err_t server_start(void);
 server_err_t server_stop(void);
 size_t server_send_to_all_clients(const char* message);
 void server_destroy(void);
+server_err_t server_start_periodic_broadcast(void);
+server_err_t server_stop_periodic_broadcast(void);
 
 #endif // SERVER_H
