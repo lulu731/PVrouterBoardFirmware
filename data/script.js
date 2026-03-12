@@ -16,10 +16,12 @@ function init()// open WebSocket
     var obj = rx.data;
     try {
       var js = JSON.parse(obj);
-      js.objects.forEach(element => {
-        document.getElementById('rxText').value +=
-          element.id + " : " + element.value + "\n";
-      });
+      const formatted = js.objects.map(element => {
+        const unit = element.id.startsWith('I') ? 'A' :
+                     element.id.startsWith('U') ? 'V' : '';
+        return `${element.id} = ${element.value}${unit}`;
+      }).join(', ');
+      document.getElementById('rxText').value += formatted + "\n";
     }
     catch(e)
     {
