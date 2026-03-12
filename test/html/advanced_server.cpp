@@ -20,6 +20,7 @@
 #include <boost/asio/bind_executor.hpp>
 #include <boost/asio/dispatch.hpp>
 #include <boost/asio/signal_set.hpp>
+#include <boost/asio/steady_timer.hpp>
 #include <boost/asio/strand.hpp>
 #include <boost/make_unique.hpp>
 #include <boost/optional.hpp>
@@ -216,11 +217,14 @@ class websocket_session : public std::enable_shared_from_this<websocket_session>
 {
     websocket::stream<beast::tcp_stream> ws_;
     beast::flat_buffer buffer_;
+    net::steady_timer timer_;
+    bool sending_ = false;
 
 public:
     // Take ownership of the socket
-    explicit websocket_session(tcp::socket&& socket)
+    explicit websocket_session(tcp::socket&& socket, net::io_context& ioc)
         : ws_(std::move(socket))
+        , timer_(ioc)
     {
     }
 
@@ -256,8 +260,54 @@ private:
         if(ec)
             return fail(ec, "accept");
 
+        // Start the periodic timer to send JSON every 2 seconds
+        timer_.expires_after(std::chrono::seconds(2));
+        timer_.async_wait(
+            beast::bind_front_handler(
+                &websocket_session::on_timer,
+                shared_from_this()));
+
         // Read a message
         do_read();
+    }
+
+    void on_timer(beast::error_code ec)
+    {
+        if(ec)
+        {
+            if(ec == boost::asio::error::operation_aborted)
+                return;
+            return fail(ec, "timer");
+        }
+
+        // Send the JSON object
+        std::string str = "{\"objects\":[{\"id\":\"Umain\",\"value\":230}, {\"id\":\"IL\",\"value\":2}, {\"id\":\"IN\",\"value\":3}]}";
+
+        ws_.text(true);
+        net::mutable_buffer buffers(str.data(), str.length());
+
+        ws_.async_write(
+            buffers,
+            beast::bind_front_handler(
+                &websocket_session::on_timer_write,
+                shared_from_this()));
+    }
+
+    void on_timer_write(beast::error_code ec, std::size_t)
+    {
+        if(ec)
+        {
+            if(ec == boost::asio::error::operation_aborted)
+                return;
+            return fail(ec, "timer write");
+        }
+
+        // Re-arm the timer for another 2 seconds
+        timer_.expires_after(std::chrono::seconds(2));
+        timer_.async_wait(
+            beast::bind_front_handler(
+                &websocket_session::on_timer,
+                shared_from_this()));
     }
 
     void do_read()
@@ -328,6 +378,7 @@ class http_session : public std::enable_shared_from_this<http_session>
     beast::tcp_stream stream_;
     beast::flat_buffer buffer_;
     std::shared_ptr<std::string const> doc_root_;
+    net::io_context* ioc_;
 
     static constexpr std::size_t queue_limit = 8; // max responses
     std::queue<http::message_generator> response_queue_;
@@ -340,9 +391,11 @@ public:
     // Take ownership of the socket
     http_session(
         tcp::socket&& socket,
-        std::shared_ptr<std::string const> const& doc_root)
+        std::shared_ptr<std::string const> const& doc_root,
+        net::io_context& ioc)
         : stream_(std::move(socket))
         , doc_root_(doc_root)
+        , ioc_(&ioc)
     {
         static_assert(queue_limit > 0,
                       "queue limit must be positive");
@@ -401,8 +454,10 @@ private:
         {
             // Create a websocket session, transferring ownership
             // of both the socket and the HTTP request.
+            // Pass ioc reference for timer
             std::make_shared<websocket_session>(
-                stream_.release_socket())->do_accept(parser_->release());
+                stream_.release_socket(),
+                *ioc_)->do_accept(parser_->release());
             return;
         }
 
@@ -568,7 +623,8 @@ private:
             // Create the http session and run it
             std::make_shared<http_session>(
                 std::move(socket),
-                doc_root_)->run();
+                doc_root_,
+                ioc_)->run();
         }
 
         // Accept another connection
