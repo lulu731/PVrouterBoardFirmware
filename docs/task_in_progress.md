@@ -1,37 +1,53 @@
 # Task In Progress Summary
 
 ## Task Description
-Modify the server handlers in `lib/server/uri_handlers.c` to automatically send a JSON object every 2 seconds to connected clients.
+For now, the periodic_broadcast_callback timer callback function in @/lib/server/server.c does not update the json object.
 
 ## Requirements
-- Send JSON object: `{"objects":[{"id":"Umain","value":230}, {"id":"IL","value":2}, {"id":"IN","value":3}]}`
-- Send interval: Every 2 seconds
-- Only send when clients are connected (check before sending)
+- The values in JSON object: `{"objects":[{"id":"Umain","value":230}, {"id":"IL","value":2}, {"id":"IN","value":3}]}` should be updated before to be brodcasted.
+- I think that the id parameters should conform to registers in @/lib/adc/adc_registers.c : U_RMS, I_RMS and I_RMS_2
 
 ## Implementation Plan
 
-### Step 1: Modify `lib/server/server.c`
-- Add include for `esp_timer.h`
-- Create a periodic timer using `esp_timer_create()` that fires every 2 seconds
-- In the timer callback:
-  - Check if any clients are connected using `httpd_get_client_list()`
-  - Only send JSON message if clients exist
-- Add `server_start_periodic_broadcast()` function to start the timer
-- Add `server_stop_periodic_broadcast()` function to stop the timer
+### Step 1: Create Tests (TDD approach)
 
-### Step 2: Modify `lib/server/server.h`
-- Add declarations:
-  - `server_err_t server_start_periodic_broadcast(void);`
-  - `server_err_t server_stop_periodic_broadcast(void);`
+1. **Add tests to `test/json/test_json.c`**:
+   - Add test for new JSON function that handles floating-point values
+   - Test format: `{"objects":[{"id":"U_RMS","value":123.45}, ...]}`
 
-### Step 3: Modify `lib/app/app.c`
-- Call `server_start_periodic_broadcast()` after successful `server_start()`
-- Call `server_stop_periodic_broadcast()` before `server_stop()`
+2. **Add tests to `test/server/test_server.c`**:
+   - Add tests for value conversion (raw ADC to physical units):
+     - Voltage: raw / 100.0
+     - Current: raw / 1000.0
+   - Test the periodic broadcast functionality
 
-### Step 4: Create `docs/decisions.md`
-- Document the architectural decision (Option 1 vs Option 2)
+### Step 2: Implement the Solution
 
-## Architecture Decision
-- **Option 1 (Chosen)**: Check client count before sending - timer runs every 2 seconds but only sends when clients are connected
-- **Option 2**: Start/stop timer on connect/disconnect - more efficient but complex due to WebSocket disconnect detection challenges
-- **Reason for Choice**: Simpler implementation, robust, avoids complex disconnect detection logic
+1. **Add new function to `lib/json/json.c`**:
+   - Add a struct for float values (e.g., `gain_object_float`)
+   - Add function to create JSON with float values using cJSON
+
+2. **Add declaration to `lib/json/json.h`**:
+   - Declare the new struct and function
+
+3. **Modify `lib/server/server.c`**:
+   - Call the new JSON function from `periodic_broadcast_callback`
+   - Read U_RMS, I_RMS, I_RMS_2 registers
+   - Convert values (voltage/100, current/1000)
+   - Broadcast to WebSocket clients
+
+### JSON Output Format:
+```json
+{"objects":[{"id":"U_RMS","value":123.45}, {"id":"I_RMS","value":12.345}, {"id":"I_RMS_2","value":...}]}
+```
+
+### Implementation Details:
+- Values will be sent as floating-point numbers
+- The IDs will match the register names from `adc_registers.c`
+- The callback will read actual ADC values and convert them before broadcasting
+- **cJSON should only be used in `lib/json/json.c`**
+- Tests for JSON function in `test/json/test_json.c`
+- Tests for value conversion in `test/server/test_server.c`
+
+## Questions
+Ask questions about the task when needed for understanding or planning.
