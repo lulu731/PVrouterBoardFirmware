@@ -35,16 +35,28 @@ The firmware handles:
 - **Conventional Commits**: Git commit message format (type(scope): description)
 - **Cline Rules**: AI assistant configuration rules stored in .clinerules directory
 
-## Git Commit Workflow
+## Tests
 
-- Before executing git commit, ask the user to approve the commit message
-- Follow conventional commits format: `<type>(<scope>): <description>`
-- Use appropriate type based on changes:
-  - `feat` - new features
-  - `fix` - bug fixes
-  - `chore` - Cline rules and auxiliary tools
-  - `docs` - documentation changes
-  - `refactor` - code refactoring
-  - `test` - test-related changes
-  - `ci` - CI/CD configuration changes
-- The scope should be derived from the file path (e.g., `.clinerules`, `lib/adc`)
+### Writing tests
+You should use TDD as possible:
+- first, write a test;
+- execute the test to fail;
+- implement the code to test;
+- the test should succeed.
+When needed, mocks, stubs and fakes should be implemented as lightly as possible, without using CMock.
+
+### Executing tests
+You should use ceedling. Examples:
+- command "ceedling", to exexcute all tests;
+- command "ceedling test:app", to test the app module in test/app/test_app.c
+
+## compiling project
+Use the command "pio run -e esp32-s3-devkitc-1".
+
+## Before committing
+When the user wants you to git commit, compile the project, then execute all the tests.
+In case of errors, make proposals to solve the errors, wait for the user.
+If there are no error, execute the command to commit code.
+
+## User requests
+Ask question if something is not clear.
