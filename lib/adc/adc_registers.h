@@ -12,4 +12,9 @@ struct adc_register
     adc_data data;
 };
 
+// RMS measurement registers
+extern struct adc_register U_RMS;
+extern struct adc_register I_RMS;
+extern struct adc_register I_RMS_2;
+
 #endif // ADC_REGISTERS_H

@@ -21,6 +21,7 @@
 TEST_INCLUDE_PATH("test/support/esp-idf/include/common")
 
 TEST_SOURCE_FILE("test/app/stub_nvs.c")
+TEST_SOURCE_FILE("lib/adc/adc_registers.c")
 
 // Include cJSON for JSON parsing (needed by uri_handlers.c)
 #include "cJSON.h"

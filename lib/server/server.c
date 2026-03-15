@@ -26,6 +26,7 @@ extern uint16_t Ugain, IgainL, IgainN;
 // ADC registers for gain parameters
 extern struct adc_register U_GAIN, I_GAIN_L, I_GAIN_N, CS2;
 */
+
 static httpd_config_t config = HTTPD_DEFAULT_CONFIG();
 static esp_timer_handle_t periodic_broadcast_timer = NULL;
 
@@ -218,9 +219,24 @@ static void periodic_broadcast_callback(void* arg)
         return;
     }
 
-    // Send the JSON message to all connected clients
-    const char* json_message = "{\"objects\":[{\"id\":\"Umain\",\"value\":230}, {\"id\":\"IL\",\"value\":2}, {\"id\":\"IN\",\"value\":3}]}";
+    // Read ADC registers for RMS values
+    read_adc_register(&U_RMS);
+    read_adc_register(&I_RMS);
+    read_adc_register(&I_RMS_2);
+
+    // Create JSON with float values
+    gain_object objects[3] = {
+        {"U_RMS", U_RMS.data},
+        {"I_RMS", I_RMS.data},
+        {"I_RMS_2", I_RMS_2.data}
+    };
+
+    char* json_message = json_stringify(objects, 3);
+    if (json_message != NULL)
+    {
     server_send_to_all_clients(json_message);
+        free(json_message);
+    }
 }
 
 /**
