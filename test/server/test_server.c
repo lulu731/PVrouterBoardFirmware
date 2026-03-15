@@ -27,6 +27,9 @@ TEST_SOURCE_FILE("lib/adc/adc_registers.c")
 #include "cJSON.h"
 #include "json.h"
 
+// Use mock for adc_rw to avoid duplicate symbol issues
+#include "mock_adc_rw.h"
+
 // Include calibration_params and adc_rw (needed by uri_handlers.c ws_handler)
 
 spi_device_handle_t meter_handle;
@@ -142,6 +145,67 @@ void test_send_to_all_clients_should_return_0_if_get_list_error(void)
 
     TEST_ASSERT_EQUAL(0, fds);
     send_to_all_clients_error = 0;
+}
+
+// Tests for create_broadcast_json_message() helper function
+
+// Callback function to set different return values for each call
+static int fake_read_adc_callback(struct adc_register* reg, int call_count)
+{
+    if (reg == NULL) return -1;
+
+    // First call: U_RMS
+    if (call_count == 0)
+    {
+        reg->data = 2300;
+    }
+    // Second call: I_RMS
+    else if (call_count == 1)
+    {
+        reg->data = 1500;
+    }
+    // Third call: I_RMS_2
+    else if (call_count == 2)
+    {
+        reg->data = 1200;
+    }
+
+    return 0;
+}
+
+void test_create_broadcast_json_message_should_return_non_null(void)
+{
+    // Use callback to set return values
+    read_adc_register_StubWithCallback(fake_read_adc_callback);
+
+    char* json = create_broadcast_json_message();
+
+    TEST_ASSERT_NOT_NULL(json);
+
+    free(json);
+}
+
+void test_create_broadcast_json_message_should_contain_correct_values(void)
+{
+    // Use callback to set specific values
+    // The callback sets: U_RMS=2300, I_RMS=1500, I_RMS_2=1200
+    read_adc_register_StubWithCallback(fake_read_adc_callback);
+
+    char* json = create_broadcast_json_message();
+
+    // JSON format: {"objects":[{"id":"U_RMS","value":2300},{"id":"I_RMS","value":1500},{"id":"I_RMS_2","value":1200}]}
+
+    // Verify the JSON contains all expected key-value pairs
+    TEST_ASSERT_NOT_NULL(strstr(json, "\"id\":\"U_RMS\""));
+    TEST_ASSERT_NOT_NULL(strstr(json, "\"value\":2300"));
+
+    TEST_ASSERT_NOT_NULL(strstr(json, "\"id\":\"I_RMS\""));
+    TEST_ASSERT_NOT_NULL(strstr(json, "\"value\":1500"));
+
+    TEST_ASSERT_NOT_NULL(strstr(json, "\"id\":\"I_RMS_2\""));
+    TEST_ASSERT_NOT_NULL(strstr(json, "\"value\":1200"));
+
+    free(json);
 }
 
 #endif // TEST

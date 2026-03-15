@@ -193,6 +193,31 @@ server_err_t server_stop(void)
 }
 
 /**
+ * @brief Create JSON message with current ADC RMS values
+ *
+ * This function reads the U_RMS, I_RMS, and I_RMS_2 ADC registers
+ * and creates a JSON string with their values.
+ *
+ * @return JSON string (caller must free with free()), or NULL on failure
+ */
+char* create_broadcast_json_message(void)
+{
+    // Read ADC registers for RMS values
+    read_adc_register(&U_RMS);
+    read_adc_register(&I_RMS);
+    read_adc_register(&I_RMS_2);
+
+    // Create JSON with RMS values
+    gain_object objects[3] = {
+        {"U_RMS", U_RMS.data},
+        {"I_RMS", I_RMS.data},
+        {"I_RMS_2", I_RMS_2.data}
+    };
+
+    return json_stringify(objects, 3);
+}
+
+/**
  * @brief Periodic timer callback to broadcast JSON to all connected WebSocket clients
  *
  * This function is called every 2 seconds. It checks if any clients are connected
@@ -219,22 +244,11 @@ static void periodic_broadcast_callback(void* arg)
         return;
     }
 
-    // Read ADC registers for RMS values
-    read_adc_register(&U_RMS);
-    read_adc_register(&I_RMS);
-    read_adc_register(&I_RMS_2);
-
-    // Create JSON with float values
-    gain_object objects[3] = {
-        {"U_RMS", U_RMS.data},
-        {"I_RMS", I_RMS.data},
-        {"I_RMS_2", I_RMS_2.data}
-    };
-
-    char* json_message = json_stringify(objects, 3);
+    // Create and send JSON message
+    char* json_message = create_broadcast_json_message();
     if (json_message != NULL)
     {
-    server_send_to_all_clients(json_message);
+        server_send_to_all_clients(json_message);
         free(json_message);
     }
 }

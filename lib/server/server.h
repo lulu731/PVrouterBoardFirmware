@@ -17,4 +17,7 @@ void server_destroy(void);
 server_err_t server_start_periodic_broadcast(void);
 server_err_t server_stop_periodic_broadcast(void);
 
+// Helper function for creating broadcast JSON message
+char* create_broadcast_json_message(void);
+
 #endif // SERVER_H
