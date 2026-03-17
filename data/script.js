@@ -19,7 +19,9 @@ function init()// open WebSocket
       const formatted = js.objects.map(element => {
         const unit = element.id.startsWith('I') ? 'A' :
                      element.id.startsWith('U') ? 'V' : '';
-        return `${element.id} = ${element.value}${unit}`;
+        const value = element.id.startsWith('I') ? (element.value/1000).toFixed(1) :
+                      element.id.startsWith('U') ? element.value/100 : 0;
+        return `${element.id} = ${value}${unit}`;
       }).join(', ');
       document.getElementById('rxText').value += formatted + "\n";
     }
