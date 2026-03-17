@@ -281,7 +281,7 @@ private:
         }
 
         // Send the JSON object
-        std::string str = "{\"objects\":[{\"id\":\"Umain\",\"value\":230}, {\"id\":\"IL\",\"value\":2}, {\"id\":\"IN\",\"value\":3}]}";
+        std::string str = "{\"objects\":[{\"id\":\"Umain\",\"value\":23000}, {\"id\":\"IL\",\"value\":2345}, {\"id\":\"IN\",\"value\":3400}]}";
 
         ws_.text(true);
         net::mutable_buffer buffers(str.data(), str.length());
@@ -645,6 +645,7 @@ int main(int argc, char* argv[])
             "    advanced-server 0.0.0.0 8080 . 1\n";
         return EXIT_FAILURE;
     }
+    std::cout << "!!! Started server. !!!\n";
     auto const address = net::ip::make_address(argv[1]);
     auto const port = static_cast<unsigned short>(std::atoi(argv[2]));
     auto const doc_root = std::make_shared<std::string>(argv[3]);
