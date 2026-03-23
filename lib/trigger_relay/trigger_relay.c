@@ -11,7 +11,8 @@
 
 static uint8_t relay_trigger_flag = 0;
 
-#define GPIO_HEATER    GPIO_NUM_18
+#define GPIO_ZX     GPIO_NUM_14
+#define GPIO_HEATER GPIO_NUM_18
 
 /**
  * @brief ISR handler for GPIO pin_zx

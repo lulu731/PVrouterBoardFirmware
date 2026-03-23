@@ -4,8 +4,7 @@
 #include "freertos/task.h"
 
 #include "spi_master.h"
-
-static const int POWER_THRESHOLD = 100;
+#include "trigger_relay.h"
 
 void app_main(void)
 {
@@ -18,12 +17,8 @@ void app_main(void)
     // Step 3: Launch web server
     launch_server();
 
-    // Step 4: Main loop - power monitoring and relay triggering
-    while (true)
-    {
-        trigger_relay_when_power_below_threshold(POWER_THRESHOLD);
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
+    // Step 4: power monitoring and relay triggering
+    create_trigger_relay();
 }
 
     /*esp_err_t nvs_error = nvs_init();
