@@ -57,11 +57,3 @@ bool launch_server(void)
 
     return true;
 }
-
-void trigger_relay_when_power_below_threshold(const int threshold)
-{
-    if (get_main_real_power() < -threshold)
-    {
-        trigger_relay();
-    }
-}

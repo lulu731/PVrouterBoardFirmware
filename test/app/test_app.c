@@ -118,33 +118,7 @@ void test_launch_server_creates_and_starts_server(void)
 }
 
 // ============================================================================
-// Integration Test 4: trigger_relay_directly - Direct relay triggering test
-// ============================================================================
-
-void test_trigger_relay_directly(void)
-{
-    // Test direct relay triggering (without power check)
-    trigger_relay();
-    extern int calls_to_set_level_h;
-    TEST_ASSERT_EQUAL_INT(1, calls_to_set_level_h);
-}
-
-// ============================================================================
-// Integration Test 5: trigger_relay_when_power_below_threshold - Power above threshold
-// ============================================================================
-
-void test_trigger_relay_when_power_below_threshold_does_not_trigger_when_power_above(void)
-{
-    P_MEAN.data = 50;  // Positive power (exporting)
-    int threshold = 100;
-    extern int calls_to_set_level_h;
-    calls_to_set_level_h = 0;
-    trigger_relay_when_power_below_threshold(threshold);
-    TEST_ASSERT_EQUAL_INT(0, calls_to_set_level_h);
-}
-
-// ============================================================================
-// Integration Test 6: ADC register access tracking
+// Integration Test 4: ADC register access tracking
 // ============================================================================
 
 void test_adc_register_access_tracking(void)
@@ -152,45 +126,6 @@ void test_adc_register_access_tracking(void)
     nbr_access_to_adc = 0;
     int16_t power = get_main_real_power();
     TEST_ASSERT_TRUE(nbr_access_to_adc > 0);
-}
-
-// ============================================================================
-// Integration Test 7: Full integration flow - Mount -> Init ADC -> Server -> Relay
-// This is the main integration test that validates the complete app flow
-// ============================================================================
-
-void test_full_integration_flow(void)
-{
-    // Step 1: Mount LittleFS partition
-    bool mount_result = mount_littlefs_partition();
-    TEST_ASSERT_TRUE(mount_result);
-
-    // Step 2: Initialize ADC (load calibration params)
-    bool adc_result = init_adc();
-    TEST_ASSERT_TRUE(adc_result);
-
-    // Step 3: Launch web server
-    bool server_result = launch_server();
-    TEST_ASSERT_TRUE(server_result);
-
-    // Step 4: Simulate power monitoring and relay triggering
-    extern int calls_to_set_level_h;
-    calls_to_set_level_h = 0;
-
-    // Simulate 10 power readings - use raw values where sign bit indicates negative
-    for (uint8_t i = 0; i < 10; i++)
-    {
-        // p_main_data[i] contains raw register values
-        // When sign bit (bit 15) is set, it's interpreted as negative power
-        P_MEAN.data = p_main_data[i];
-        trigger_relay_when_power_below_threshold(POWER_THRESHOLD);
-    }
-
-    // Verify that relay was triggered for negative power values
-    // 7 out of 10 values have sign bit set (negative power)
-    TEST_ASSERT_EQUAL_INT(7, calls_to_set_level_h);
-
-    server_destroy();
 }
 
 #endif // TEST

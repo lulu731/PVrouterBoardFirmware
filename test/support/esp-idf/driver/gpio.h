@@ -10,6 +10,7 @@
 typedef enum {
     GPIO_NUM_NC = -1,    /*!< Use to signal not connected to S/W */
     GPIO_NUM_4 = 4,
+    GPIO_NUM_14 = 14,
     GPIO_NUM_18 = 18,
 } gpio_num_t;
 

@@ -29,18 +29,6 @@ void tearDown(void)
 }
 
 /**
- * @brief Test that trigger_relay toggles GPIO correctly
- */
-void test_trigger_relay(void)
-{
-    TEST_ASSERT(level_is_low());
-    trigger_relay();
-    TEST_ASSERT_EQUAL_INT(1, calls_to_set_level_h);
-    TEST_ASSERT_EQUAL_INT(1, calls_to_set_level_l);
-    TEST_ASSERT(level_is_low());
-}
-
-/**
  * @brief Helper function to set P_MEAN to represent a negative power value
  * The sign bit (bit 15) is 1 for negative values
  */

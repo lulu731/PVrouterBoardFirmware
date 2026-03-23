@@ -32,7 +32,7 @@ static void IRAM_ATTR zx_gpio_isr_handler(void* arg)
  * It sets the GPIO as input with pull-down resistor and configures
  * a rising edge interrupt to call power_isr when the pin goes high.
  */
-void init_zx_gpio(void)
+static void init_zx_gpio(void)
 {
     // Configure GPIO as input
     gpio_set_direction(GPIO_ZX, GPIO_MODE_INPUT);
@@ -71,7 +71,7 @@ void create_trigger_relay(void)
  *
  * It is intended to be used as a trigger for a relay connected to a GPIO pin.
  */
-void trigger_relay(void)
+static void trigger_relay(void)
 {
     gpio_set_level(GPIO_HEATER, 1);
 
