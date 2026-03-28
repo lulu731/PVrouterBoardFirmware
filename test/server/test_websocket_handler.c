@@ -222,6 +222,9 @@ void test_ws_handler_multiple_parameter_updates(void)
     TEST_ASSERT_EQUAL(3, write_adc_register_call_count);
 }
 
+// External variable from esp_http_server.c stub
+extern char* message_received;
+
 extern int nvs_open_called, nvs_commit_called, nvs_close_called;
 void test_ws_handler_should_save_calibration_to_nvs(void)
 {
@@ -245,6 +248,41 @@ void test_ws_handler_should_save_calibration_to_nvs(void)
     TEST_ASSERT_EQUAL_INT(3, nvs_commit_called); //each data saving calls commit
     TEST_ASSERT_EQUAL_INT(1, nvs_close_called);
     TEST_ASSERT_EQUAL(ESP_OK, result);
+}
+
+// ============================================================================
+// Calibration Initialization Tests
+// ============================================================================
+
+void test_ws_handler_should_send_calibration_on_first_message(void)
+{
+    // Set specific calibration values
+    Ugain = 1000;
+    IgainL = 2000;
+    IgainN = 3000;
+
+    // Reset message_received
+    if (message_received != NULL) {
+        free(message_received);
+        message_received = NULL;
+    }
+
+    // Setup WebSocket frame with any command (simulating first message from new client)
+    message_sent = "{\"objects\":[{\"id\":\"cmd\",\"value\":4}]}";
+
+    // Create a mock request with POST method and NO session context (new client)
+    httpd_req_t req;
+    req.method = HTTP_POST;
+    req.sess_ctx = NULL;  // This indicates a new client connection
+
+    // Call ws_handler
+    esp_err_t result = ws_handler(&req);
+
+    // Verify results
+    TEST_ASSERT_EQUAL(ESP_OK, result);
+    // Verify that calibration values were sent back to client
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("{\"objects\":[{\"id\":\"Ugain\",\"value\":1000},{\"id\":\"IgainL\",\"value\":2000},{\"id\":\"IgainN\",\"value\":3000}]}",
+                                    message_received, "Server should send calibration data on first message");
 }
 
 #endif // TEST
