@@ -24,6 +24,17 @@ function init()// open WebSocket
         return `${element.id} = ${value}${unit}`;
       }).join(', ');
       document.getElementById('rxText').value += formatted + "\n";
+
+      // Initialize input fields with calibration values
+      js.objects.forEach(element => {
+        if (element.id === 'Ugain') {
+          document.getElementById('Ugain').value = element.value;
+        } else if (element.id === 'IgainL') {
+          document.getElementById('IgainL').value = element.value;
+        } else if (element.id === 'IgainN') {
+          document.getElementById('IgainN').value = element.value;
+        }
+      });
     }
     catch(e)
     {
