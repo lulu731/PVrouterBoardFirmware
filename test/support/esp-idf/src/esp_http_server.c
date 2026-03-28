@@ -1,6 +1,10 @@
 #include "esp_http_server.h"
 
 #include <string.h>
+#include <stdlib.h>
+
+// Global variable to capture messages sent by the server (for test verification)
+char* message_received = NULL;
 
 int server_handle = 100;
 httpd_handle_t web_server = &server_handle;
@@ -93,6 +97,14 @@ esp_err_t httpd_queue_work(httpd_handle_t handle, httpd_work_fn_t work_fn, void 
 
 esp_err_t httpd_ws_send_frame_async(httpd_handle_t hd, int fd, httpd_ws_frame_t *frame)
 {
+    // Store the message sent by the server for test verification
+    if (frame->payload != NULL && frame->len > 0) {
+        message_received = malloc(frame->len + 1);
+        if (message_received != NULL) {
+            strncpy(message_received, (const char*)frame->payload, frame->len);
+            message_received[frame->len] = '\0';
+        }
+    }
     return ESP_OK;
 }
 

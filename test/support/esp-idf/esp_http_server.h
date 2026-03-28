@@ -31,6 +31,7 @@ typedef enum http_method httpd_method_t;
 typedef struct httpd_req_t{
     int method;
     void *sess_ctx;
+    httpd_handle_t handle;
 } httpd_req_t;
 
 typedef struct httpd_uri_t{
