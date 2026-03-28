@@ -338,3 +338,37 @@ void server_destroy(void)
 {
     web_server = NULL;
 }
+
+/**
+ * @brief Send a message to a specific client by socket file descriptor
+ *
+ * This function creates a WebSocket frame and sends it to a specific client.
+ *
+ * @param sock_fd The socket file descriptor of the client
+ * @param message The message to send
+ * @return SERVER_OK on success, SERVER_ERROR on failure
+ */
+server_err_t server_send_to_client(int sock_fd, const char* message)
+{
+    if (web_server == NULL || message == NULL) {
+        return SERVER_ERROR;
+    }
+
+    // Create WebSocket frame
+    httpd_ws_frame_t ws_frame = {
+        .fragmented = false,
+        .type = HTTPD_WS_TYPE_TEXT,
+        .payload = (uint8_t*)message,
+        .len = strlen(message)
+    };
+
+    // Send the frame
+    esp_err_t err = httpd_ws_send_frame_async(web_server, sock_fd, &ws_frame);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to send WebSocket frame to client %d: %d", sock_fd, err);
+        return SERVER_ERROR;
+    }
+
+    ESP_LOGI(TAG, "Sent message to client %d", sock_fd);
+    return SERVER_OK;
+}

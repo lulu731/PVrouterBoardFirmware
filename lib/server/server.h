@@ -20,4 +20,7 @@ server_err_t server_stop_periodic_broadcast(void);
 // Helper function for creating broadcast JSON message
 char* create_broadcast_json_message(void);
 
+// Send a message to a specific client by socket file descriptor
+server_err_t server_send_to_client(int sock_fd, const char* message);
+
 #endif // SERVER_H

@@ -5,6 +5,8 @@
 #include "calibration_params.h"
 #include "json.h"
 #include "nvs_storage.h"
+#include "server_Hardware.h"
+#include "server.h"
 
 #include "esp_log.h"
 #include "esp_http_server.h"
@@ -207,9 +209,67 @@ static esp_err_t update_gain_value(const char* key, uint16_t value)
     return ESP_OK;
 }
 
+/**
+ * @brief Send calibration values to a client via WebSocket
+ * @param req The HTTP request handle
+ * @return ESP_OK on success, ESP_FAIL on failure
+ */
+static esp_err_t send_calibration_to_client(httpd_req_t *req)
+{
+    // Create JSON with calibration values
+    gain_object objects[3] = {
+        {"Ugain", Ugain},
+        {"IgainL", IgainL},
+        {"IgainN", IgainN}
+    };
+
+    char* json_message = json_stringify(objects, 3);
+    if (json_message == NULL) {
+        ESP_LOGE(TAG, "Failed to create calibration JSON");
+        return ESP_FAIL;
+    }
+
+    // Get the socket file descriptor
+    int sock_fd = httpd_req_to_sockfd(req);
+
+    // Create WebSocket frame
+    httpd_ws_frame_t ws_frame = {
+        .fragmented = false,
+        .type = HTTPD_WS_TYPE_TEXT,
+        .payload = (uint8_t*)json_message,
+        .len = strlen(json_message)
+    };
+
+    // Send the WebSocket frame directly
+    esp_err_t ret = httpd_ws_send_frame_async(req->handle, sock_fd, &ws_frame);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to send WebSocket frame: %d", ret);
+        free(json_message);
+        return ret;
+    }
+
+    ESP_LOGI(TAG, "Sent calibration to client: Ugain=%u, IgainL=%u, IgainN=%u", Ugain, IgainL, IgainN);
+    free(json_message);
+    return ESP_OK;
+}
+
 esp_err_t ws_handler(httpd_req_t *req)
 {
-    esp_err_t ret = get_ws_payload(req, ws_payload);
+    esp_err_t ret = ESP_OK;
+
+    // Check if this is a new client (no session context)
+    bool is_new_client = (req->sess_ctx == NULL);
+
+    // If new client, save session context first
+    if (is_new_client) {
+        ret = save_req_session_context(req);
+        if (ret != ESP_OK) {
+            ESP_LOGE(TAG, "Failed to save session context");
+            return ret;
+        }
+    }
+
+    ret = get_ws_payload(req, ws_payload);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to get WebSocket payload: %d", ret);
         return ret;
@@ -218,6 +278,15 @@ esp_err_t ws_handler(httpd_req_t *req)
     if (ws_payload == NULL) {
         ESP_LOGW(TAG, "No WebSocket payload received");
         return ESP_OK;
+    }
+
+    // If this is a new client, send calibration values
+    if (is_new_client) {
+        ret = send_calibration_to_client(req);
+        if (ret != ESP_OK) {
+            ESP_LOGE(TAG, "Failed to send calibration to new client");
+            // Continue processing even if calibration send fails
+        }
     }
 
     gain_object* obj = json_parse_gain_object((const char*)ws_payload);
