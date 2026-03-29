@@ -1,5 +1,5 @@
-#ifndef CALIBRATION_HELPER_H
-#define CALIBRATION_HELPER_H
+#ifndef CALIBRATION_LOAD_PARAMS_H
+#define CALIBRATION_LOAD_PARAMS_H
 
 #ifdef TEST
     #include <stdint.h>
@@ -13,12 +13,13 @@
     * @param to_param_array An array of pointers to uint16_t params. If the key is found,
     *                       the value will be stored in the corresponding element of this array.
     * @param array_keys_count The length of the key_array or to_param_array.
+    * @return true if the key was found and loaded, false otherwise.
     */
-    void load_param(const char*    key,   const char* key_array[],
+    bool load_param(const char*    key,   const char* key_array[],
                     const uint16_t value, uint16_t*   to_param_array[],
                     const int      array_keys_count);
 #endif
 
 int load_calibration_params(void);
 
-#endif // CALIBRATION_HELPER_H
+#endif // CALIBRATION_LOAD_PARAMS_H
