@@ -5,6 +5,7 @@
 #include "calibration_params.h"
 #include "adc_rw.h"
 #include "adc_registers.h"
+#include "calibration_constants.h"
 
 #include "esp_http_server.h"
 #include "esp_log.h"
@@ -247,8 +248,8 @@ server_err_t server_start_periodic_broadcast(void)
         return SERVER_ERROR;
     }
 
-    // Start timer with 2 second period (2,000,000 microseconds)
-    err = esp_timer_start_periodic(periodic_broadcast_timer, 2000000);
+    // Start timer with broadcast interval
+    err = esp_timer_start_periodic(periodic_broadcast_timer, BROADCAST_INTERVAL_US);
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "Failed to start periodic broadcast timer: %d", err);
