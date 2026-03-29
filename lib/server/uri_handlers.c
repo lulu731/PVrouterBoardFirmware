@@ -290,11 +290,11 @@ esp_err_t ws_handler(httpd_req_t *req)
     }
 
     gain_object* obj = json_parse_gain_object((const char*)ws_payload);
-    if (obj == NULL) {
-        ESP_LOGE(TAG, "Failed to parse gain object from JSON");
+    if (obj == &null_gain_object) {
+        ESP_LOGW(TAG, "Failed to parse gain object from JSON");
         free(ws_payload);
         ws_payload = NULL;
-        return ESP_FAIL;
+        return ESP_OK;  // Return OK to handle gracefully
     }
 
     if (obj->key != NULL) {

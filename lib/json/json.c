@@ -60,7 +60,7 @@ gain_object* json_parse_gain_object(const char* json_string)
     {
         object = malloc(sizeof(gain_object));
         object->key = malloc(strlen(json_id->valuestring) + 1);
-        strncpy(object->key, json_id->valuestring, sizeof(object->key));
+        strncpy(object->key, json_id->valuestring, strlen(json_id->valuestring) + 1);
         object->value = (json_value->valueint);
     }
     else
