@@ -16,7 +16,6 @@ typedef struct
 
 nvs_data_t get_first_nvs_data(void);
 nvs_data_t get_next_nvs_data(void);
-nvs_err_t  nvs_write_u16(const nvs_data_t nvs_data);
 
 nvs_err_t  nvs_init(void);
 

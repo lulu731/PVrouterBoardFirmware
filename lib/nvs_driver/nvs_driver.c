@@ -101,26 +101,3 @@ nvs_data_t get_next_nvs_data(void)
 
     return nvs_data;
 }
-
-/**
- * @brief Sets a uint16_t value in NVS storage.
- *
- * This function sets a uint16_t value in the NVS storage with the given key.
- *
- * @param nvs_data The data to store to nvs file
- * @return NVS_OK if the operation succeeds, NVS_INIT_ERROR if it fails.
- */
-nvs_err_t nvs_write_u16(const nvs_data_t nvs_data)
-{
-    esp_err_t nvs_error = nvs_set_u16(handle, nvs_data.key, nvs_data.value);
-    if (nvs_error != ESP_OK)
-    {
-        return NVS_INIT_ERROR;
-    }
-    nvs_error = nvs_commit(handle);
-    if (nvs_error != ESP_OK)
-    {
-        return NVS_INIT_ERROR;
-    }
-    return NVS_OK;
-}
