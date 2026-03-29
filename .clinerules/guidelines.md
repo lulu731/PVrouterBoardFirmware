@@ -58,5 +58,8 @@ When the user wants you to git commit, compile the project, then execute all the
 In case of errors, make proposals to solve the errors, wait for the user.
 If there are no error, execute the command to commit code.
 
+## Beware
+After git commit, never push branch to origin.
+
 ## User requests
 Ask question if something is not clear.
