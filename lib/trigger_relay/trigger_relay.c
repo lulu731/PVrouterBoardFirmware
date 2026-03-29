@@ -7,6 +7,9 @@
 #include "esp_attr.h"
 #include "esp_intr_alloc.h"
 
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
 #include <stddef.h>
 
 static uint8_t relay_trigger_flag = 0;
@@ -74,6 +77,9 @@ void create_trigger_relay(void)
 static void trigger_relay(void)
 {
     gpio_set_level(GPIO_HEATER, 1);
+
+    // Most relays need ~5-20ms pulse width to activate
+    vTaskDelay(pdMS_TO_TICKS(5));
 
     gpio_set_level(GPIO_HEATER, 0);
 }
