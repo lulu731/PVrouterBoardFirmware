@@ -3,6 +3,7 @@
 #include "calibration_helpers.h"
 #include "adc_rw.h"
 #include "adc_registers.h"
+#include "calibration_constants.h"
 
 #include <assert.h>
 
@@ -44,7 +45,7 @@ void write_PL_constant() //21 - 22H
 {
     assert(Mc != 0 && Un != 0 && Ib != 0);
 
-    const float pl_float = 838860800.0f * (float)(Gl * Vl * Vu) / (float)(Mc * Un * Ib);
+    const float pl_float = (float)PL_CONST_MAX * (float)(Gl * Vl * Vu) / (float)(Mc * Un * Ib);
     uint32_t pl_const = pl_float;
 
     int8_t mod = pl_const % 4;
@@ -112,9 +113,9 @@ extern struct adc_register U_RMS;
     read_adc_register(gain_register);
     adc_data old_gain = (*gain_register).data;
 
-    float divider = 1000;
+    float divider = CURRENT_RMS_DIVIDER;
     if ((*measured_value_register).address == U_RMS.address)
-        divider = 100;
+        divider = VOLTAGE_RMS_DIVIDER;
 
     const float float_measured_value = (*measured_value_register).data / divider;
 
@@ -132,5 +133,5 @@ adc_data get_offset(struct adc_register reg, const adc_data gain)
 
 adc_data get_power_offset(struct adc_register* power_register)
 {
-    return get_average_data_fm_register(power_register, 5);
+    return get_average_data_fm_register(power_register, POWER_OFFSET_SAMPLES);
 }
