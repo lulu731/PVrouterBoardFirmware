@@ -11,12 +11,13 @@
 #include "lwip/err.h"
 #include "lwip/sys.h"
 
+// Force build failure if credentials are not provided via build flags
 #ifndef SSID
-#define SSID "WIFI_SSID"
+    #error "WiFi SSID must be defined via build flag (e.g., -DSSID=\"YourNetwork\")"
 #endif
 
 #ifndef PASSWD
-#define PASSWD "WIFI_PASSWORD"
+    #error "WiFi password must be defined via build flag (e.g., -DPASSWD=\"YourPassword\")"
 #endif
 
 /* FreeRTOS event group to signal when we are connected*/
