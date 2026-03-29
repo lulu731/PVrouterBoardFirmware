@@ -39,9 +39,12 @@ adc_data get_complement_average_fm_register(struct adc_register* source_reg, con
 
 extern uint16_t Mc, Un, Ib, Gl, Vl, Vu;
 extern struct adc_register PL_CONST_H, PL_CONST_L;
+
 void write_PL_constant() //21 - 22H
 {
-    const float pl_float = 838860800 * (float)(Gl * Vl *Vu) / (float)(Mc * Un * Ib);
+    assert(Mc != 0 && Un != 0 && Ib != 0);
+
+    const float pl_float = 838860800.0f * (float)(Gl * Vl * Vu) / (float)(Mc * Un * Ib);
     uint32_t pl_const = pl_float;
 
     int8_t mod = pl_const % 4;
