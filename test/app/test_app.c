@@ -98,8 +98,12 @@ void test_mount_littlefs_partition_fails_when_mount_part_fails(void)
 // Integration Test 2: init_adc() - Load calibration params and run calibration
 // ============================================================================
 
+extern uint16_t Mc, Un, Ib;
 void test_init_adc_loads_calibration_params(void)
 {
+    Mc = 1000;
+    Un = 230;
+    Ib = 10;
     bool result = init_adc();
     TEST_ASSERT_TRUE(result);
     TEST_ASSERT_TRUE(nbr_access_to_adc > 0);
