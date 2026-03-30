@@ -1,1 +1,1 @@
-[ ] check gains are populated with nvs file values
+[x] check gains are populated with nvs file values

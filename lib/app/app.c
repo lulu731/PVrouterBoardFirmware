@@ -6,6 +6,7 @@
 #include "trigger_relay.h"
 #include "system.h"
 
+#include "nvs_storage.h"
 #include "server.h"
 
 #include "esp_log.h"
@@ -31,10 +32,16 @@ bool mount_littlefs_partition(void)
 
 bool init_adc(void)
 {
-    if (load_calibration_params() != 0) {
-        ESP_LOGE("main", "failed to load calibration params");
+    // Initialize NVS storage first
+    nvs_storage_create("meter_config");
+    if (nvs_storage_open() != NVS_STORAGE_OK) {
+        ESP_LOGE("main", "failed to open NVS storage");
         return false;
     }
+
+    // Load calibration params (returns count of params loaded)
+    int param_count = load_calibration_params();
+    ESP_LOGI("main", "loaded %d calibration params from NVS", param_count);
 
     exec_metering_calibration();
     return true;
