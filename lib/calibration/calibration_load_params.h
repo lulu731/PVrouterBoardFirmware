@@ -3,6 +3,7 @@
 
 #ifdef TEST
     #include <stdint.h>
+    #include <stdbool.h>
     /**
     * @brief Load a parameter from to_param_array with the value of the given key.
     *
