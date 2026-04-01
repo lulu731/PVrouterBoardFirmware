@@ -7,12 +7,9 @@
 set -e
 
 # Default values
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-
-INPUT_CSV="${1:-$PROJECT_ROOT/src/meter_config.csv}"
-OUTPUT_BIN="${2:-$PROJECT_ROOT/meter_config.bin}"
-BIN_SIZE="${3:-0x3000}"
+export INPUT_CSV="${1:-src/meter_config.csv}"
+export OUTPUT_BIN="${2:-meter_config.bin}"
+export BIN_SIZE="${3:-0x3000}"
 
 echo "=== NVS Bin Generator ==="
 echo "Input CSV:  $INPUT_CSV"
@@ -26,7 +23,8 @@ if [ ! -f "$INPUT_CSV" ]; then
 fi
 
 # Run the nvs_partition_gen.py tool via PlatformIO
-pio pkg exec --package "platformio/framework-espidf" -- components/nvs_flash/nvs_partition_generator/nvs_partition_gen.py generate "$INPUT_CSV" "$OUTPUT_BIN" "$BIN_SIZE"
+bash -c 'podman run -i --rm -v $(pwd):/home/dev/project -v pio_jenkins:/root pio_run_e_jenkins:1.0.0 \
+pkg exec --package "platformio/framework-espidf" -- components/nvs_flash/nvs_partition_generator/nvs_partition_gen.py generate "$INPUT_CSV" "$OUTPUT_BIN" "$BIN_SIZE"'
 
 if [ $? -eq 0 ]; then
     echo "Success! NVS binary created: $OUTPUT_BIN"

@@ -6,20 +6,16 @@
 
 set -e
 
-# Default values
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-
 # Chip parameters
-CHIP="esp32s3"
-FLASH_MODE="qio"
-FLASH_FREQ="80m"
-FLASH_SIZE="4MB"
-PARTITION_OFFSET="0x9000"
+export CHIP="esp32s3"
+export FLASH_MODE="qio"
+export FLASH_FREQ="80m"
+export FLASH_SIZE="4MB"
+export PARTITION_OFFSET="0x9000"
 
 # Serial port (must be provided or auto-detected)
-PORT="${1:-}"
-BIN_FILE="${2:-$PROJECT_ROOT/meter_config.bin}"
+export PORT="${1:-}"
+export BIN_FILE="${2:-meter_config.bin}"
 
 # Auto-detect port if not provided
 if [ -z "$PORT" ]; then
@@ -28,7 +24,7 @@ if [ -z "$PORT" ]; then
     # Common ESP32 serial ports on Linux/macOS
     for p in /dev/ttyUSB* /dev/ttyACM* /dev/cu.usbserial-* /dev/cu.usbmodem*; do
         if [ -e "$p" ]; then
-            PORT="$p"
+            export PORT="$p"
             break
         fi
     done
@@ -55,7 +51,8 @@ if [ ! -f "$BIN_FILE" ]; then
 fi
 
 # Run esptool.py to flash the binary
-pio pkg exec --package "platformio/tool-esptoolpy" -- esptool.py \
+bash -c 'podman run -i --rm -v $(pwd):/home/dev/project -v pio_jenkins:/root pio_run_e_jenkins:1.0.0 \
+    pkg exec --package "platformio/tool-esptoolpy" -- esptool.py \
     --chip "$CHIP" \
     -p "$PORT" \
     --before=default_reset \
@@ -64,7 +61,7 @@ pio pkg exec --package "platformio/tool-esptoolpy" -- esptool.py \
     --flash_mode "$FLASH_MODE" \
     --flash_freq "$FLASH_FREQ" \
     --flash_size "$FLASH_SIZE" \
-    "$PARTITION_OFFSET" "$BIN_FILE"
+    "$PARTITION_OFFSET" "$BIN_FILE"'
 
 if [ $? -eq 0 ]; then
     echo "Success! Binary flashed to partition at offset $PARTITION_OFFSET"
