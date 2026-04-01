@@ -10,6 +10,8 @@ pipeline {
       stage('build') {
          steps {
             sh './jenkins/platformio_build.sh'
+            sh './scripts/generate_nvs_bin.sh'
+            sh 'test -f meter_config.bin && test -s meter_config.bin || exit 1'
          }
       }
       stage('test') {
