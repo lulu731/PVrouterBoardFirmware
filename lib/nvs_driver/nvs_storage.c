@@ -1,5 +1,8 @@
 #include "nvs_storage.h"
 
+#include "nvs_flash.h"
+#include "esp_log.h"
+
 static const char *TAG = "nvs_file";
 static const char* nvs_namespace;
 static nvs_handle_t handle;
@@ -27,9 +30,18 @@ void nvs_storage_create(const char* namespace)
  */
 nvs_err_t nvs_storage_open()
 {
-    esp_err_t nvs_error = nvs_open(nvs_namespace, NVS_READWRITE, &handle);
+    ESP_LOGI(TAG, "nvs_namespace in nvs_storage_open = %s\n", nvs_namespace);
+    esp_err_t nvs_error = nvs_flash_init_partition("config");
     if (nvs_error != ESP_OK)
     {
+        ESP_LOGE(TAG, "nvs_error flash_init = %s", esp_err_to_name(nvs_error));
+        return NVS_STORAGE_ERROR;
+    }
+
+    nvs_error = nvs_open(nvs_namespace, NVS_READWRITE, &handle);
+    if (nvs_error != ESP_OK)
+    {
+        ESP_LOGE(TAG, "nvs_error open = %s", esp_err_to_name(nvs_error));
         return NVS_STORAGE_ERROR;
     }
     return NVS_STORAGE_OK;

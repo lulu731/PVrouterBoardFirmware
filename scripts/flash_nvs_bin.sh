@@ -15,7 +15,7 @@ CHIP="esp32s3"
 FLASH_MODE="qio"
 FLASH_FREQ="80m"
 FLASH_SIZE="4MB"
-PARTITION_OFFSET="0x9000"
+PARTITION_OFFSET="0x130000"
 
 # Serial port (must be provided or auto-detected)
 PORT="${1:-}"
