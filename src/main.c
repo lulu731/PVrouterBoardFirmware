@@ -5,6 +5,7 @@
 
 #include "spi_master.h"
 #include "trigger_relay.h"
+#include "wifi_connect.h"
 
 void app_main(void)
 {
@@ -13,6 +14,8 @@ void app_main(void)
 
     // Step 2: Initialize ADC (load calibration params)
     init_adc();
+
+    connect_to_wifi();
 
     // Step 3: Launch web server
     launch_server();
