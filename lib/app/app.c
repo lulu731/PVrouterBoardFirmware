@@ -5,6 +5,7 @@
 #include "calibration_load_params.h"
 #include "trigger_relay.h"
 #include "system.h"
+#include "spi_master.h"
 
 #include "nvs_storage.h"
 #include "server.h"
@@ -43,7 +44,8 @@ bool init_adc(void)
     int param_count = load_calibration_params();
     ESP_LOGI("main", "loaded %d calibration params from NVS", param_count);
 
-    exec_metering_calibration();
+    calibrate_adc();
+    //exec_metering_calibration();
     return true;
 }
 
