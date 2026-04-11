@@ -32,7 +32,7 @@ static httpd_uri_t index_uri = {
 };
 
 static httpd_uri_t calibration_uri = {
-    .uri       = "/",
+    .uri       = "/calibration.html",
     .method    = HTTP_GET,
     .handler   = calibration_handler,
     .user_ctx  = NULL,
