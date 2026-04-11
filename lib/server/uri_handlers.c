@@ -127,6 +127,18 @@ esp_err_t calibration_handler(httpd_req_t *req)
     return ESP_OK;
 }
 
+
+esp_err_t script_handler(httpd_req_t *req)
+{
+    if (req->method == HTTP_GET)
+    {
+        esp_err_t err = load_html("/littlefs/script.js", req);
+        return err;
+    }
+    return ESP_OK;
+}
+
+
 extern uint16_t Ugain;
 extern uint16_t IgainL;
 extern uint16_t IgainN;

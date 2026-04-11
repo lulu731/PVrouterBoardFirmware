@@ -24,6 +24,13 @@ static httpd_handle_t web_server;
 static httpd_config_t config = HTTPD_DEFAULT_CONFIG();
 static esp_timer_handle_t periodic_broadcast_timer = NULL;
 
+static httpd_uri_t script_uri = {
+    .uri       = "/script.js",
+    .method    = HTTP_GET,
+    .handler   = script_handler,
+    .user_ctx  = NULL,
+};
+
 static httpd_uri_t index_uri = {
     .uri       = "/",
     .method    = HTTP_GET,
@@ -77,7 +84,8 @@ server_err_t server_start(void)
     {
         err = httpd_register_uri_handler(web_server, &index_uri) ||
               httpd_register_uri_handler(web_server, &calibration_uri) ||
-              httpd_register_uri_handler(web_server, &ws_uri);
+              httpd_register_uri_handler(web_server, &ws_uri) ||
+              httpd_register_uri_handler(web_server, &script_uri);
     }
 
     if (err != ESP_OK)
