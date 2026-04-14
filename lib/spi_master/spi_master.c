@@ -24,12 +24,19 @@ esp_err_t calibrate_adc()
     ESP_LOGI(TAG, "Initializing bus SPI%d...", EMETER_HOST + 1);
     //Initialize the SPI bus
     ret = spi_bus_initialize(EMETER_HOST, &buscfg, SPI_DMA_CH_AUTO);
-    ESP_ERROR_CHECK(ret);
-
+    if (ret != ESP_OK)
+    {
+        ESP_ERROR_CHECK(ret);
+    }
+    else ESP_LOGI(TAG, "SPI bus initialied");
 
     ESP_LOGI(TAG, "Initializing meter...");
-    ret = spi_bus_add_device( EMETER_HOST, &devcfg, &meter_handle);
-    ESP_ERROR_CHECK(ret);
+    ret = spi_bus_add_device(EMETER_HOST, &devcfg, &meter_handle);
+        if (ret != ESP_OK)
+    {
+        ESP_ERROR_CHECK(ret);
+    }
+    else ESP_LOGI(TAG, "SPI meter initialied meter_handle = %d", meter_handle);
 
     exec_calibration();
 

@@ -7,8 +7,14 @@
 #include "trigger_relay.h"
 #include "wifi_connect.h"
 
+#include "esp_log.h"
+
 void app_main(void)
 {
+    vTaskDelay(10000 / portTICK_PERIOD_MS);
+
+    ESP_LOGI("main.c", "delay passed");
+
     // Step 1: Mount LittleFS partition
     mount_littlefs_partition();
 

@@ -37,8 +37,9 @@ nvs_err_t nvs_storage_open()
         ESP_LOGE(TAG, "nvs_error flash_init = %s", esp_err_to_name(nvs_error));
         return NVS_STORAGE_ERROR;
     }
+    ESP_LOGI(TAG, "nvs partition initiated");
 
-    nvs_error = nvs_open(nvs_namespace, NVS_READWRITE, &handle);
+    nvs_error = nvs_open_from_partition("config", nvs_namespace, NVS_READWRITE, &handle);
     if (nvs_error != ESP_OK)
     {
         ESP_LOGE(TAG, "nvs_error open = %s", esp_err_to_name(nvs_error));

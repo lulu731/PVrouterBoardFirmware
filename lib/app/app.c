@@ -15,6 +15,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+const char* TAG = "app.c";
+
 bool mount_littlefs_partition(void)
 {
     partition_config_t conf = {
@@ -24,10 +26,10 @@ bool mount_littlefs_partition(void)
 
     mount_part_create(&conf);
     if (mount_part() != MOUNT_OK) {
-        ESP_LOGE("main", "mount create error");
+        ESP_LOGE(TAG, "mount create error");
         return false;
     }
-
+    ESP_LOGI(TAG, "partitions mounted");
     return true;
 }
 
@@ -36,13 +38,13 @@ bool init_adc(void)
     // Initialize NVS storage first
     nvs_storage_create("meter_config");
     if (nvs_storage_open() != NVS_STORAGE_OK) {
-        ESP_LOGE("main", "failed to open NVS storage");
+        ESP_LOGE(TAG, "failed to open NVS storage");
         return false;
     }
 
     // Load calibration params (returns count of params loaded)
     int param_count = load_calibration_params();
-    ESP_LOGI("main", "loaded %d calibration params from NVS", param_count);
+    ESP_LOGI(TAG, "loaded %d calibration params from NVS", param_count);
 
     calibrate_adc();
     //exec_metering_calibration();
