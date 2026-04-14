@@ -70,8 +70,13 @@ char* index_file ="/littlefs/index.html";
 esp_err_t index_handler(httpd_req_t *req)
 {
     esp_err_t err = ESP_OK;
-    err = handler_first_call(req, index_file);
-    return err;
+    if (req->method == HTTP_GET)
+    {
+        err = handler_first_call(req, index_file);
+        return err;
+    }
+
+    return ESP_OK;
 }
 
 char* calibration_file ="/littlefs/calibration.html";
@@ -132,6 +137,7 @@ esp_err_t script_handler(httpd_req_t *req)
 {
     if (req->method == HTTP_GET)
     {
+        httpd_resp_set_type(req, "application/javascript");
         esp_err_t err = load_html("/littlefs/script.js", req);
         return err;
     }
