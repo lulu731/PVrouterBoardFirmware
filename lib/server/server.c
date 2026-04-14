@@ -62,6 +62,7 @@ static httpd_uri_t ws_uri = {
 void server_create(void)
 {
     ESP_LOGI(TAG, "creating server");
+    config.server_port = 8081;
     web_server = NULL;
 }
 
