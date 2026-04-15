@@ -127,7 +127,7 @@ esp_err_t calibration_handler(httpd_req_t *req)
         return err;
     }
 
-    get_ws_payload(req, ws_payload);
+    //get_ws_payload(req, ws_payload);
 
     return ESP_OK;
 }
@@ -289,8 +289,8 @@ esp_err_t ws_handler(httpd_req_t *req)
 
     ret = get_ws_payload(req, ws_payload);
     if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to get WebSocket payload: %d", ret);
-        return ret;
+        ESP_LOGW(TAG, "Failed to get WebSocket payload: %d", ret);
+        return ESP_OK;//ret;
     }
 
     if (ws_payload == NULL) {
@@ -331,7 +331,8 @@ esp_err_t ws_handler(httpd_req_t *req)
                 ret = ESP_OK;
             }
         }
-    } else {
+    } else
+    {
         ESP_LOGW(TAG, "Parsed gain object has NULL key");
     }
 
@@ -345,5 +346,5 @@ esp_err_t ws_handler(httpd_req_t *req)
     free(ws_payload);
     ws_payload = NULL;
 
-    return ret;
+    return ESP_OK;//ret;
 }
