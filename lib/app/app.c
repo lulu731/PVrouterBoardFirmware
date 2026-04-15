@@ -48,6 +48,9 @@ bool init_adc(void)
 
     calibrate_adc();
     //exec_metering_calibration();
+
+    nvs_storage_close();
+
     return true;
 }
 
