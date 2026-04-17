@@ -29,6 +29,11 @@ bool load_param(const char*    key,   const char* key_array[],
         if (strcmp(key, key_array[i]) == 0)
         {
             *to_param_array[i] = value;
+            if (strcmp(key, "Un") == 0)
+            {
+                ESP_LOGI(TAG, "value = %d, *to_param_array[i] = %d, Un = %d", value, *to_param_array[i], Un);
+            }
+
             return true;
         }
     return false;
@@ -48,6 +53,7 @@ int load_calibration_params(void)
 
     while (nvs_data.key != NULL)
     {
+        ESP_LOGI(TAG, "key = %s - value = %d", nvs_data.key, nvs_data.value);
         bool found = load_param(nvs_data.key, string_keys_array, nvs_data.value, keys_array, keys_count);
         if (!found)
         {
@@ -64,5 +70,6 @@ int load_calibration_params(void)
         ESP_LOGW(TAG, "Found %d unknown key(s) in NVS that were not loaded", unmatched_count);
     }
 
+    ESP_LOGI(TAG, "Mc = %d - Un = %d - Ib = %d\n", Mc, Un, Ib);
     return data_count;
 }

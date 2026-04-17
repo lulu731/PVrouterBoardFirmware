@@ -7,6 +7,8 @@
 
 #include <assert.h>
 
+#include "esp_log.h"
+
 /**
  * @brief calculates the average of adc register values
  * @param reg pointer to adc register to read from
@@ -43,6 +45,7 @@ extern struct adc_register PL_CONST_H, PL_CONST_L;
 
 void write_PL_constant() //21 - 22H
 {
+    ESP_LOGI("adc_funcions.c", "Mc = %d - Un = %d - Ib = %d\n", Mc, Un, Ib);
     assert(Mc != 0 && Un != 0 && Ib != 0);
 
     const float pl_float = (float)PL_CONST_MAX * (float)(Gl * Vl * Vu) / (float)(Mc * Un * Ib);
