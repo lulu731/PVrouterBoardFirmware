@@ -5,7 +5,7 @@
 
 static const char *TAG = "nvs_file";
 static const char* nvs_namespace;
-static nvs_handle_t handle;
+nvs_handle_t config_nvs_handle;
 
 /**
  * @brief Create a new NVS storage with the given namespace.
@@ -17,7 +17,7 @@ static nvs_handle_t handle;
 void nvs_storage_create(const char* namespace)
 {
     nvs_namespace = namespace;
-    handle = 0;
+    config_nvs_handle = 0;
 }
 
 /**
@@ -39,7 +39,7 @@ nvs_err_t nvs_storage_open()
     }
     ESP_LOGI(TAG, "nvs partition initiated");
 
-    nvs_error = nvs_open_from_partition("config", nvs_namespace, NVS_READWRITE, &handle);
+    nvs_error = nvs_open_from_partition("config", nvs_namespace, NVS_READWRITE, &config_nvs_handle);
     if (nvs_error != ESP_OK)
     {
         ESP_LOGE(TAG, "nvs_error open = %s", esp_err_to_name(nvs_error));
@@ -56,7 +56,7 @@ nvs_err_t nvs_storage_open()
  */
 void nvs_storage_close()
 {
-    nvs_close(handle);
+    nvs_close(config_nvs_handle);
 }
 
 /**
@@ -69,12 +69,12 @@ void nvs_storage_close()
  */
 nvs_err_t nvs_storage_save(nvs_data_t data)
 {
-    esp_err_t nvs_error = nvs_set_u16(handle, data.key, data.value);
+    esp_err_t nvs_error = nvs_set_u16(config_nvs_handle, data.key, data.value);
     if (nvs_error != ESP_OK)
     {
         return NVS_STORAGE_ERROR;
     }
-    nvs_error = nvs_commit(handle);
+    nvs_error = nvs_commit(config_nvs_handle);
     if (nvs_error != ESP_OK)
     {
         return NVS_STORAGE_ERROR;

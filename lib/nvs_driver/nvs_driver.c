@@ -7,7 +7,7 @@
 
 static const char* namespace = "meter_config";
 
-nvs_handle_t handle = 0;
+extern nvs_handle_t config_nvs_handle;
 static nvs_iterator_t iterator = NULL;
 
 /**
@@ -18,14 +18,14 @@ static nvs_iterator_t iterator = NULL;
  *
  * @return NVS_OK if the initialization succeeds, NVS_INIT_ERROR if it fails.
  */
-nvs_err_t nvs_init(void)
+/*nvs_err_t nvs_init(void)
 {
-    if (nvs_flash_init() != ESP_OK)
+    if (nvs_flash_init_partition("config") != ESP_OK)
     {
         return NVS_INIT_ERROR;
     }
     return NVS_OK;
-};
+};*/
 
 /**
  * @brief Returns the first NVS data entry.
@@ -43,7 +43,7 @@ nvs_data_t get_first_nvs_data(void)
         .value = 0
     };
 
-    esp_err_t nvs_error = nvs_entry_find("nvs", namespace, NVS_TYPE_U16, &iterator);
+    esp_err_t nvs_error = nvs_entry_find_in_handle(config_nvs_handle, NVS_TYPE_U16, &iterator);
     switch (nvs_error)
     {
         case ESP_OK:
@@ -51,7 +51,7 @@ nvs_data_t get_first_nvs_data(void)
             nvs_entry_info(iterator, &entry_info);
 
             uint16_t param_value;
-            nvs_get_u16(handle, entry_info.key, &param_value);
+            nvs_get_u16(config_nvs_handle, entry_info.key, &param_value);
 
             nvs_data.key = entry_info.key;
             nvs_data.value = param_value;
@@ -91,7 +91,7 @@ nvs_data_t get_next_nvs_data(void)
         nvs_entry_info(iterator, &entry_info);
 
         uint16_t param_value;
-        nvs_get_u16(handle, entry_info.key, &param_value);
+        nvs_get_u16(config_nvs_handle, entry_info.key, &param_value);
 
         nvs_data.key = entry_info.key;
         nvs_data.value = param_value;
