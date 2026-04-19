@@ -64,10 +64,10 @@ bool launch_server(void)
     }
 
     // Start the periodic broadcast timer
-    err = server_start_periodic_broadcast();
+    /*err = server_start_periodic_broadcast();
     if (err != SERVER_OK) {
         ESP_LOGW("main", "failed to start periodic broadcast, continuing without it");
-    }
+    }*/
 
     return true;
 }

@@ -1,4 +1,7 @@
 var wskt;
+var reconnectAttempts = 0;
+var maxReconnectAttempts = 5;
+var reconnectDelay = 1000; // 1 second
 
 window.onload = function()
 {init()};
@@ -6,9 +9,37 @@ window.onload = function()
 function init()// open WebSocket
 {
   console.log('Trying to open a WebSocket connection...');
+  connectWebSocket();
+}
+
+function connectWebSocket() {
   wskt = new WebSocket('ws://' + window.location.hostname + ':8081/ws');
-  wskt.onopen =  function(event){console.log('connection opened');};
-  wskt.onclose = function(event){console.log('connection closed');};
+
+  wskt.onopen = function(event) {
+    console.log('WebSocket connection opened');
+    document.getElementById('errorText').value += "WebSocket connected successfully\n";
+    reconnectAttempts = 0; // Reset reconnect counter on successful connection
+  };
+
+  wskt.onclose = function(event) {
+    console.log('WebSocket connection closed: ' + event.code + ' ' + event.reason);
+    document.getElementById('errorText').value += "WebSocket closed. Attempting to reconnect...\n";
+
+    // Attempt to reconnect
+    if (reconnectAttempts < maxReconnectAttempts) {
+      reconnectAttempts++;
+      setTimeout(connectWebSocket, reconnectDelay);
+      reconnectDelay *= 2; // Exponential backoff
+    } else {
+      document.getElementById('errorText').value += "Max reconnect attempts reached. Please refresh the page.\n";
+    }
+  };
+
+  wskt.onerror = function(event) {
+    console.log('WebSocket error: ', event);
+    document.getElementById('errorText').value += "WebSocket error occurred\n";
+  };
+
   wskt.onmessage = function(rx)
   {  // client receive message
 //      console.log('message received');

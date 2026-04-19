@@ -66,29 +66,23 @@ static esp_err_t handler_first_call(httpd_req_t *req, const char* file)
     return err;
 }
 
-char* index_file ="/littlefs/index.html";
+const char* index_file ="/littlefs/index.html";
 esp_err_t index_handler(httpd_req_t *req)
 {
-    esp_err_t err = ESP_OK;
     if (req->method == HTTP_GET)
-    {
-        err = handler_first_call(req, index_file);
-        return err;
-    }
+        return load_html(index_file, req);
 
     return ESP_OK;
 }
 
-char* calibration_file ="/littlefs/calibration.html";
-unsigned char* ws_payload; // caller is responsible to free
-
-static esp_err_t get_ws_payload(httpd_req_t *req, unsigned char* payload)
+const char* calibration_file ="/littlefs/calibration.html";
+static esp_err_t get_ws_payload(httpd_req_t *req, unsigned char** payload)
 {
     httpd_ws_frame_t ws_pkt;
     memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
     ws_pkt.type = HTTPD_WS_TYPE_TEXT;
 
-    ws_payload = NULL;
+    *payload = NULL;
 
     /* Set max_len = 0 to get the frame len */
     esp_err_t ret = httpd_ws_recv_frame(req, &ws_pkt, 0);
@@ -100,17 +94,18 @@ static esp_err_t get_ws_payload(httpd_req_t *req, unsigned char* payload)
 
     if (ws_pkt.len) {
         /* ws_pkt.len + 1 is for NULL termination as we are expecting a string */
-        ws_payload = calloc(1, ws_pkt.len + 1);
-        if (ws_payload == NULL) {
+        *payload = calloc(1, ws_pkt.len + 1);
+        if (*payload == NULL) {
             ESP_LOGE(TAG, "Failed to calloc memory for buf");
             return ESP_ERR_NO_MEM;
         }
-        ws_pkt.payload = ws_payload;
+        ws_pkt.payload = *payload;
         /* Set max_len = ws_pkt.len to get the frame payload */
         ret = httpd_ws_recv_frame(req, &ws_pkt, ws_pkt.len);
         if (ret != ESP_OK) {
             ESP_LOGE(TAG, "httpd_ws_recv_frame failed with %d", ret);
-            free(ws_payload);
+            free(*payload);
+            *payload = NULL;
             return ret;
         }
         ESP_LOGI(TAG, "Got packet with message: %s", ws_pkt.payload);
@@ -120,14 +115,8 @@ static esp_err_t get_ws_payload(httpd_req_t *req, unsigned char* payload)
 
 esp_err_t calibration_handler(httpd_req_t *req)
 {
-    esp_err_t err = ESP_OK;
     if (req->method == HTTP_GET)
-    {
-        err = handler_first_call(req, calibration_file);
-        return err;
-    }
-
-    //get_ws_payload(req, ws_payload);
+        return load_html(calibration_file, req);
 
     return ESP_OK;
 }
@@ -138,8 +127,7 @@ esp_err_t script_handler(httpd_req_t *req)
     if (req->method == HTTP_GET)
     {
         httpd_resp_set_type(req, "application/javascript");
-        esp_err_t err = load_html("/littlefs/script.js", req);
-        return err;
+        return load_html("/littlefs/script.js", req);
     }
     return ESP_OK;
 }
@@ -273,21 +261,17 @@ static esp_err_t send_calibration_to_client(httpd_req_t *req)
 
 esp_err_t ws_handler(httpd_req_t *req)
 {
-    esp_err_t ret = ESP_OK;
-
-    // Check if this is a new client (no session context)
-    bool is_new_client = (req->sess_ctx == NULL);
-
-    // If new client, save session context first
-    if (is_new_client) {
-        ret = save_req_session_context(req);
-        if (ret != ESP_OK) {
-            ESP_LOGE(TAG, "Failed to save session context");
-            return ret;
-        }
+    if (req->method == HTTP_GET)
+    {
+        ESP_LOGI(TAG, "Handshake done, the new connection was opened");
+        return ESP_OK;
     }
 
-    ret = get_ws_payload(req, ws_payload);
+    esp_err_t ret = ESP_OK;
+    unsigned char* ws_payload = NULL;
+
+    // Get WebSocket payload
+    ret = get_ws_payload(req, &ws_payload);
     if (ret != ESP_OK) {
         ESP_LOGW(TAG, "Failed to get WebSocket payload: %d", ret);
         return ESP_OK;//ret;
@@ -296,15 +280,6 @@ esp_err_t ws_handler(httpd_req_t *req)
     if (ws_payload == NULL) {
         ESP_LOGW(TAG, "No WebSocket payload received");
         return ESP_OK;
-    }
-
-    // If this is a new client, send calibration values
-    if (is_new_client) {
-        ret = send_calibration_to_client(req);
-        if (ret != ESP_OK) {
-            ESP_LOGE(TAG, "Failed to send calibration to new client");
-            // Continue processing even if calibration send fails
-        }
     }
 
     gain_object* obj = json_parse_gain_object((const char*)ws_payload);
@@ -316,8 +291,16 @@ esp_err_t ws_handler(httpd_req_t *req)
     }
 
     if (obj->key != NULL) {
+        // Check for ready command (id="ready" and value=0)
+        if (strcmp(obj->key, "ready") == 0 && obj->value == 0) {
+            ESP_LOGI(TAG, "Ready command received - sending gain values");
+            esp_err_t send_ret = send_calibration_to_client(req);
+            if (send_ret != ESP_OK) {
+                ESP_LOGE(TAG, "Failed to send gain values to client: %d", send_ret);
+            }
+        }
         // Check for save calibration command (cmd=6)
-        if (strcmp(obj->key, "cmd") == 0 && obj->value == 6) {
+        else if (strcmp(obj->key, "cmd") == 0 && obj->value == 6) {
             ESP_LOGI(TAG, "Save calibration command received");
             ret = save_calibration_to_nvs();
             if (ret != ESP_OK) {
@@ -326,25 +309,25 @@ esp_err_t ws_handler(httpd_req_t *req)
         } else {
             ret = update_gain_value(obj->key, obj->value);
             if (ret != ESP_OK) {
-                /* Unknown key is not a fatal error - log warning and continue */
+                //Unknown key is not a fatal error - log warning and continue
                 ESP_LOGW(TAG, "Unknown or invalid key: %s", obj->key);
                 ret = ESP_OK;
             }
         }
-    } else
-    {
+    } else {
         ESP_LOGW(TAG, "Parsed gain object has NULL key");
     }
 
-    /* Free the parsed object */
+    // Free the parsed object
     if (obj != &null_gain_object) {
         free(obj->key);
         free(obj);
     }
 
-    /* Free the WebSocket payload */
+    // Free the WebSocket payload
     free(ws_payload);
     ws_payload = NULL;
 
+    ESP_LOGI(TAG, "in ws_handler out of handshake");
     return ESP_OK;//ret;
 }

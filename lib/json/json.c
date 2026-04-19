@@ -48,10 +48,15 @@ gain_object* json_parse_gain_object(const char* json_string)
     if (root && cJSON_IsArray(root->child))
     {
         json_array = cJSON_GetObjectItemCaseSensitive(root, "objects");
-        cJSON_ArrayForEach(json_object, json_array)
+        if (json_array && cJSON_IsArray(json_array))
         {
-            json_id = cJSON_GetObjectItemCaseSensitive(json_object, "id");
-            json_value = cJSON_GetObjectItemCaseSensitive(json_object, "value");
+            // Get the first object in the array
+            json_object = cJSON_GetArrayItem(json_array, 0);
+            if (json_object)
+            {
+                json_id = cJSON_GetObjectItemCaseSensitive(json_object, "id");
+                json_value = cJSON_GetObjectItemCaseSensitive(json_object, "value");
+            }
         }
     }
 
