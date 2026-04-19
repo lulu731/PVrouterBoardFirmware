@@ -11,7 +11,7 @@
 
 void app_main(void)
 {
-    vTaskDelay(10000 / portTICK_PERIOD_MS);
+    vTaskDelay(5000 / portTICK_PERIOD_MS);
 
     ESP_LOGI("main.c", "delay passed");
 
