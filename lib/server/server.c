@@ -124,20 +124,14 @@ static void httpd_work_fn(void *arg)
 size_t server_send_to_all_clients(const char* message)
 {
     ESP_LOGI(TAG, "entering server_send_to_all_clients");
-    size_t fds = config.max_open_sockets;
-    int* client_fds = malloc(sizeof(int) * fds);
-    if (client_fds == NULL)
-    {
-        ESP_LOGE(TAG, "malloc of client_fds in send_to_all_clients fail");
-        return 0;
-    }
 
-    esp_err_t err = httpd_get_client_list(web_server, &fds, client_fds);
+    // Use helper function to get connected clients
+    int* client_fds = NULL;
+    size_t fds = get_connected_clients(web_server, &config, &client_fds);
 
-    if (err != ESP_OK)
+    if (fds == 0)
     {
-        ESP_LOGE(TAG, "httpd_get_client_list fail");
-        free(client_fds);
+        ESP_LOGE(TAG, "get_connected_clients failed or no clients connected");
         return 0;
     }
 
@@ -201,29 +195,24 @@ char* create_broadcast_json_message(void)
 /**
  * @brief Periodic timer callback to broadcast JSON to all connected WebSocket clients
  *
- * This function is called every 2 seconds. It checks if any clients are connected
+ * This function is called every 2 seconds. It checks if there are any clients are connected
  * before sending the JSON message to avoid unnecessary work when no clients are present.
  */
 static void periodic_broadcast_callback(void* arg)
 {
     (void)arg;
 
-    // Check if there are any connected clients
-    size_t fds = config.max_open_sockets;
-    int* client_fds = malloc(sizeof(int) * fds);
-    if (client_fds == NULL)
-    {
-        return;
-    }
+    // Use helper function to get connected clients
+    int* client_fds = NULL;
+    size_t fds = get_connected_clients(web_server, &config, &client_fds);
 
-    esp_err_t err = httpd_get_client_list(web_server, &fds, client_fds);
-    free(client_fds);
-
-    if (err != ESP_OK || fds == 0)
+    if (fds == 0)
     {
         // No clients connected, don't send
         return;
     }
+
+    free(client_fds);
 
     // Create and send JSON message
     char* json_message = create_broadcast_json_message();
@@ -335,16 +324,8 @@ server_err_t server_send_to_client(int sock_fd, const char* message)
         return SERVER_ERROR;
     }
 
-    // Create WebSocket frame
-    httpd_ws_frame_t ws_frame = {
-        .fragmented = false,
-        .type = HTTPD_WS_TYPE_TEXT,
-        .payload = (uint8_t*)message,
-        .len = strlen(message)
-    };
-
-    // Send the frame
-    esp_err_t err = httpd_ws_send_frame_async(web_server, sock_fd, &ws_frame);
+    // Use helper function to create and send WebSocket frame
+    esp_err_t err = create_and_send_ws_frame(web_server, sock_fd, message);
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "Failed to send WebSocket frame to client %d: %d", sock_fd, err);
         return SERVER_ERROR;

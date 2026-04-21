@@ -222,14 +222,8 @@ static esp_err_t update_gain_value(const char* key, uint16_t value)
  */
 static esp_err_t send_calibration_to_client(httpd_req_t *req)
 {
-    // Create JSON with calibration values
-    gain_object objects[3] = {
-        {"Ugain", Ugain},
-        {"IgainL", IgainL},
-        {"IgainN", IgainN}
-    };
-
-    char* json_message = json_stringify(objects, 3);
+    // Use helper function to create JSON with calibration values
+    char* json_message = create_gain_json_message("Ugain", Ugain, "IgainL", IgainL, "IgainN", IgainN);
     if (json_message == NULL) {
         ESP_LOGE(TAG, "Failed to create calibration JSON");
         return ESP_FAIL;
@@ -238,16 +232,8 @@ static esp_err_t send_calibration_to_client(httpd_req_t *req)
     // Get the socket file descriptor
     int sock_fd = httpd_req_to_sockfd(req);
 
-    // Create WebSocket frame
-    httpd_ws_frame_t ws_frame = {
-        .fragmented = false,
-        .type = HTTPD_WS_TYPE_TEXT,
-        .payload = (uint8_t*)json_message,
-        .len = strlen(json_message)
-    };
-
-    // Send the WebSocket frame directly
-    esp_err_t ret = httpd_ws_send_frame_async(req->handle, sock_fd, &ws_frame);
+    // Use helper function to send WebSocket frame
+    esp_err_t ret = create_and_send_ws_frame(req->handle, sock_fd, json_message);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to send WebSocket frame: %d", ret);
         free(json_message);
