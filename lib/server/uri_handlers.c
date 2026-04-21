@@ -16,6 +16,9 @@
 #include <string.h>
 #include <assert.h>
 
+#include "json_utils.h"
+#include "websocket_utils.h"
+
 static const char TAG[] = "uri_handlers.c";
 
 static esp_err_t load_html(const char* file, httpd_req_t *req)
@@ -223,7 +226,7 @@ static esp_err_t update_gain_value(const char* key, uint16_t value)
 static esp_err_t send_calibration_to_client(httpd_req_t *req)
 {
     // Use helper function to create JSON with calibration values
-    char* json_message = create_gain_json_message("Ugain", Ugain, "IgainL", IgainL, "IgainN", IgainN);
+    char* json_message = create_json_message_3("Ugain", Ugain, "IgainL", IgainL, "IgainN", IgainN);
     if (json_message == NULL) {
         ESP_LOGE(TAG, "Failed to create calibration JSON");
         return ESP_FAIL;

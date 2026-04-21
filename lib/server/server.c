@@ -17,6 +17,10 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#include "json_utils.h"
+#include "websocket_utils.h"
+#include "client_utils.h"
+
 #define TAG "server.c: "
 
 static httpd_handle_t web_server;
@@ -142,7 +146,7 @@ size_t server_send_to_all_clients(const char* message)
         ESP_LOGI(TAG, "queuing socket %d", index_client_fds);
     }
 
-    free(client_fds);
+    free_client_fds(client_fds);
 
     ESP_LOGI(TAG, "exiting server_send_to_all_clients");
 
@@ -177,19 +181,7 @@ server_err_t server_stop(void)
  */
 char* create_broadcast_json_message(void)
 {
-    // Read ADC registers for RMS values
-    read_adc_register(&U_RMS);
-    read_adc_register(&I_RMS);
-    read_adc_register(&I_RMS_2);
-
-    // Create JSON with RMS values
-    gain_object objects[3] = {
-        {"U_RMS", U_RMS.data},
-        {"I_RMS", I_RMS.data},
-        {"I_RMS_2", I_RMS_2.data}
-    };
-
-    return json_stringify(objects, 3);
+    return create_adc_rms_json_message();
 }
 
 /**
@@ -212,7 +204,7 @@ static void periodic_broadcast_callback(void* arg)
         return;
     }
 
-    free(client_fds);
+    free_client_fds(client_fds);
 
     // Create and send JSON message
     char* json_message = create_broadcast_json_message();
