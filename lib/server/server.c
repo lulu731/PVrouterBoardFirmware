@@ -123,6 +123,7 @@ static void httpd_work_fn(void *arg)
  */
 size_t server_send_to_all_clients(const char* message)
 {
+    ESP_LOGI(TAG, "entering server_send_to_all_clients");
     size_t fds = config.max_open_sockets;
     int* client_fds = malloc(sizeof(int) * fds);
     if (client_fds == NULL)
@@ -144,9 +145,13 @@ size_t server_send_to_all_clients(const char* message)
     {
         struct work_fn_arg* arg = work_fn_arg_create(*(client_fds + index_client_fds), message);
         httpd_queue_work(web_server, httpd_work_fn, arg);
+        ESP_LOGI(TAG, "queuing socket %d", index_client_fds);
     }
 
     free(client_fds);
+
+    ESP_LOGI(TAG, "exiting server_send_to_all_clients");
+
     return fds;
 }
 
