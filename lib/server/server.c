@@ -142,8 +142,12 @@ size_t server_send_to_all_clients(const char* message)
     for (size_t index_client_fds = 0; index_client_fds < fds; index_client_fds++)
     {
         struct work_fn_arg* arg = work_fn_arg_create(*(client_fds + index_client_fds), message);
-        httpd_queue_work(web_server, httpd_work_fn, arg);
-        ESP_LOGI(TAG, "queuing socket %d", index_client_fds);
+        if (arg != NULL) {
+            httpd_queue_work(web_server, httpd_work_fn, arg);
+            ESP_LOGI(TAG, "queuing socket %d", index_client_fds);
+        } else {
+            ESP_LOGE(TAG, "Failed to create work arg for socket %d", index_client_fds);
+        }
     }
 
     free_client_fds(client_fds);
