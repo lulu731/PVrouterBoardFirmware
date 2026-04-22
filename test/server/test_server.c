@@ -23,6 +23,13 @@ TEST_INCLUDE_PATH("test/support/esp-idf/include/common")
 TEST_SOURCE_FILE("test/app/stub_nvs.c")
 TEST_SOURCE_FILE("lib/adc/adc_registers.c")
 
+// Include source files that are needed for linking
+TEST_SOURCE_FILE("lib/json/json_utils.c")
+TEST_SOURCE_FILE("lib/server/websocket_utils.c")
+TEST_SOURCE_FILE("lib/server/client_utils.c")
+TEST_SOURCE_FILE("lib/server/json_utils.c")
+TEST_SOURCE_FILE("lib/server/server_Hardware.c")
+
 // Include cJSON for JSON parsing (needed by uri_handlers.c)
 #include "cJSON.h"
 #include "json.h"

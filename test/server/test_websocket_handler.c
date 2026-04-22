@@ -6,6 +6,12 @@
 
 TEST_SOURCE_FILE("test/app/stub_nvs.c")
 
+// Include source files that are needed for linking
+TEST_SOURCE_FILE("lib/json/json_utils.c")
+TEST_SOURCE_FILE("lib/server/websocket_utils.c")
+TEST_SOURCE_FILE("lib/calibration/calibration_helpers.c")
+TEST_SOURCE_FILE("lib/adc/adc_registers.c")
+
 #include "uri_handlers.h"
 #include "calibration_params.h"
 #include "adc_rw.h"

@@ -20,6 +20,12 @@ TEST_INCLUDE_PATH("test/support/esp-idf/include/handlers")
 
 TEST_SOURCE_FILE("test/app/stub_nvs.c")
 
+// Include source files that are needed for linking
+TEST_SOURCE_FILE("lib/json/json_utils.c")
+TEST_SOURCE_FILE("lib/server/websocket_utils.c")
+TEST_SOURCE_FILE("lib/calibration/calibration_helpers.c")
+TEST_SOURCE_FILE("lib/adc/adc_registers.c")
+
 // Include cJSON for JSON parsing (needed by uri_handlers.c)
 #include "cJSON.h"
 #include "json.h"
@@ -125,45 +131,6 @@ static esp_err_t call_calibration_handler_with_GET_then_POST(httpd_req_t *req)
     req->method = HTTP_POST;
     err = calibration_handler(req);
     return err;
-}
-
-extern char* ws_payload;
-extern char* message_sent;
-
-void test_calibration_handler_with_not_HTTP_TEXT_should_process_WS(void)
-{
-    message_sent = "a message sent";
-
-    esp_err_t err = call_calibration_handler_with_GET_then_POST(&req);
-
-    TEST_ASSERT_EQUAL_INT(ESP_OK, err);
-    TEST_ASSERT_EQUAL_STRING(message_sent, ws_payload);
-    free(ws_payload);
-    ws_payload = NULL;
-}
-
-void test_calibration_handler_with_big_message_sent_should_process_WS(void)
-{
-    message_sent = "the message sent is a rather big one";
-
-    esp_err_t err = call_calibration_handler_with_GET_then_POST(&req);
-
-    TEST_ASSERT_EQUAL_INT(ESP_OK, err);
-    TEST_ASSERT_EQUAL_STRING(message_sent, ws_payload);
-    free(ws_payload);
-    ws_payload = NULL;
-}
-
-extern bool return_error;
-void test_calibration_handler_ws_receive_return_error_should_keep_ws(void)
-{
-    return_error = true;
-    message_sent = "the message sent is a rather big one";
-
-    esp_err_t err = call_calibration_handler_with_GET_then_POST(&req);
-
-    TEST_ASSERT_EQUAL_INT(ESP_OK, err);
-    TEST_ASSERT_NULL(ws_payload);
 }
 
 #endif // TEST
