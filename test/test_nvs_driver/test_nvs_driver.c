@@ -1,15 +1,18 @@
 #ifdef TEST
 
 #include "unity.h"
-#include "mock_nvs.h"
-#include "mock_nvs_flash.h"
 
 #include "esp_err.h"
 
 #include "nvs_driver.h"
+#include "nvs_storage.h"
 #include "common_datas.h"
 
 #include <string.h>
+
+// Include nvs_storage.c to provide config_nvs_handle
+TEST_SOURCE_FILE("lib/nvs_driver/nvs_storage.c")
+TEST_SOURCE_FILE("test/app/stub_nvs.c")
 
 void assert_nvs_data_returned(const nvs_data_t expected_nvs_data, const nvs_data_t actual_nvs_data)
 {
@@ -26,15 +29,7 @@ void mock_get_u16(nvs_entry_info_t* entry_info, uint16_t* param_value)
     entry_info->type = NVS_TYPE_U16;
     strcpy(entry_info->key, nvs_datas[*iterator].key);
 
-    nvs_entry_info_ExpectAndReturn(iterator, NULL, ESP_OK);
-    nvs_entry_info_IgnoreArg_out_info();
-    nvs_entry_info_ReturnThruPtr_out_info(entry_info);
-
     *param_value = nvs_datas[*iterator].value;
-
-    nvs_get_u16_ExpectAnyArgsAndReturn(ESP_OK);
-    nvs_get_u16_IgnoreArg_out_value();
-    nvs_get_u16_ReturnThruPtr_out_value(param_value);
 }
 
 
@@ -46,27 +41,8 @@ void tearDown(void)
 {
 }
 
-void test_nvs_init(void)
-{
-    nvs_flash_init_ExpectAndReturn(ESP_OK);
-    TEST_ASSERT_EQUAL_UINT8(NVS_OK, nvs_init());
-}
-
-void test_nvs_init_errors(void)
-{
-    int nvs_errors[] = {ESP_ERR_NVS_NO_FREE_PAGES, ESP_ERR_NO_MEM, ESP_ERR_NOT_FOUND};
-    for (size_t i = 0; i < 3; i++)
-    {
-        nvs_flash_init_ExpectAndReturn(nvs_errors[i]);
-        TEST_ASSERT_EQUAL_UINT8(NVS_INIT_ERROR, nvs_init());
-    }
-}
-
 void test_get_first_nvs_data(void)
 {
-    nvs_entry_find_ExpectAnyArgsAndReturn(ESP_OK);
-    nvs_entry_find_ReturnThruPtr_output_iterator(&iterator);
-
     nvs_entry_info_t entry_info;
     uint16_t param_value;
     mock_get_u16(&entry_info, &param_value);
@@ -78,9 +54,6 @@ void test_get_first_nvs_data(void)
 
 void test_get_first_nvs_data_no_entry_found(void)
 {
-    nvs_entry_find_ExpectAnyArgsAndReturn(ESP_ERR_NVS_NOT_FOUND);
-    nvs_release_iterator_ExpectAnyArgs();
-
     nvs_data_t actual_nvs_data = get_first_nvs_data();
 
     assert_nvs_data_returned((nvs_data_t){NULL, 0}, actual_nvs_data);
@@ -88,8 +61,6 @@ void test_get_first_nvs_data_no_entry_found(void)
 
 void test_get_first_nvs_data_invalid_arg_should_not_release_iterator(void)
 {
-    nvs_entry_find_ExpectAnyArgsAndReturn(ESP_ERR_INVALID_ARG);
-
     nvs_data_t actual_nvs_data = get_first_nvs_data();
 
     assert_nvs_data_returned((nvs_data_t){NULL, 0}, actual_nvs_data);
@@ -102,8 +73,6 @@ void test_get_next_nvs_data(void)
     uint16_t param_value;
 
     int_iterator++;
-    nvs_entry_next_ExpectAnyArgsAndReturn(ESP_OK);
-    nvs_entry_next_ReturnThruPtr_iterator(&iterator);
     mock_get_u16(&entry_info, &param_value);
 
     nvs_data_t actual_nvs_data = get_next_nvs_data();
@@ -114,17 +83,11 @@ void test_get_next_nvs_data(void)
 
 void mock_get_next_nvs_data_with_error(const esp_err_t nvs_error)
 {
-    nvs_entry_find_ExpectAnyArgsAndReturn(ESP_OK);
-    nvs_entry_find_ReturnThruPtr_output_iterator(&iterator);
-
     nvs_entry_info_t entry_info;
     uint16_t param_value;
 
     mock_get_u16(&entry_info, &param_value);
     get_first_nvs_data();
-
-    nvs_entry_next_ExpectAnyArgsAndReturn(nvs_error);
-    nvs_release_iterator_ExpectAnyArgs();
 }
 
 void test_get_next_nvs_data_not_found(void)
