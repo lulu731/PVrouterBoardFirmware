@@ -44,4 +44,7 @@ typedef struct spi_transaction_t spi_transaction_t;
 
 esp_err_t spi_device_polling_transmit(spi_device_handle_t handle, spi_transaction_t *trans_desc);
 
+// Stub for calibration function used in app.c
+esp_err_t calibrate_adc(void);
+
 #endif // SPI_MASTER_H

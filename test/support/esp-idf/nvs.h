@@ -31,6 +31,9 @@ esp_err_t nvs_entry_find(const char *part_name,
         nvs_type_t type,
         nvs_iterator_t *output_iterator);
 
+esp_err_t nvs_entry_find_in_handle(nvs_handle_t handle,
+        nvs_type_t type,
+        nvs_iterator_t *output_iterator);
 
 esp_err_t nvs_entry_next(nvs_iterator_t *iterator);
 
@@ -48,6 +51,7 @@ typedef enum {
 } nvs_open_mode_t;
 
 esp_err_t nvs_open(const char* namespace_name, nvs_open_mode_t open_mode, nvs_handle_t *out_handle);
+esp_err_t nvs_open_from_partition(const char *partition_name, const char *namespace_name, nvs_open_mode_t open_mode, nvs_handle_t *out_handle);
 void nvs_close(nvs_handle_t handle);
 
 #endif // NVS_H

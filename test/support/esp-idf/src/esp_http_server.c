@@ -47,6 +47,11 @@ esp_err_t httpd_resp_sendstr_chunk(httpd_req_t *r, const char *str)
     return ESP_OK;
 }
 
+esp_err_t httpd_resp_set_type(httpd_req_t *r, const char *type)
+{
+    return ESP_OK;
+}
+
 esp_err_t httpd_resp_send_chunk(httpd_req_t *r, const char *buf, size_t buf_len)
 {
     return ESP_OK;

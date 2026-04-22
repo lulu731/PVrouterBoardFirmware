@@ -9,6 +9,7 @@
 typedef void* httpd_handle_t;
 
 typedef struct httpd_config {
+    uint16_t    server_port;
     uint16_t    max_open_sockets;
 } httpd_config_t;
 
@@ -61,6 +62,7 @@ typedef int httpd_err_code_t;
 
 int httpd_req_to_sockfd(httpd_req_t *r);
 esp_err_t httpd_resp_send_err(httpd_req_t *req, httpd_err_code_t error, const char *msg);
+esp_err_t httpd_resp_set_type(httpd_req_t *r, const char *type);
 esp_err_t httpd_resp_sendstr_chunk(httpd_req_t *r, const char *str);
 esp_err_t httpd_ws_send_frame(httpd_req_t *req, httpd_ws_frame_t *pkt);
 
