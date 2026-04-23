@@ -4,13 +4,22 @@
 
 // Static storage for test values
 static uint16_t stored_u16_value = 0;
-static char stored_key[32] = {0};
 
 // Control variables for test behavior
 static int nvs_flash_init_partition_error = 0;
 static int nvs_open_from_partition_error = 0;
 
-// Functions to control stub error states
+// Iterator control for nvs_driver tests
+static int iterator_position = 0;
+static int max_iterator_position = 0;
+
+// Error injection controls
+static int nvs_entry_find_in_handle_error = 0;  // 0 = ESP_OK, 1 = ESP_ERR_INVALID_ARG
+static int nvs_entry_next_error = 0;  // 0 = ESP_OK, 1 = ESP_ERR_NVS_NOT_FOUND, 2 = ESP_ERR_INVALID_ARG
+
+// Include common_datas.h for test data
+#include "common_datas.h"
+
 void stub_nvs_set_flash_init_error(int error)
 {
     nvs_flash_init_partition_error = error;
@@ -21,17 +30,35 @@ void stub_nvs_set_open_error(int error)
     nvs_open_from_partition_error = error;
 }
 
-// Global variables to control stub behavior for tests
-int nvs_entry_find_in_handle_return_ESP_OK = 0;
-int nvs_entry_next_return_ESP_OK = 0;
-int nvs_entry_info_should_fill_key = 0;
+void stub_nvs_reset_iterator(void)
+{
+    iterator_position = 0;
+}
+
+void stub_nvs_set_iterator_end(void)
+{
+    iterator_position = sizeof(nvs_datas) / sizeof(nvs_datas[0]);
+}
+
+void stub_nvs_set_entry_find_error(int error)
+{
+    nvs_entry_find_in_handle_error = error;
+}
+
+void stub_nvs_set_entry_next_error(int error)
+{
+    nvs_entry_next_error = error;
+}
 
 esp_err_t nvs_entry_info(const nvs_iterator_t iterator, nvs_entry_info_t *out_info)
 {
-    if (out_info != NULL && nvs_entry_info_should_fill_key) {
+    if (iterator_position >= (int)(sizeof(nvs_datas) / sizeof(nvs_datas[0]))) {
+        return ESP_ERR_NVS_NOT_FOUND;
+    }
+    if (out_info != NULL) {
         strcpy(out_info->namespace_name, "meter_config");
         out_info->type = NVS_TYPE_U16;
-        strcpy(out_info->key, stored_key);
+        strcpy(out_info->key, nvs_datas[iterator_position].key);
     }
     return ESP_OK;
 }
@@ -40,39 +67,50 @@ esp_err_t nvs_entry_find_in_handle(nvs_handle_t handle,
         nvs_type_t type,
         nvs_iterator_t *output_iterator)
 {
-    if (nvs_entry_find_in_handle_return_ESP_OK) {
-        return ESP_OK;
+    if (output_iterator == NULL) {
+        return ESP_ERR_INVALID_ARG;
     }
-    return ESP_ERR_NVS_NOT_FOUND;
+    iterator_position = 0;
+    if (sizeof(nvs_datas) / sizeof(nvs_datas[0]) == 0) {
+        return ESP_ERR_NVS_NOT_FOUND;
+    }
+    *output_iterator = (nvs_iterator_t)1;
+    return ESP_OK;
 }
 
 // Return error to indicate no entries found - this allows load_calibration_params
 // to properly handle the "no calibration data" case without hanging
 esp_err_t nvs_entry_find(const char *part_name, const char *namespace_name, nvs_type_t type, nvs_iterator_t *output_iterator)
 {
-    if (nvs_entry_find_in_handle_return_ESP_OK) {
-        return ESP_OK;
-    }
     return ESP_ERR_INVALID_ARG;
 }
 
 esp_err_t nvs_entry_next(nvs_iterator_t *iterator)
 {
-    if (nvs_entry_next_return_ESP_OK) {
-        return ESP_OK;
+    if (iterator == NULL) {
+        return ESP_ERR_INVALID_ARG;
     }
-    return ESP_ERR_NVS_NOT_FOUND;
+    iterator_position++;
+    if (iterator_position >= (int)(sizeof(nvs_datas) / sizeof(nvs_datas[0]))) {
+        return ESP_ERR_NVS_NOT_FOUND;
+    }
+    return ESP_OK;
 }
 
 void nvs_release_iterator(nvs_iterator_t iterator)
 {
-    return;
+    iterator_position = 0;
 }
 
 esp_err_t nvs_get_u16(nvs_handle_t handle, const char *key, uint16_t *out_value)
 {
     if (out_value != NULL) {
-        *out_value = stored_u16_value;
+        // Use the current iterator position to get the value
+        if (iterator_position < (int)(sizeof(nvs_datas) / sizeof(nvs_datas[0]))) {
+            *out_value = nvs_datas[iterator_position].value;
+        } else {
+            *out_value = stored_u16_value;
+        }
     }
     return ESP_OK;
 }
@@ -109,11 +147,17 @@ void nvs_close(nvs_handle_t handle)
 
 esp_err_t nvs_flash_init_partition(const char *partition_label)
 {
+    if (nvs_flash_init_partition_error) {
+        return ESP_ERR_NVS_NO_SPACE;
+    }
     return ESP_OK;
 }
 
 esp_err_t nvs_open_from_partition(const char *partition_name, const char *namespace_name, nvs_open_mode_t open_mode, nvs_handle_t *out_handle)
 {
     nvs_open_called++;
+    if (nvs_open_from_partition_error) {
+        return ESP_ERR_NVS_NOT_FOUND;
+    }
     return ESP_OK;
 }

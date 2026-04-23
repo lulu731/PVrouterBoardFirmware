@@ -4,10 +4,14 @@
 
 #include "nvs_storage.h"
 
+// Function declarations for stub control
+void stub_nvs_set_flash_init_error(int error);
+void stub_nvs_set_open_error(int error);
+
 // Include nvs_storage.c to get the implementation
 TEST_SOURCE_FILE("lib/nvs_driver/nvs_storage.c")
 // Include stub for ESP-IDF NVS functions
-TEST_SOURCE_FILE("test/app/stub_nvs.c")
+TEST_SOURCE_FILE("test/test_nvs_driver/stub_nvs_storage.c")
 
 const char* namespace;
 
@@ -15,6 +19,9 @@ void setUp(void)
 {
     namespace = "test";
     nvs_storage_create(namespace);
+    // Reset stub error states
+    stub_nvs_set_flash_init_error(0);
+    stub_nvs_set_open_error(0);
 }
 
 void tearDown(void)
@@ -28,6 +35,8 @@ void test_nvs_storage_open_(void)
 
 void test_nvs_storage_open_error(void)
 {
+    // Set flash init to fail
+    stub_nvs_set_flash_init_error(1);
     TEST_ASSERT_EQUAL_UINT8(NVS_STORAGE_ERROR, nvs_storage_open());
 }
 
