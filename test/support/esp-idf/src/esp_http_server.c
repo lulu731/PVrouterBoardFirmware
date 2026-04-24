@@ -33,7 +33,10 @@ esp_err_t httpd_register_uri_handler(httpd_handle_t handle,
                                      const httpd_uri_t *uri_handler)
 {
     handle_param = handle;
-    uri = uri_handler;
+    if (uri_handler->is_websocket)
+    {
+        uri = uri_handler;
+    }
     return ESP_OK;
 }
 
