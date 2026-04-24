@@ -21,5 +21,6 @@ esp_err_t spi_device_polling_transmit(spi_device_handle_t handle, spi_transactio
 
 esp_err_t calibrate_adc(void)
 {
+    nbr_access_to_adc++;
     return ESP_OK;
 }
