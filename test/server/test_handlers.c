@@ -19,6 +19,8 @@
 TEST_INCLUDE_PATH("test/support/esp-idf/include/handlers")
 
 // Include source files that are needed for linking
+TEST_SOURCE_FILE("test/server/stub_stdio.c")
+
 #include "json_utils.h"
 #include "websocket_utils.h"
 #include "calibration_helpers.h"
