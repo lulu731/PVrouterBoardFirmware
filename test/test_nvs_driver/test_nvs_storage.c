@@ -8,11 +8,6 @@
 void stub_nvs_set_flash_init_error(int error);
 void stub_nvs_set_open_error(int error);
 
-// Include nvs_storage.c to get the implementation
-TEST_SOURCE_FILE("lib/nvs_driver/nvs_storage.c")
-// Include stub for ESP-IDF NVS functions
-TEST_SOURCE_FILE("test/test_nvs_driver/stub_nvs_storage.c")
-
 const char* namespace;
 
 void setUp(void)

@@ -6,7 +6,7 @@
 static uint16_t stored_u16_value = 0;
 
 // Control variables for test behavior
-static int nvs_flash_init_partition_error = 0;
+int nvs_flash_init_partition_error = 0;
 static int nvs_open_from_partition_error = 0;
 
 // Iterator control for nvs_driver tests
@@ -140,24 +140,4 @@ esp_err_t nvs_open(const char* namespace_name, nvs_open_mode_t open_mode, nvs_ha
 void nvs_close(nvs_handle_t handle)
 {
     nvs_close_called++;
-}
-
-// Stub implementations for nvs_storage functions
-#include "nvs_flash.h"
-
-esp_err_t nvs_flash_init_partition(const char *partition_label)
-{
-    if (nvs_flash_init_partition_error) {
-        return ESP_ERR_NVS_NO_SPACE;
-    }
-    return ESP_OK;
-}
-
-esp_err_t nvs_open_from_partition(const char *partition_name, const char *namespace_name, nvs_open_mode_t open_mode, nvs_handle_t *out_handle)
-{
-    nvs_open_called++;
-    if (nvs_open_from_partition_error) {
-        return ESP_ERR_NVS_NOT_FOUND;
-    }
-    return ESP_OK;
 }
