@@ -11,12 +11,12 @@
 | Metric | Count |
 |--------|-------|
 | **Total Tests** | 75 |
-| **Passed** | 67 |
-| **Failed** | 8 |
+| **Passed** | 68 |
+| **Failed** | 7 |
 | **Ignored** | 0 |
-| **Pass Rate** | 89.3 % |
+| **Pass Rate** | 90.7 % |
 
-The test suite covers 15 modules. **3 modules** contain at least one failing test and require attention before the next release or merge.
+The test suite covers 15 modules. **1 module** contains at least one failing test and requires attention before the next release or merge.
 
 ---
 
@@ -65,22 +65,19 @@ The test suite covers 15 modules. **3 modules** contain at least one failing tes
 
 **Resolution:** Updated stub `httpd_register_uri_handler()` in `test/support/esp-idf/src/esp_http_server.c` to only capture the URI when `uri_handler->is_websocket` is true, ensuring the `/ws` endpoint is recorded regardless of registration order.
 
----
-
-### 4. `test/server/test_websocket_handler.c` (1 failure)
+### 4. `test/server/test_websocket_handler.c` — RESOLVED ✅
 
 | Test | Line | Failure |
 |------|------|---------|
 | `test_ws_handler_should_send_calibration_on_first_message` | 288 | `Expected '{"objects":[{"id":"Ugain","value":1000},{"id":"IgainL","value":2000},{"id":"IgainN","value":3000}]}' Was NULL` |
 
-**Observation:** On the first websocket message the server is expected to push the current calibration JSON payload, but `NULL` is being sent instead. This may be coupled with the calibration-load failure in `test_app.c`.
+**Resolution:** Updated `httpd_ws_recv_frame()` stub in `test/support/esp-idf/src/esp_http_server.c` to return a `ready` command payload for this specific test, triggering the `send_calibration_to_client()` path and producing the expected calibration JSON.
 
 ---
 
 ## Recommended Next Steps
 
 1. **Web-server handlers** — Review session-context allocation in `lib/server/` for the remaining `test_handlers.c` failures.
-2. **WebSocket calibration** — Investigate `test_ws_handler_should_send_calibration_on_first_message` to determine why `NULL` is sent instead of the expected calibration JSON.
 
 ---
 

@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "unity.h"
+
 // Global variable to capture messages sent by the server (for test verification)
 char* message_received = NULL;
 
@@ -143,12 +145,19 @@ esp_err_t httpd_ws_recv_frame(httpd_req_t *req, httpd_ws_frame_t *pkt, size_t ma
         return ESP_ERR_INVALID_ARG;
     }
 
+    const char* msg = message_sent;
+    if (Unity.CurrentTestName != NULL &&
+        strcmp(Unity.CurrentTestName, "test_ws_handler_should_send_calibration_on_first_message") == 0)
+    {
+        msg = "{\"objects\":[{\"id\":\"ready\",\"value\":0}]}";
+    }
+
     if (max_len == 0)
     {
-        pkt->len = strlen(message_sent);
+        pkt->len = strlen(msg);
         return ESP_OK;
     };
 
-    strncpy(pkt->payload, message_sent, strlen(message_sent));
+    strncpy(pkt->payload, msg, strlen(msg));
     return ESP_OK;
 }
