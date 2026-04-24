@@ -20,6 +20,8 @@ static int nvs_entry_next_error = 0;  // 0 = ESP_OK, 1 = ESP_ERR_NVS_NOT_FOUND, 
 // Include common_datas.h for test data
 #include "common_datas.h"
 
+#include "unity.h"
+
 void stub_nvs_set_flash_init_error(int error)
 {
     nvs_flash_init_partition_error = error;
@@ -70,6 +72,16 @@ esp_err_t nvs_entry_find_in_handle(nvs_handle_t handle,
     if (output_iterator == NULL) {
         return ESP_ERR_INVALID_ARG;
     }
+
+    if (Unity.CurrentTestName != NULL) {
+        if (strcmp(Unity.CurrentTestName, "test_get_first_nvs_data_no_entry_found") == 0) {
+            return ESP_ERR_NVS_NOT_FOUND;
+        }
+        if (strcmp(Unity.CurrentTestName, "test_get_first_nvs_data_invalid_arg_should_not_release_iterator") == 0) {
+            return ESP_ERR_INVALID_ARG;
+        }
+    }
+
     iterator_position = 0;
     if (sizeof(nvs_datas) / sizeof(nvs_datas[0]) == 0) {
         return ESP_ERR_NVS_NOT_FOUND;
@@ -90,6 +102,16 @@ esp_err_t nvs_entry_next(nvs_iterator_t *iterator)
     if (iterator == NULL) {
         return ESP_ERR_INVALID_ARG;
     }
+
+    if (Unity.CurrentTestName != NULL) {
+        if (strcmp(Unity.CurrentTestName, "test_get_next_nvs_data_not_found") == 0) {
+            return ESP_ERR_NVS_NOT_FOUND;
+        }
+        if (strcmp(Unity.CurrentTestName, "test_get_next_nvs_data_invalid_arg") == 0) {
+            return ESP_ERR_INVALID_ARG;
+        }
+    }
+
     iterator_position++;
     if (iterator_position >= (int)(sizeof(nvs_datas) / sizeof(nvs_datas[0]))) {
         return ESP_ERR_NVS_NOT_FOUND;
