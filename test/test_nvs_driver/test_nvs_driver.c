@@ -11,8 +11,7 @@
 #include <string.h>
 
 // Include nvs_storage.c to provide config_nvs_handle
-TEST_SOURCE_FILE("lib/nvs_driver/nvs_storage.c")
-TEST_SOURCE_FILE("test/app/stub_nvs.c")
+#include "nvs_storage.h"
 
 void assert_nvs_data_returned(const nvs_data_t expected_nvs_data, const nvs_data_t actual_nvs_data)
 {

@@ -8,7 +8,6 @@
 #include "system.h"
 #include "adc_registers.h"
 
-TEST_SOURCE_FILE("test/trigger_relay/stub_gpio.c");
 TEST_SOURCE_FILE("test/system/fake_adc_rw.c");
 
 extern int calls_to_set_level_h;

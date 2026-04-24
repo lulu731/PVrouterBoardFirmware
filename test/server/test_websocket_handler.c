@@ -4,13 +4,11 @@
 
 #include "nvs_storage.h"
 
-TEST_SOURCE_FILE("test/app/stub_nvs.c")
-
 // Include source files that are needed for linking
-TEST_SOURCE_FILE("lib/json/json_utils.c")
-TEST_SOURCE_FILE("lib/server/websocket_utils.c")
-TEST_SOURCE_FILE("lib/calibration/calibration_helpers.c")
-TEST_SOURCE_FILE("lib/adc/adc_registers.c")
+#include "json_utils.h"
+#include "websocket_utils.h"
+#include "calibration_helpers.h"
+#include "adc_registers.h"
 
 #include "uri_handlers.h"
 #include "calibration_params.h"
