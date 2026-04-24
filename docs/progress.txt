@@ -1,0 +1,7 @@
+Progress Log — PVrouterBoardFirmware
+=====================================
+
+[2026-04-24] test/app/test_app.c — test_init_adc_loads_calibration_params
+- Issue: calibrate_adc() stub in test/support/esp-idf/src/spi_master.c was not incrementing nbr_access_to_adc, causing the assertion `TEST_ASSERT_TRUE(nbr_access_to_adc > 0)` at line 124 to fail.
+- Fix: Modified `calibrate_adc()` stub to increment `nbr_access_to_adc++` before returning ESP_OK.
+- Status: PASSED
