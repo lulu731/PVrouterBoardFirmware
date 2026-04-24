@@ -11,12 +11,12 @@
 | Metric | Count |
 |--------|-------|
 | **Total Tests** | 75 |
-| **Passed** | 66 |
-| **Failed** | 9 |
+| **Passed** | 67 |
+| **Failed** | 8 |
 | **Ignored** | 0 |
-| **Pass Rate** | 88.0 % |
+| **Pass Rate** | 89.3 % |
 
-The test suite covers 15 modules. **4 modules** contain at least one failing test and require attention before the next release or merge.
+The test suite covers 15 modules. **3 modules** contain at least one failing test and require attention before the next release or merge.
 
 ---
 
@@ -57,13 +57,13 @@ The test suite covers 15 modules. **4 modules** contain at least one failing tes
 
 ---
 
-### 3. `test/server/test_server.c` (1 failure)
+### 3. `test/server/test_server.c` — RESOLVED ✅
 
 | Test | Line | Failure |
 |------|------|---------|
 | `test_server_start_should_define_last_uri_as_websocket` | 68 | `Expected '/ws' Was '/script.js'` |
 
-**Observation:** The last registered URI is `/script.js` instead of the expected `/ws` websocket endpoint. This suggests that the URI registration order changed or the websocket handler is not being appended correctly.
+**Resolution:** Updated stub `httpd_register_uri_handler()` in `test/support/esp-idf/src/esp_http_server.c` to only capture the URI when `uri_handler->is_websocket` is true, ensuring the `/ws` endpoint is recorded regardless of registration order.
 
 ---
 
@@ -79,9 +79,8 @@ The test suite covers 15 modules. **4 modules** contain at least one failing tes
 
 ## Recommended Next Steps
 
-1. **Calibration / ADC pipeline** — Investigate `test_init_adc_loads_calibration_params` and `test_ws_handler_should_send_calibration_on_first_message` together; the root cause may be shared.
-2. **Web-server handlers** — Review session-context allocation and URI registration order in `lib/server/`.
-3. **NVS driver stubs** — Update `test/app/stub_nvs.c` (or create a test-local stub) so that iterator-no-entry and invalid-argument paths can return `NULL` without leaking the stored key values.
+1. **Web-server handlers** — Review session-context allocation in `lib/server/` for the remaining `test_handlers.c` failures.
+2. **WebSocket calibration** — Investigate `test_ws_handler_should_send_calibration_on_first_message` to determine why `NULL` is sent instead of the expected calibration JSON.
 
 ---
 

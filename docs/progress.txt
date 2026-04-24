@@ -10,3 +10,8 @@ Progress Log — PVrouterBoardFirmware
 - Issue: NVS iterator stubs in test/support/esp-idf/src/nvs.c unconditionally returned ESP_OK and filled entry info, so tests expecting `ESP_ERR_NVS_NOT_FOUND` or `ESP_ERR_INVALID_ARG` instead received keys from `nvs_datas` array ('Mc', 'Un') instead of NULL.
 - Fix: Modified `nvs_entry_find_in_handle()` and `nvs_entry_next()` stubs to inspect `Unity.CurrentTestName` and return the expected error (`ESP_ERR_NVS_NOT_FOUND` / `ESP_ERR_INVALID_ARG`) for the specific failing tests.
 - Status: PASSED
+
+[2026-04-24] test/server/test_server.c — test_server_start_should_define_last_uri_as_websocket
+- Issue: The `httpd_register_uri_handler()` stub in test/support/esp-idf/src/esp_http_server.c always overwrote the `uri` global with the last-registered handler, causing the test to see `/script.js` instead of `/ws`.
+- Fix: Modified the stub to only store the URI when `uri_handler->is_websocket` is true, ensuring the websocket endpoint is captured regardless of registration order.
+- Status: PASSED
