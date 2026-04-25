@@ -12,6 +12,7 @@ static int nvs_open_from_partition_error = 0;
 // Iterator control for nvs_driver tests
 static int iterator_position = 0;
 static int max_iterator_position = 0;
+int is_release_iterator_called = 0;
 
 // Error injection controls
 static int nvs_entry_find_in_handle_error = 0;  // 0 = ESP_OK, 1 = ESP_ERR_INVALID_ARG
@@ -65,6 +66,8 @@ esp_err_t nvs_entry_info(const nvs_iterator_t iterator, nvs_entry_info_t *out_in
     return ESP_OK;
 }
 
+esp_err_t (*nvs_entry_find_returns_error)();
+
 esp_err_t nvs_entry_find_in_handle(nvs_handle_t handle,
         nvs_type_t type,
         nvs_iterator_t *output_iterator)
@@ -73,14 +76,8 @@ esp_err_t nvs_entry_find_in_handle(nvs_handle_t handle,
         return ESP_ERR_INVALID_ARG;
     }
 
-    if (Unity.CurrentTestName != NULL) {
-        if (strcmp(Unity.CurrentTestName, "test_get_first_nvs_data_no_entry_found") == 0) {
-            return ESP_ERR_NVS_NOT_FOUND;
-        }
-        if (strcmp(Unity.CurrentTestName, "test_get_first_nvs_data_invalid_arg_should_not_release_iterator") == 0) {
-            return ESP_ERR_INVALID_ARG;
-        }
-    }
+    if (*nvs_entry_find_returns_error)
+        return nvs_entry_find_returns_error();
 
     iterator_position = 0;
     if (sizeof(nvs_datas) / sizeof(nvs_datas[0]) == 0) {
@@ -103,14 +100,8 @@ esp_err_t nvs_entry_next(nvs_iterator_t *iterator)
         return ESP_ERR_INVALID_ARG;
     }
 
-    if (Unity.CurrentTestName != NULL) {
-        if (strcmp(Unity.CurrentTestName, "test_get_next_nvs_data_not_found") == 0) {
-            return ESP_ERR_NVS_NOT_FOUND;
-        }
-        if (strcmp(Unity.CurrentTestName, "test_get_next_nvs_data_invalid_arg") == 0) {
-            return ESP_ERR_INVALID_ARG;
-        }
-    }
+    if (*nvs_entry_find_returns_error)
+        return nvs_entry_find_returns_error();
 
     iterator_position++;
     if (iterator_position >= (int)(sizeof(nvs_datas) / sizeof(nvs_datas[0]))) {
@@ -121,6 +112,7 @@ esp_err_t nvs_entry_next(nvs_iterator_t *iterator)
 
 void nvs_release_iterator(nvs_iterator_t iterator)
 {
+    is_release_iterator_called++;
     iterator_position = 0;
 }
 

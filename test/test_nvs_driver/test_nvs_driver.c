@@ -31,9 +31,14 @@ void mock_get_u16(nvs_entry_info_t* entry_info, uint16_t* param_value)
     *param_value = nvs_datas[*iterator].value;
 }
 
+extern esp_err_t (*nvs_entry_find_returns_error)();
+
+extern int is_release_iterator_called;
 
 void setUp(void)
 {
+    nvs_entry_find_returns_error = NULL;
+    is_release_iterator_called = 0;
 }
 
 void tearDown(void)
@@ -51,18 +56,33 @@ void test_get_first_nvs_data(void)
     assert_nvs_data_returned(nvs_datas[*iterator], actual_nvs_data);
 }
 
+
+
+esp_err_t return_not_found()
+{
+    return ESP_ERR_NVS_NOT_FOUND;
+}
+
 void test_get_first_nvs_data_no_entry_found(void)
 {
+    nvs_entry_find_returns_error = &return_not_found;
     nvs_data_t actual_nvs_data = get_first_nvs_data();
 
     assert_nvs_data_returned((nvs_data_t){NULL, 0}, actual_nvs_data);
 }
 
+esp_err_t return_invalid_arg()
+{
+    return ESP_ERR_INVALID_ARG;
+}
+
 void test_get_first_nvs_data_invalid_arg_should_not_release_iterator(void)
 {
+    nvs_entry_find_returns_error = &return_invalid_arg;
     nvs_data_t actual_nvs_data = get_first_nvs_data();
 
     assert_nvs_data_returned((nvs_data_t){NULL, 0}, actual_nvs_data);
+    TEST_ASSERT_FALSE(is_release_iterator_called);
 }
 
 
@@ -92,19 +112,23 @@ void mock_get_next_nvs_data_with_error(const esp_err_t nvs_error)
 void test_get_next_nvs_data_not_found(void)
 {
     mock_get_next_nvs_data_with_error(ESP_ERR_NVS_NOT_FOUND);
+    nvs_entry_find_returns_error = &return_not_found;
 
     nvs_data_t actual_nvs_data = get_next_nvs_data();
 
     assert_nvs_data_returned((nvs_data_t){NULL, 0}, actual_nvs_data);
+    TEST_ASSERT_TRUE(is_release_iterator_called);
 }
 
 void test_get_next_nvs_data_invalid_arg(void)
 {
     mock_get_next_nvs_data_with_error(ESP_ERR_INVALID_ARG);
+    nvs_entry_find_returns_error = &return_invalid_arg;
 
     nvs_data_t actual_nvs_data = get_next_nvs_data();
 
     assert_nvs_data_returned((nvs_data_t){NULL, 0}, actual_nvs_data);
+    TEST_ASSERT_TRUE(is_release_iterator_called);
 }
 
 #endif // TEST
