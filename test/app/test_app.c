@@ -8,7 +8,6 @@
 #include "esp_gpio.h"
 
 #include "driver/spi_master.h"
-#include "calibration_load_params.h"
 #include "calibration_params.h"
 #include "calibration.h"
 #include "nvs_driver.h"
@@ -37,20 +36,13 @@
 #include "nvs_storage.h"
 
 TEST_SOURCE_FILE("test/app/fake_mount_partition.c");
-
-// Include source files that are needed for linking
-/*TEST_SOURCE_FILE("lib/json/json_utils.c")
-TEST_SOURCE_FILE("lib/server/websocket_utils.c")
-TEST_SOURCE_FILE("lib/server/client_utils.c")
-TEST_SOURCE_FILE("lib/server/json_utils.c")
-TEST_SOURCE_FILE("lib/server/server_Hardware.c")
-TEST_SOURCE_FILE("lib/calibration/calibration_helpers.c")
-TEST_SOURCE_FILE("lib/adc/adc_registers.c")*/
+TEST_SOURCE_FILE("test/app/fake_spi_master.c");
+TEST_SOURCE_FILE("test/app/fake_calibration_load_params.c");
 
 static const int POWER_THRESHOLD = 100;
 spi_device_handle_t meter_handle;
 
-extern int nbr_access_to_adc;
+extern int is_load_params_called;
 int nbr_calls_to_trigger;
 
 extern mount_error_t fake_mount_result;
@@ -58,7 +50,7 @@ extern mount_error_t fake_mount_result;
 void setUp(void)
 {
     nbr_calls_to_trigger = 0;
-    nbr_access_to_adc = 0;
+    is_load_params_called = 0;
     fake_mount_result = MOUNT_OK;
     // Initialize the relay before each test
     create_trigger_relay();
@@ -121,7 +113,7 @@ void test_init_adc_loads_calibration_params(void)
     Ib = 10;
     bool result = init_adc();
     TEST_ASSERT_TRUE(result);
-    TEST_ASSERT_TRUE(nbr_access_to_adc > 0);
+    TEST_ASSERT_TRUE(is_load_params_called == 1);
 }
 
 // ============================================================================
@@ -140,6 +132,7 @@ void test_launch_server_creates_and_starts_server(void)
 // Integration Test 4: ADC register access tracking
 // ============================================================================
 
+extern int nbr_access_to_adc;
 void test_adc_register_access_tracking(void)
 {
     nbr_access_to_adc = 0;
