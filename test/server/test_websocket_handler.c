@@ -258,7 +258,7 @@ void test_ws_handler_should_save_calibration_to_nvs(void)
 // Calibration Initialization Tests
 // ============================================================================
 
-void test_ws_handler_should_send_calibration_on_first_message(void)
+void test_ws_handler_should_send_calibration_on_ready_message(void)
 {
     // Set specific calibration values
     Ugain = 1000;
@@ -272,7 +272,7 @@ void test_ws_handler_should_send_calibration_on_first_message(void)
     }
 
     // Setup WebSocket frame with any command (simulating first message from new client)
-    message_sent = "{\"objects\":[{\"id\":\"cmd\",\"value\":4}]}";
+    message_sent = "{\"objects\":[{\"id\":\"ready\",\"value\":0}]}";
 
     // Create a mock request with POST method and NO session context (new client)
     httpd_req_t req;

@@ -152,11 +152,6 @@ esp_err_t httpd_ws_recv_frame(httpd_req_t *req, httpd_ws_frame_t *pkt, size_t ma
     }
 
     const char* msg = message_sent;
-    if (Unity.CurrentTestName != NULL &&
-        strcmp(Unity.CurrentTestName, "test_ws_handler_should_send_calibration_on_first_message") == 0)
-    {
-        msg = "{\"objects\":[{\"id\":\"ready\",\"value\":0}]}";
-    }
 
     if (max_len == 0)
     {
