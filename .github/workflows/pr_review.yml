@@ -1,0 +1,33 @@
+name: AI PR Reviewer
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  review_pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout AI_PR_Reviewer
+        uses: actions/checkout@v4
+        with:
+          repository: lulu731/AI_PR_Reviewer
+          path: ai_pr_reviewer
+          fetch-depth: 1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: ai_pr_reviewer
+        run: npm ci
+
+      - name: Run PR Reviewer
+        working-directory: ai_pr_reviewer
+        run: node index.js
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
