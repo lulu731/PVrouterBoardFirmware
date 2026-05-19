@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PV router esp32</title>
+    <style>
+    body {font-family:Arial; background-color: white;}
+    td {vertical-align: top;}
+    textarea {font-family:Arial; width:300px; height:500px}
+    </style>
+  </head>
+  <body id='initialise'>
+  <button onclick='clickHeaterON()'>Heater ON</button>
+  <button onclick='clickHeaterOFF()'>Heater OFF</button>
+  <br></br>
+  <button onclick='clickUpdate()'>UPDATE</button>
+  <br></br>
+  <button onclick='clickResetDivE()'>Reset Div Energy</button>
+  <br></br>
+  <h2>PV_router data</h2>
+  <table>
+    <tr>
+      <td>from serial</td>
+    </tr>
+    <tr>
+      <td>
+        <textarea id='rxText' onfocus='this.value=""'></textarea>
+        <br>
+      </td>
+      <td>
+        <textarea id='errorText' onfocus='this.value=""'></textarea>
+        <br>
+      </td>
+    </tr>
+    <tr>
+      <td><a href="calibration.html">calibration</a>
+    </tr>
+  </table>
+
+  <script src="script.js"></script>
+  <script>
+  function clickUpdate()
+  {
+    wskt.send('9');
+  };
+
+  function clickHeaterON()
+  {
+    wskt.send('1');
+    document.getElementById('errorText').value += "Heater ON\n";
+  };
+
+  function clickHeaterOFF()
+  {
+    wskt.send('0');
+    document.getElementById('errorText').value += "Heater OFF\n";
+  };
+
+  function clickResetDivE()
+  {
+    wskt.send('8');
+    document.getElementById('errorText').value += "Reset Div Energy\n";
+  };
+  </script>
+  </body>
+</html>
+
+
+// test esp32 WS

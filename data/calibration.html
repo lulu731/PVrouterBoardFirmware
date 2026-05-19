@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>calibration PV router</title>
+    <style>
+    body {font-family:Arial; background-color: white;}
+    td {vertical-align: top;}
+    textarea {font-family:Arial; width:300px; height:500px}
+    </style>
+  </head>
+  <body id='initialise'>
+  <button onclick='click_Ib_calibration()'>Ib calibration</button>
+  <button onclick='click_no_current_calibration()'>No current calibration</button>
+  <button onclick='click_save_calibration()'>Save</button>
+  <br></br>
+  <h2>Calibration</h2>
+  <table>
+    <tr>
+      <td>
+        <textarea id='rxText' onfocus='this.value=""'></textarea>
+        <br>
+      </td>
+      <td>
+        <textarea id='errorText' onfocus='this.value=""'></textarea>
+        <br>
+      </td>
+      <td>
+        <label for="Ugain">Ugain</label><br>
+        <input type="number" id='Ugain' onchange='sendGain(event)'><br><br>
+        <label for="IgainL">IgainL</label><br>
+        <input type="number" id='IgainL' onchange='sendGain(event)'><br><br>
+        <label for="IgainN">IgainN</label><br>
+        <input type="number" id='IgainN' onchange='sendGain(event)'><br><br>
+      </td>
+    </tr>
+  </table>
+
+  <script src="script.js"></script>
+  <script>
+  // Function to send ready message when WebSocket is connected
+  function sendReadyMessage() {
+    if (typeof wskt !== 'undefined' && wskt.readyState === WebSocket.OPEN) {
+      const readyObj = { "objects": [{ "id": "ready", "value": 0 }] };
+      wskt.send(JSON.stringify(readyObj));
+      console.log('Sent ready message to server');
+    }
+  }
+
+  // Override the onopen handler to send ready message
+  function setupWebSocketHandlers() {
+    if (typeof wskt !== 'undefined') {
+      // Store original onopen handler
+      var originalOnOpen = wskt.onopen;
+
+      // Create new onopen handler that calls original and sends ready message
+      wskt.onopen = function(event) {
+        if (originalOnOpen) {
+          originalOnOpen(event);
+        }
+        sendReadyMessage();
+      };
+
+      // If WebSocket is already open, send ready message immediately
+      if (wskt.readyState === WebSocket.OPEN) {
+        sendReadyMessage();
+      }
+    } else {
+      // If wskt is not defined yet, try again later
+      setTimeout(setupWebSocketHandlers, 100);
+    }
+  }
+
+  // Start setting up the WebSocket handlers
+  setupWebSocketHandlers();
+
+  function click_Ib_calibration()
+  {
+    const obj2 = { "objects": [{ "id": "cmd", "value": 4 }] };
+    wskt.send(JSON.stringify(obj2));
+  };
+
+  function click_no_current_calibration()
+  {
+    const obj2 = { "objects": [{ "id": "cmd", "value": 5 }] };
+    wskt.send(JSON.stringify(obj2));
+    document.getElementById('errorText').value += "No current calibration\n";
+  };
+
+  function click_save_calibration()
+  {
+    const obj2 = { "objects": [{ "id": "cmd", "value": 6 }] };
+    wskt.send(JSON.stringify(obj2));
+    document.getElementById('errorText').value += "Save calibration\n";
+  };
+
+  function sendGain(event)
+  {
+    const obj2 = { "objects": [{ "id": event.target.id, "value": parseInt(event.target.value) }] };
+    //console.log(obj);
+    wskt.send(JSON.stringify(obj2));
+    console.log(JSON.stringify(obj2));
+  };
+  </script>
+  </body>
+</html>
+
+// test esp32 WS

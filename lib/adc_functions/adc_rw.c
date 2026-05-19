@@ -1,0 +1,59 @@
+#include "adc_rw.h"
+
+#include "adc_registers.h"
+#include "calibration_helpers.h"
+
+#include "esp_err.h"
+#include "driver/spi_master.h"
+
+#define MSB_READ_ADDR_MASK 0x80 //adress should start with 1 for read phase
+
+extern spi_device_handle_t meter_handle;
+
+/***********************/
+/* READ and WRITE data */
+/***********************/
+
+/**
+ * @brief read the value of a given adc register
+ * @param reg the adc register to read
+ * @return ESP_OK if the read operation was successful, otherwise an error code
+ */
+int read_adc_register(struct adc_register* reg)
+{
+    spi_transaction_t trans = {
+        .addr = (*reg).address | MSB_READ_ADDR_MASK,
+        .length = 24,
+        .rxlength = 16,
+        .flags = SPI_TRANS_USE_RXDATA,
+    };
+
+    esp_err_t ret = spi_device_polling_transmit( meter_handle, &trans);
+    if (ret ==ESP_OK)
+        (*reg).data = (adc_data)trans.rx_data[0] << 8 | (adc_data)trans.rx_data[1];
+
+    return ret;
+}
+
+/**
+ * @brief write the value of a given adc register
+ * @param reg the adc register to write
+ * @return ESP_OK if the write operation was successful, otherwise an error code
+ */
+int write_adc_register(const struct adc_register reg)
+{
+    spi_transaction_t trans = {
+        .addr = reg.address,
+        .length = 16,
+        .flags = SPI_TRANS_USE_TXDATA,
+    };
+    set_txdata_with(trans.tx_data, reg.data);
+
+    return spi_device_polling_transmit( meter_handle, &trans);
+}
+
+//todo: manage errors in writing
+/***********************/
+/*        END          */
+/* READ and WRITE data */
+/***********************/

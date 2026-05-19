@@ -1,0 +1,72 @@
+################################################################
+# TOOLCHAIN CONFIGURATION
+################################################################
+
+:tools:
+  :test_compiler:
+    :executable: clang-18
+    :arguments:
+      #- "-fexperimental-new-pass-manager"
+      - -I"${5}"
+      - -D"${6}"
+      - -fpass-plugin=/usr/lib/mull-ir-frontend-18
+      - -g
+      - -grecord-command-line
+      - -c ${1}
+      - -o ${2}
+#     :name:
+#     :optional: FALSE
+  :test_linker:
+    :executable: clang-18
+    :arguments:
+      - ${1}
+      - -o ${2}
+      - ${4}
+#     :name:
+#     :optional: FALSE
+#   :test_assembler:
+#     :executable:
+#     :arguments: []
+#     :name:
+#     :optional: FALSE
+#   :test_fixture:
+#     :executable:
+#     :arguments: []
+#     :name:
+#     :optional: FALSE
+#   :test_includes_preprocessor:
+#     :executable:
+#     :arguments: []
+#     :name:
+#     :optional: FALSE
+#   :test_file_preprocessor:
+#     :executable:
+#     :arguments: []
+#     :name:
+#     :optional: FALSE
+#   :test_file_preprocessor_directives:
+#     :executable:
+#     :arguments: []
+#     :name:
+#     :optional: FALSE
+#   :release_compiler:
+#     :executable:
+#     :arguments: []
+#     :name:
+#     :optional: FALSE
+#   :release_linker:
+#     :executable:
+#     :arguments: []
+#     :name:
+#     :optional: FALSE
+#   :release_assembler:
+#     :executable:
+#     :arguments: []
+#     :name:
+#     :optional: FALSE
+#   :release_dependencies_generator:
+#     :executable:
+#     :arguments: []
+#     :name:
+#     :optional: FALSE
+...
